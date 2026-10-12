@@ -19,7 +19,7 @@ the two trees merge on disk before typecheck, test, and deploy.
   media, override data, sentence-bearing specs, content-coupled tests.
   License: all rights reserved (see `LICENSE-content`).
 
-(Names assume the `prag67` GitHub account; rename freely — only the
+(Names assume the `pragmaticonline` GitHub account; rename freely — only the
 merge script's remote URL and CI secrets change.)
 
 ## Seam: whole-file overlay, paths as contract

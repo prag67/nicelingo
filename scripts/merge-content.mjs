@@ -36,7 +36,7 @@ const OWNED = [
 ];
 
 const REMOTE =
-  process.env.CONTENT_REMOTE ?? "git@github.com:prag67/nicelingo-content.git";
+  process.env.CONTENT_REMOTE ?? "git@github.com:pragmaticonline/nicelingo-content.git";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
