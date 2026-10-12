@@ -203,16 +203,19 @@ describe("judgePronunciation", () => {
       capture.body = body;
       return { answers: { verdict: { choice: "wrong", probabilities: {} } } };
     });
+    // Synthetic script token as escapes: the public tree must stay
+    // ASCII-only (CI leak test), so no literal Thai/Han here. Real
+    // lesson phrases exercise this path in the content repo's suite.
     await judgePronunciation(
       { AI: { run } },
       "QUJD",
-      "เด็กผู้หญิงกำลังดื่ม",
-      "dèk-pûu-yǐng gam-lang dʉ̀ʉm",
+      "\u0E01\u0E02\u0E04\u0E07",
+      "synthetic-roman",
       "th",
     );
     const state = capture.body.state as string;
-    expect(state).toContain("เด็กผู้หญิงกำลังดื่ม");
-    expect(state).toContain("dèk-pûu-yǐng gam-lang dʉ̀ʉm");
+    expect(state).toContain("\u0E01\u0E02\u0E04\u0E07");
+    expect(state).toContain("synthetic-roman");
   });
 
   it("returns null without an AI binding", async () => {
