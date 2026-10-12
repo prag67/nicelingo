@@ -50,11 +50,12 @@ Lesson complete when all 4 activities are done. Progress stored per user
   - green: score ≥ 85
   - yellow: 60–84
   - red: < 60
-- Verdicts are deterministic for the same input (no LLM in the scoring
-  path for this lesson).
-- Scoring compares the learner's speech against the native reference audio
-  for that phrase. Details of the comparison are an implementation concern;
-  the thresholds above are the product contract.
+- Pronunciation is judged by Clef (`clef-omni`, `src/lib/judge.ts`) from
+  the learner audio directly: correct → 100/green, minor slip (or
+  low-confidence correct) → 70/yellow, wrong → 0/red. Whisper
+  transcript scoring is the fallback when Clef is unavailable or fails.
+- Clef verdicts are model judgments, not deterministic string compares;
+  the score bands above remain the product contract.
 
 ## API surface (this lesson only)
 

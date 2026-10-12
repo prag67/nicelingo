@@ -4,6 +4,7 @@ vi.mock("../src/lib/transcribe", () => ({ transcribeAudio: vi.fn() }));
 
 import app from "../src/index";
 import { lessons } from "../src/lessons/curriculum";
+import { judgePronunciation, sniffAudioMime } from "../src/lib/judge";
 import { scoreTranscript } from "../src/lib/scoring";
 import { transcribeAudio } from "../src/lib/transcribe";
 
@@ -110,5 +111,124 @@ describe("POST /api/score", () => {
       body: JSON.stringify({ phraseId: "001-snarf-zorping", audio: "QUJD" }),
     });
     expect(mockedTranscribe).toHaveBeenLastCalledWith(undefined, "QUJD", "en");
+  });
+});
+
+// Clef judges pronunciation from the audio directly; Whisper transcript
+// scoring is the fallback when Clef is unavailable or fails.
+describe("POST /api/score (Clef judging)", () => {
+  function clefEnv(choice: string, pCorrect: number) {
+    const run = vi.fn(async (_model: string, _body: unknown) => ({
+      answers: { verdict: { choice, probabilities: { correct: pCorrect } } },
+    }));
+    return { AI: { run }, run };
+  }
+
+  function clefRequest(env: { AI: { run: unknown } }) {
+    return app.request(
+      "/api/score",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phraseId: "001-snarf-zorping", audio: "QUJD" }),
+      },
+      env,
+    );
+  }
+
+  it("judges correct audio green without calling Whisper", async () => {
+    mockedTranscribe.mockClear();
+    const { AI } = clefEnv("correct", 0.7);
+    const res = await clefRequest({ AI });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ score: 100, verdict: "green" });
+    expect(mockedTranscribe).not.toHaveBeenCalled();
+  });
+
+  it("maps minor_slip to yellow", async () => {
+    const { AI } = clefEnv("minor_slip", 0.3);
+    const res = await clefRequest({ AI });
+    expect(await res.json()).toEqual({ score: 70, verdict: "yellow" });
+  });
+
+  it("maps low-confidence correct to yellow", async () => {
+    const { AI } = clefEnv("correct", 0.35);
+    const res = await clefRequest({ AI });
+    expect(await res.json()).toEqual({ score: 70, verdict: "yellow" });
+  });
+
+  it("maps wrong to red", async () => {
+    const { AI } = clefEnv("wrong", 0.05);
+    const res = await clefRequest({ AI });
+    expect(await res.json()).toEqual({ score: 0, verdict: "red" });
+  });
+
+  it("falls back to Whisper scoring when Clef errors", async () => {
+    const run = vi.fn(async () => {
+      throw new Error("clef down");
+    });
+    mockedTranscribe.mockResolvedValueOnce("The snarf is zorping.");
+    const res = await clefRequest({ AI: { run } });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ score: 100, verdict: "green" });
+    expect(mockedTranscribe).toHaveBeenCalledWith(
+      expect.anything(),
+      "QUJD",
+      "en",
+    );
+  });
+
+  it("falls back to Whisper scoring on a malformed Clef response", async () => {
+    const run = vi.fn(async () => ({}));
+    mockedTranscribe.mockResolvedValueOnce("hello world");
+    const res = await clefRequest({ AI: { run } });
+    expect(await res.json()).toEqual({ score: 0, verdict: "red" });
+  });
+
+  it("accepts the REST-wrapped Clef response shape", async () => {
+    const run = vi.fn(async () => ({
+      result: {
+        answers: { verdict: { choice: "correct", probabilities: { correct: 0.8 } } },
+      },
+    }));
+    const res = await clefRequest({ AI: { run } });
+    expect(await res.json()).toEqual({ score: 100, verdict: "green" });
+  });
+});
+
+describe("judgePronunciation", () => {
+  it("gives Thai judges both the script and the romanization", async () => {
+    const capture: { body?: any } = {};
+    const run = vi.fn(async (_model: string, body: unknown) => {
+      capture.body = body;
+      return { answers: { verdict: { choice: "wrong", probabilities: {} } } };
+    });
+    await judgePronunciation(
+      { AI: { run } },
+      "QUJD",
+      "เด็กผู้หญิงกำลังดื่ม",
+      "dèk-pûu-yǐng gam-lang dʉ̀ʉm",
+      "th",
+    );
+    const state = capture.body.state as string;
+    expect(state).toContain("เด็กผู้หญิงกำลังดื่ม");
+    expect(state).toContain("dèk-pûu-yǐng gam-lang dʉ̀ʉm");
+  });
+
+  it("returns null without an AI binding", async () => {
+    await expect(
+      judgePronunciation(undefined, "QUJD", "the snarf is zorping", null, "en"),
+    ).resolves.toBeNull();
+  });
+});
+
+describe("sniffAudioMime", () => {
+  it("labels webm, mp4, ogg, and mp3 bytes; defaults to webm", () => {
+    // EBML header, ftyp box, OggS magic, ID3 tag.
+    expect(sniffAudioMime("GkXfo59ChoEBQ8AAAAA")).toBe("audio/webm");
+    expect(sniffAudioMime("AAAAGGZ0eXBtcDQy")).toBe("audio/mp4");
+    expect(sniffAudioMime("T2dnUwACAAAAAAC")).toBe("audio/ogg");
+    expect(sniffAudioMime("SUQzAwAAAAAA")).toBe("audio/mpeg");
+    expect(sniffAudioMime("QUJD")).toBe("audio/webm");
   });
 });

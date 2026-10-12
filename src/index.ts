@@ -4,6 +4,7 @@ import { createAuth, type AuthEnv } from "./lib/auth";
 import { curriculumMap, isFreeLesson, lessons, type Lang } from "./lessons/curriculum";
 import { pickerLanguages } from "./lessons/languages";
 import { completeActivity } from "./lib/progress";
+import { judgePronunciation } from "./lib/judge";
 import { scoreTranscript } from "./lib/scoring";
 import { scoreUnspacedTranscript } from "./lib/scoring-unspaced";
 import {
@@ -220,8 +221,22 @@ app.post("/api/score", async (c) => {
   }
   // EN phrase ids carry no prefix ("001-..."); others are "es-"/"de-"/"fr-".
   const language = phraseId.match(/^(es|de|fr|th|zh)-/)?.[1] ?? "en";
-  const transcript = await transcribeAudio(c.env, audio, language);
   const reference = phrase.scoreText ?? phrase.text;
+  // Clef judges the audio directly; Whisper transcript scoring below is
+  // the fallback when Clef is unavailable or fails.
+  const roman =
+    (language === "th" || language === "zh") && phrase.scoreText
+      ? phrase.text
+      : null;
+  const judged = await judgePronunciation(
+    c.env,
+    audio,
+    reference,
+    roman,
+    language,
+  );
+  if (judged) return c.json(judged);
+  const transcript = await transcribeAudio(c.env, audio, language);
   // Unspaced scripts (Thai, Han) score by character similarity.
   if (phraseId.startsWith("th-") || phraseId.startsWith("zh-")) {
     return c.json(scoreUnspacedTranscript(reference, transcript));
