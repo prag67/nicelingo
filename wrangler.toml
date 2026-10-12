@@ -1,0 +1,25 @@
+name = "nicelingo"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Local dev (`wrangler dev`) emulates D1 automatically. Before your first
+# deploy, run `wrangler d1 create nicelingo-auth` and paste the real
+# database_id here.
+[[d1_databases]]
+binding = "DB"
+database_name = "nicelingo-auth"
+database_id = "a30fd8c3-24ed-489b-8919-8f9865b4f28d"
+migrations_dir = "drizzle"
+
+[ai]
+binding = "AI"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+# Paid media gate: without this, matching files are served directly and
+# the worker's /static/:rest route never runs (assets-first is the
+# default). Boolean (this wrangler predates path-list support); the
+# catch-all route below serves non-gated assets from the binding.
+run_worker_first = true

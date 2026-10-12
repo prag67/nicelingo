@@ -1,0 +1,9 @@
+# Used by Wrangler in local development. Copy to .dev.vars and fill in.
+# In production, set these as Cloudflare Worker secrets instead.
+BETTER_AUTH_URL=http://localhost:8787
+BETTER_AUTH_SECRET=replace-with-32-plus-random-chars-for-local-dev
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+# Local QA only: open paid lessons + scoring on localhost (qa-audio.mjs
+# needs this). Never set in production — the paywall must stay on there.
+# PAYWALL_DISABLED=1

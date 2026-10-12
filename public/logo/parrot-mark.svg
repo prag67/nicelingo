@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Nicelingo">
+<clipPath id="head"><circle cx="54" cy="62" r="42"/></clipPath>
+<path d="M30 30 C22 14, 34 6, 44 20 Z" fill="#FFE066"/>
+<path d="M40 24 C38 6, 54 4, 56 22 Z" fill="#8CC8FF"/>
+<circle cx="54" cy="62" r="42" fill="#1A5FEB"/>
+<g clip-path="url(#head)"><ellipse cx="44" cy="112" rx="36" ry="26" fill="#FFE066"/></g>
+<path d="M78 62 C88 61, 95 67, 94 77 C89 83, 80 81, 76 73 Z" fill="#C96200"/>
+<path d="M74 36 C100 28, 120 46, 114 70 C112 80, 104 86, 97 82 C102 70, 96 60, 74 60 Z" fill="#FF8A1F"/>
+<circle cx="66" cy="52" r="19" fill="#FFFFFF"/>
+<circle cx="70" cy="51" r="7.5" fill="#0E1B3D"/>
+<circle cx="72.5" cy="48.5" r="2.4" fill="#FFFFFF"/>
+<circle cx="56" cy="78" r="6" fill="#FF9DB5"/>
+</svg>
