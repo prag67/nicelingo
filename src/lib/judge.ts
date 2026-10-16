@@ -10,6 +10,12 @@
 // that mapping goes 133/133 on the eval data with zero false greens.
 import type { PronunciationScore } from "./scoring";
 
+export type JudgedScore = PronunciationScore & {
+  source: "clef";
+  /** Clef's p(wrong) for this attempt (null when not reported). */
+  wrongProb: number | null;
+};
+
 const CLEF_MODEL = "@cf/cloudflare/clef-omni";
 
 // Learner audio arrives as bare base64 (MediaRecorder output, usually
@@ -48,7 +54,7 @@ export async function judgePronunciation(
   reference: string,
   roman: string | null,
   lang: string,
-): Promise<PronunciationScore | null> {
+): Promise<JudgedScore | null> {
   try {
     if (!env?.AI) return null;
     const scriptLabel = lang === "th" ? "Thai script" : "Han characters";
@@ -91,14 +97,25 @@ export async function judgePronunciation(
     const pCorrect = Number(
       (verdict?.probabilities as { correct?: unknown } | undefined)?.correct,
     );
-    if (choice === "wrong") return { score: 0, verdict: "red" };
-    if (choice === "minor_slip") return { score: 70, verdict: "yellow" };
+    const pWrongRaw = Number(
+      (verdict?.probabilities as { wrong?: unknown } | undefined)?.wrong,
+    );
+    const wrongProb = Number.isFinite(pWrongRaw) ? pWrongRaw : null;
+    if (choice === "wrong") return { score: 0, verdict: "red", source: "clef", wrongProb };
+    if (choice === "minor_slip") return { score: 70, verdict: "yellow", source: "clef", wrongProb };
     // Scores stay inside the 85/60 contract bands the client was built
     // on (it renders the verdict; the number is informational).
+    // A missing confidence signal trusts the choice: the under-0.4
+    // demotion was calibrated on eval responses that all carried
+    // p(correct), and learners with good audio were stuck yellow
+    // whenever Clef answered with a bare choice.
     if (choice === "correct") {
-      return Number.isFinite(pCorrect) && pCorrect >= 0.4
-        ? { score: 100, verdict: "green" }
-        : { score: 70, verdict: "yellow" };
+      if (!Number.isFinite(pCorrect)) {
+        return { score: 100, verdict: "green", source: "clef", wrongProb };
+      }
+      return pCorrect >= 0.4
+        ? { score: 100, verdict: "green", source: "clef", wrongProb }
+        : { score: 70, verdict: "yellow", source: "clef", wrongProb };
     }
     return null;
   } catch {

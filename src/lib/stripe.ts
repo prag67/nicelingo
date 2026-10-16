@@ -8,15 +8,55 @@ export type StripeEnv = {
   STRIPE_WEBHOOK_SECRET?: string;
   STRIPE_MONTHLY_PRICE_ID?: string;
   STRIPE_YEARLY_PRICE_ID?: string;
+  STRIPE_THB_MONTHLY_PRICE_ID?: string;
+  STRIPE_THB_YEARLY_PRICE_ID?: string;
+  STRIPE_PROMPTPAY_MONTHLY_PRICE_ID?: string;
+  STRIPE_PROMPTPAY_YEARLY_PRICE_ID?: string;
+  STRIPE_PORTAL_CONFIGURATION_ID?: string;
 };
 
 export type BillingPlan = "monthly" | "yearly";
+
+/** One-time PromptPay passes (Thailand): no auto-renewal, access runs
+ *  for a fixed number of days from purchase (stacking onto any unexpired
+ *  pass). PromptPay itself is one-time-only in Stripe, hence passes. */
+export type PassPlan = "promptpay-monthly" | "promptpay-yearly";
+
+export const PASS_DAYS: Record<PassPlan, number> = {
+  "promptpay-monthly": 30,
+  "promptpay-yearly": 365,
+};
+
+export function isPassPlan(plan: string): plan is PassPlan {
+  return plan === "promptpay-monthly" || plan === "promptpay-yearly";
+}
+
+export function passPriceForPlan(env: StripeEnv, plan: PassPlan): string | null {
+  return plan === "promptpay-monthly"
+    ? (env.STRIPE_PROMPTPAY_MONTHLY_PRICE_ID ?? null)
+    : (env.STRIPE_PROMPTPAY_YEARLY_PRICE_ID ?? null);
+}
 
 export function stripeConfigured(env: StripeEnv | undefined): boolean {
   return Boolean(
     env?.STRIPE_SECRET_KEY &&
       (env.STRIPE_MONTHLY_PRICE_ID || env.STRIPE_YEARLY_PRICE_ID),
   );
+}
+
+/** Card price for a plan: Thai visitors (country TH) get the baht
+ *  prices mirroring PromptPay (THB 99/month, THB 990/year); everyone
+ *  else gets the USD prices. Falls back to USD when THB is unset. */
+export function cardPriceForPlan(
+  env: StripeEnv,
+  plan: BillingPlan,
+  country: string | null | undefined,
+): string | null {
+  if (country?.toUpperCase() === "TH") {
+    const thb = plan === "monthly" ? env.STRIPE_THB_MONTHLY_PRICE_ID : env.STRIPE_THB_YEARLY_PRICE_ID;
+    if (thb) return thb;
+  }
+  return priceForPlan(env, plan);
 }
 
 export function priceForPlan(env: StripeEnv, plan: BillingPlan): string | null {
@@ -106,6 +146,24 @@ export function statusGrantsAccess(status: string | null | undefined): boolean {
   return status === "active" || status === "trialing";
 }
 
+/** Whether a stored entitlement row currently unlocks paid lessons.
+ *  Card subscriptions (a Stripe subscription id is present) grant on
+ *  status alone — their period end renews and a delayed webhook must not
+ *  lock a paying subscriber out. PromptPay passes have no subscription
+ *  id, so they grant only until their fixed period end. */
+export function entitlementGrantsAccess(
+  row: {
+    status: string | null | undefined;
+    stripeSubscriptionId: string | null | undefined;
+    currentPeriodEnd: number | null | undefined;
+  },
+  nowSeconds: number,
+): boolean {
+  if (!statusGrantsAccess(row.status)) return false;
+  if (row.stripeSubscriptionId) return true;
+  return (row.currentPeriodEnd ?? 0) > nowSeconds;
+}
+
 export function retrieveSubscription(env: StripeEnv, subscriptionId: string) {
   return stripeGet<StripeSubscription>(
     env,
@@ -170,6 +228,46 @@ export function createCheckoutSession(
   );
 }
 
+/** One-time PromptPay checkout for a fixed-day pass. Payment mode with
+ *  the promptpay payment method only; the webhook grants the pass after
+ *  verifying payment, keyed by the metadata stamped here. */
+export function createPassCheckoutSession(
+  env: StripeEnv,
+  input: {
+    userId: string;
+    email: string;
+    successUrl: string;
+    cancelUrl: string;
+    priceId: string;
+    passDays: number;
+    customerId?: string | null;
+  },
+) {
+  const params = new URLSearchParams();
+  params.set("mode", "payment");
+  params.set("payment_method_types[0]", "promptpay");
+  params.set("line_items[0][price]", input.priceId);
+  params.set("line_items[0][quantity]", "1");
+  params.set("client_reference_id", input.userId);
+  if (input.customerId) {
+    params.set("customer", input.customerId);
+  } else {
+    params.set("customer_email", input.email);
+    params.set("customer_creation", "always");
+  }
+  params.set("success_url", input.successUrl);
+  params.set("cancel_url", input.cancelUrl);
+  params.set("metadata[user_id]", input.userId);
+  params.set("metadata[kind]", "promptpay_pass");
+  params.set("metadata[pass_days]", String(input.passDays));
+  return stripeRequest<{ id: string; url: string }>(
+    env,
+    "checkout/sessions",
+    params,
+    `nicelingo-pass-${input.userId}-${input.priceId}`,
+  );
+}
+
 export function createPortalSession(
   env: StripeEnv,
   customerId: string,
@@ -179,6 +277,8 @@ export function createPortalSession(
     customer: customerId,
     return_url: returnUrl,
   });
+  if (env.STRIPE_PORTAL_CONFIGURATION_ID)
+    params.set("configuration", env.STRIPE_PORTAL_CONFIGURATION_ID);
   return stripeRequest<{ id: string; url: string }>(
     env,
     "billing_portal/sessions",

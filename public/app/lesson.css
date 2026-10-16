@@ -103,18 +103,23 @@ body {
 /* progress header */
 .topbar { display: flex; align-items: center; gap: 0.75rem; }
 .brand {
-  font-family: var(--font-head);
-  width: 2.5rem; height: 2.5rem; flex: none;
-  border-radius: 50%;
-  background: var(--blue);
+  width: 2.75rem; height: 2.75rem; flex: none;
   display: grid; place-items: center;
-  color: #fff; font-weight: 900; font-size: 1.25rem;
-  box-shadow: 0 3px 0 var(--blue-edge);
+  border-radius: 50%;
 }
+.brand img { width: 2.5rem; height: 2.5rem; display: block; }
+.brand:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 .segments { display: flex; gap: 0.4rem; flex: 1; }
+.seg {
+  flex: 1; display: flex; align-items: center;
+  min-height: 2.75rem; padding: 0;
+  background: none; border: 0; font: inherit;
+}
+button.seg { cursor: pointer; border-radius: 99px; }
+button.seg:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 .segments i {
   height: 0.8rem; flex: 1; border-radius: 99px; background: var(--line);
-  overflow: hidden; position: relative;
+  overflow: hidden; position: relative; display: block;
 }
 .segments i.done { background: var(--sun); }
 .segments i.now::after {
@@ -282,8 +287,7 @@ h1 { font-family: var(--font-head); font-size: 1.4rem; margin: 0.25rem 0 0; }
 .write-row input:focus { outline: none; border-color: var(--blue); }
 
 /* celebration */
-.celebrate { text-align: center; padding-top: 2rem; display: flex; flex-direction: column; align-items: center; flex: 1; }
-.celebrate .btn { width: 100%; }
+.celebrate { text-align: center; padding-top: 2rem; display: flex; flex-direction: column; align-items: center; flex: 1; }.celebrate .btn { width: 100%; }
 .celebrate .stars { font-size: 3.5rem; letter-spacing: 0.2rem; }
 .celebrate h1 { font-size: 1.8rem; }
 .confetti { position: fixed; top: -12px; width: 10px; height: 16px; z-index: 50; animation: fall 2.6s ease-in forwards; }

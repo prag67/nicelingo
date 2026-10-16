@@ -7,6 +7,28 @@ export type Verdict = "green" | "yellow" | "red";
 
 export type PronunciationScore = { score: number; verdict: Verdict };
 
+export type ScoreSource = "clef" | "whisper";
+
+/** Whether this attempt passes the phrase. Green always passes. For
+ *  Thai only, a yellow also passes when it came from the Clef judge
+ *  (a judged minor slip, not a Whisper similarity band), Clef's own
+ *  wrong-probability is below 0.3, and it is the second consecutive
+ *  yellow — a first yellow always earns a guided retry. Whisper-fallback
+ *  yellows never pass on their own. */
+export function attemptPasses(input: {
+  lang: string;
+  verdict: Verdict;
+  source: ScoreSource;
+  wrongProb: number | null;
+  prevVerdict: Verdict | null;
+}): boolean {
+  if (input.verdict === "green") return true;
+  if (input.lang !== "th" || input.verdict !== "yellow") return false;
+  if (input.source !== "clef") return false;
+  if (input.wrongProb == null || input.wrongProb >= 0.3) return false;
+  return input.prevVerdict === "yellow";
+}
+
 function normalize(text: string): string[] {
   let lowered = text.toLowerCase().replace(/ß/g, "ss");
   for (const [from, to] of Object.entries(TRANSCRIPT_EXPANSIONS)) {

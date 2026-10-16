@@ -5,11 +5,11 @@ import type { Lang } from "./curriculum";
 
 export type LanguageNames = Record<
   Lang,
-  { name: string; ownName: string; greeting: string; tileColor: string }
+  { name: string; ownName: string; greeting: string; flag: string; tileColor: string }
 >;
 
 export const NAMES: LanguageNames = {
-  en: { name: "English", ownName: "English", greeting: "Hello", tileColor: "#8CC8FF" },
-  xx: { name: "Xxian", ownName: "Xxish", greeting: "Xxalo!", tileColor: "#FFB061" },
-  yy: { name: "Yyan", ownName: "Yyish", greeting: "Yyalo!", tileColor: "#7FE3C4" },
+  en: { name: "English", ownName: "English", greeting: "Hello", flag: "🇬🇧", tileColor: "#8CC8FF" },
+  xx: { name: "Xxian", ownName: "Xxish", greeting: "Xxalo!", flag: "🌐", tileColor: "#FFB061" },
+  yy: { name: "Yyan", ownName: "Yyish", greeting: "Yyalo!", flag: "🌐", tileColor: "#7FE3C4" },
 };

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
 import * as schema from "./schema";
-import { statusGrantsAccess } from "../lib/stripe";
+import { entitlementGrantsAccess } from "../lib/stripe";
 
 export type SubscriptionRow = {
   userId: string;
@@ -46,11 +46,17 @@ export function d1SubscriptionStore(db: D1Database): SubscriptionStore {
     },
     isSubscribed: async (userId) => {
       const rows = await orm
-        .select({ status: schema.subscriptions.status })
+        .select({
+          status: schema.subscriptions.status,
+          stripeSubscriptionId: schema.subscriptions.stripeSubscriptionId,
+          currentPeriodEnd: schema.subscriptions.currentPeriodEnd,
+        })
         .from(schema.subscriptions)
         .where(eq(schema.subscriptions.userId, userId))
         .limit(1);
-      return statusGrantsAccess(rows[0]?.status);
+      const row = rows[0];
+      if (!row) return false;
+      return entitlementGrantsAccess(row, Math.floor(Date.now() / 1000));
     },
     upsert: async (sub) => {
       await orm

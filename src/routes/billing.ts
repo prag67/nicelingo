@@ -1,5 +1,6 @@
 import { coverageLine, pickerLanguages } from "../lessons/languages";
 import { escapeHtml } from "../lib/lesson-progress";
+import { andWord, fmt, localizeLangName, t, type UiLang } from "../lib/i18n";
 
 export const MONTHLY_PRICE_LABEL = "$3/month";
 export const YEARLY_PRICE_LABEL = "$29/year";
@@ -61,22 +62,43 @@ ${body}
 </html>`;
 }
 
-export function billingPage(rawReturn?: string): string {
+export const PROMPTPAY_MONTHLY_LABEL = "THB 99 / 30 days";
+export const PROMPTPAY_YEARLY_LABEL = "THB 990 / 365 days";
+
+export function billingPage(
+  rawReturn?: string,
+  opts: { promptPay?: boolean; uiLang?: UiLang; thailand?: boolean } = {},
+): string {
+  const ui = opts.uiLang ?? "en";
+  const d = t(ui);
   const back = escapeHtml(safeReturnPath(rawReturn));
+  const langs = pickerLanguages();
+  const coverage = (() => {
+    const names = langs.map((l) => `${localizeLangName(ui, l.code, l.name)}${l.status === "partial" ? ` ${d.level1Only}` : ""}`);
+    if (names.length <= 1) return names.join("");
+    return `${names.slice(0, -1).join(", ")} ${andWord(ui)} ${names[names.length - 1]}`;
+  })();
+  const promptPay = opts.promptPay
+    ? `<div class="plans">
+<div class="plan"><h2>PromptPay · ${PROMPTPAY_MONTHLY_LABEL}</h2><p>${d.promptpayText30}</p><button class="btn" data-plan="promptpay-monthly">${d.payWithPromptPay}</button></div>
+<div class="plan"><h2>PromptPay · ${PROMPTPAY_YEARLY_LABEL}</h2><p>${d.promptpayText365}</p><button class="btn" data-plan="promptpay-yearly">${d.payWithPromptPay}</button></div>
+</div>`
+    : "";
   return shell(
     "Subscribe",
-    `<h1>Nicelingo Premium</h1>
-<p>Unit 1 (lessons 1-4) is free forever. A subscription unlocks every lesson in every language — ${coverageLine()} — all levels, present and future.</p>
-<ul>${pickerLanguages().map((l) => `<li><b>${l.name}</b> · ${l.lessons} lessons${l.status === "partial" ? " (Level 1 only)" : ""}</li>`).join("")}</ul>
-<label for="email"><b>Email for your receipt</b></label>
+    `<h1>${d.billingHeading}</h1>
+<p>${d.premiumAccountLine} ${coverage}</p>
+<ul>${langs.map((l) => `<li><b>${escapeHtml(localizeLangName(ui, l.code, l.name))}</b> · ${fmt(d.lessonsCount, { n: l.lessons })}${l.status === "partial" ? ` ${d.level1Only}` : ""}</li>`).join("")}</ul>
+<label for="email"><b>${d.receiptEmail}</b></label>
 <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
 <div class="plans" data-return="${back}">
-<div class="plan"><h2>Monthly · ${MONTHLY_PRICE_LABEL}</h2><p>Cancel anytime from your receipt or account page.</p><button class="btn" data-plan="monthly">Subscribe monthly</button></div>
-<div class="plan"><h2>Yearly · ${YEARLY_PRICE_LABEL}</h2><p>Two months free, one payment a year.</p><button class="btn" data-plan="yearly">Subscribe yearly</button></div>
+<div class="plan"><h2>${d.monthlyPlan} · ${opts.thailand ? d.thbMonthlyPrice : d.monthlyPrice}</h2><p>${d.cancelAnytime}</p><button class="btn" data-plan="monthly">${d.subscribeMonthly}</button></div>
+<div class="plan"><h2>${d.yearlyPlan} · ${opts.thailand ? d.thbYearlyPrice : d.yearlyPrice}</h2><p>${d.twoMonthsFree}</p><button class="btn" data-plan="yearly">${d.subscribeYearly}</button></div>
 </div>
-<p class="note">Payments are handled securely by Stripe. Manage or cancel anytime: <button class="btn secondary" id="manage">Manage subscription</button></p>
+${promptPay}
+<p class="note" id="manage-note" hidden>${d.paymentsNote} <button class="btn secondary" id="manage">${d.manageSubscription}</button></p>
 <p class="error" id="err" role="alert"></p>
-<p><a href="${back}">← Back to lessons</a></p>
+<p><a href="${back}">← ${d.backToLessons}</a></p>
 <script>
 (async () => {
   const backTo = document.querySelector(".plans")?.dataset.return || "/";
@@ -90,6 +112,13 @@ export function billingPage(rawReturn?: string): string {
     }
   } catch {}
   const err = document.getElementById("err");
+  try {
+    const st = await fetch("/api/billing/status", { credentials: "include" });
+    if (st.ok) {
+      const body = await st.json().catch(() => ({}));
+      if (body.status && body.status !== "none") document.getElementById("manage-note").hidden = false;
+    }
+  } catch {}
   document.querySelectorAll("[data-plan]").forEach((btn) => {
     btn.addEventListener("click", async () => {
       err.textContent = "";
@@ -120,20 +149,23 @@ export function billingPage(rawReturn?: string): string {
 export function billingSuccessPage(
   verified: boolean,
   rawReturn?: string,
+  uiLang: UiLang = "en",
 ): string {
+  const d = t(uiLang);
   const back = escapeHtml(safeReturnPath(rawReturn));
   return shell(
     "Subscribed",
     verified
-      ? `<h1>You're subscribed 🎉</h1><p>Your payment went through. All lessons are unlocked.</p><p><a href="${back}">Start learning →</a></p>`
-      : `<h1>Almost there…</h1><p>We're confirming your payment — this usually takes a few seconds. <a href="${back}">Back to lessons</a> and your progress will unlock automatically.</p>`,
+      ? `<h1>${d.subscribedHeading} 🎉</h1><p>${d.subscribedText}</p><p><a href="${back}">${d.startLearning} →</a></p>`
+      : `<h1>${d.almostHeading}</h1><p>${d.almostText} <a href="${back}">${d.backToLessons}</a></p>`,
   );
 }
 
-export function billingCancelPage(rawReturn?: string): string {
+export function billingCancelPage(rawReturn?: string, uiLang: UiLang = "en"): string {
+  const d = t(uiLang);
   const back = escapeHtml(safeReturnPath(rawReturn));
   return shell(
     "Checkout cancelled",
-    `<h1>Checkout cancelled</h1><p>No charge was made. Unit 1 is still free whenever you want it.</p><p><a href="${back}">← Back to lessons</a></p>`,
+    `<h1>Checkout cancelled</h1><p>No charge was made. Unit 1 is still free whenever you want it.</p><p><a href="${back}">← ${d.backToLessons}</a></p>`,
   );
 }

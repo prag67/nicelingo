@@ -36,7 +36,7 @@ describe("language registry", () => {
     ]);
   });
 
-  it("builds the billing coverage line from the registry", () => {
+  it("builds the coverage line from the registry", () => {
     expect(coverageLine()).toBe(
       "English, Xxian, and Yyan (Level 1 only)",
     );

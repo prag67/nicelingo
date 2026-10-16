@@ -32,6 +32,13 @@ export function d1ProgressStore(db: D1Database): ProgressStore {
       }
       return grouped;
     },
+    listActivityDays: async (userId) => {
+      const rows = await orm
+        .select({ completedAt: schema.lessonProgress.completedAt })
+        .from(schema.lessonProgress)
+        .where(eq(schema.lessonProgress.userId, userId));
+      return [...new Set(rows.map((r) => r.completedAt.toISOString().slice(0, 10)))];
+    },
     markComplete: async (userId, lessonId, activity) => {
       await orm.insert(schema.lessonProgress).values({
         id: crypto.randomUUID(),

@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
+    "deploy:staff": "wrangler deploy --config wrangler.staff.toml",
+    "deploy:staff:check": "wrangler deploy --dry-run --config wrangler.staff.toml",
+    "dev:staff": "wrangler dev --config wrangler.staff.toml",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply nicelingo-auth --local",

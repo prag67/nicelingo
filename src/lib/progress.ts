@@ -9,6 +9,8 @@ const LESSON_ORDER: Record<string, readonly string[]> = Object.fromEntries(
 export type ProgressStore = {
   listCompleted(userId: string, lessonId: string): Promise<string[]>;
   listAll(userId: string): Promise<Record<string, string[]>>;
+  /** UTC day strings (YYYY-MM-DD) with at least one completed activity. */
+  listActivityDays(userId: string): Promise<string[]>;
   markComplete(
     userId: string,
     lessonId: string,

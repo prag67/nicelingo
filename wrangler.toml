@@ -3,6 +3,13 @@ main = "src/index.ts"
 compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
 
+# Primary domain (attached 2026-10-13). Keep this so future deploys retain
+# the custom domain. www.nicelingo.com is intentionally NOT listed: it is
+# attached to the separate nicelingo-www-redirect Worker, which 301s to apex.
+routes = [
+  { pattern = "nicelingo.com", custom_domain = true },
+]
+
 # Local dev (`wrangler dev`) emulates D1 automatically. Before your first
 # deploy, run `wrangler d1 create nicelingo-auth` and paste the real
 # database_id here.
@@ -12,8 +19,25 @@ database_name = "nicelingo-auth"
 database_id = "a30fd8c3-24ed-489b-8919-8f9865b4f28d"
 migrations_dir = "drizzle"
 
+# Analytics Engine usage events (src/lib/analytics.ts). The dataset is
+# created on first write; writes need no token. Read-back reports also
+# need CF_ACCOUNT_ID (var, below) and CF_ANALYTICS_TOKEN (secret:
+# `wrangler secret put CF_ANALYTICS_TOKEN`, Account Analytics Read).
+[[analytics_engine_datasets]]
+binding = "EVENTS"
+dataset = "nicelingo_events"
+
+[vars]
+CF_ACCOUNT_ID = "30142eba9e53a37522d1c59b298db661"
+
 [ai]
 binding = "AI"
+
+# Lesson media (audio/images) lives in R2, not in git. The /static/:rest
+# route serves from this bucket first with static assets as fallback.
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "nicelingo-media"
 
 [assets]
 directory = "./public"

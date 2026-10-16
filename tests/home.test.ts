@@ -42,10 +42,9 @@ describe("GET / (language picker)", () => {
     expect(html).toContain("Choose a language");
     expect(html).toContain("Four steps in every lesson");
     expect(html).toContain("Unit 1 is free");
-    expect(html).toContain("$3/month");
-    expect(html).toContain("$29/year");
-    expect(html).toContain("See plans");
+    expect(html).toContain("Every lesson $3/month or $29/year");
     expect(html).toContain('href="/billing"');
+    expect(html).toContain("$3/month");
     expect(html).toContain('href="/developers"');
     // API list moved to /developers.
     expect(html).not.toContain("lesson manifest");
@@ -53,33 +52,22 @@ describe("GET / (language picker)", () => {
 
   it("shows the English name only when it differs", async () => {
     const html = await (await app.request("/")).text();
-    // Exactly one "English": the own-name line. No duplicate beneath.
-    expect(html.split(">English<").length - 1).toBe(1);
+    // One "English" per remaining language menu (account menu + footer); no duplicate sub-line.
+    expect(html.split(">English<").length - 1).toBe(2);
     expect(html).toContain(">Xxian · 8 lessons<");
   });
 
-  it("forwards returning visitors to their last language", async () => {
-    const res = await app.request("/", {
-      headers: { Cookie: "nl_lang=xx" },
-    });
-    expect(res.status).toBe(302);
-    expect(res.headers.get("location")).toBe("/xx");
+  it("always shows the picker, even with a remembered language", async () => {
+    for (const cookie of ["nl_lang=xx", "nl_lang=yy", "nl_lang=zz"]) {
+      const res = await app.request("/", {
+        headers: { Cookie: cookie },
+      });
+      expect(res.status).toBe(200);
+      expect(await res.text()).toContain("What do you want to learn?");
+    }
   });
 
-  it("ignores unknown cookie langs, forwards partial languages too", async () => {
-    const unknown = await app.request("/", {
-      headers: { Cookie: "nl_lang=zz" },
-    });
-    expect(unknown.status).toBe(200);
-    expect(await unknown.text()).toContain("What do you want to learn?");
-    const partial = await app.request("/", {
-      headers: { Cookie: "nl_lang=yy" },
-    });
-    expect(partial.status).toBe(302);
-    expect(partial.headers.get("location")).toBe("/yy");
-  });
-
-  it("?change=1 always shows the picker", async () => {
+  it("?change=1 still shows the picker", async () => {
     const res = await app.request("/?change=1", {
       headers: { Cookie: "nl_lang=xx" },
     });
@@ -87,7 +75,7 @@ describe("GET / (language picker)", () => {
     expect(await res.text()).toContain("What do you want to learn?");
   });
 
-  it("shows Keep going for returning learners", () => {
+  it("shows progress on the started card for returning learners", () => {
     const done = ["listen-match", "image-phrase", "speak-score", "read-write"];
     const html = homePage({
       progress: {
@@ -97,47 +85,40 @@ describe("GET / (language picker)", () => {
         "xx-lesson-004": done,
       },
     });
-    expect(html).toContain("Keep going!");
+    // One picker for everyone: the hero stays, the card carries progress.
+    expect(html).toContain("Choose a language");
+    expect(html).not.toContain("Keep going!");
     expect(html).toContain("4 of 8 lessons done");
-    expect(html).toContain("Or start another");
-    // Next lesson is locked: the button falls back to the course home.
-    expect(html).toContain("Continue lesson 5");
+    expect(html).toContain("Continue");
     expect(html).toContain('href="/xx"');
-    expect(html).not.toContain("Choose a language");
-    // No duplicate English name on the list rows either.
+    // No duplicate English name on the cards either.
     expect(html).not.toContain("English · 8 lessons");
   });
 
-  it("deep-links the open lesson from Keep going", () => {
+  it("marks partially started cards as continuing", () => {
     const html = homePage({
       progress: { "xx-lesson-001": ["listen-match"] },
     });
-    expect(html).toContain("Continue lesson 1");
-    expect(html).toContain('href="/lesson/xx/001"');
+    expect(html).toContain("Choose a language");
+    expect(html).toContain("Continue");
+    expect(html).toContain('href="/xx"');
   });
 
-  it("deep-links Unit 1 lessons past Lesson 1", () => {
-    const html = homePage({
-      progress: {
-        "xx-lesson-001": ["listen-match", "image-phrase", "speak-score", "read-write"],
-      },
-    });
-    expect(html).toContain("Continue lesson 2");
-    expect(html).toContain('href="/lesson/xx/002"');
-  });
-
-  it("hides the pricing band for subscribers", () => {
+  it("hides the pricing band for subscribed users", () => {
     const html = homePage({ subscribed: true });
-    expect(html).not.toContain("See plans");
+    expect(html).not.toContain("Every lesson $3/month or $29/year");
     expect(html).toContain("Choose a language");
   });
 });
 
 describe("fixed single-segment routes still resolve", () => {
-  it("keeps /billing and /health away from /:lang", async () => {
+  it("keeps /register, /billing, and /health away from /:lang", async () => {
+    const register = await app.request("/register");
+    expect(register.status).toBe(200);
+    expect(await register.text()).toContain("Create your free account");
     const billing = await app.request("/billing");
     expect(billing.status).toBe(200);
-    expect(await billing.text()).toContain("Nicelingo Premium");
+    expect(await billing.text()).toContain("$3/month");
     const health = await app.request("/health");
     expect(health.status).toBe(200);
   });

@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 // Core Better Auth tables (D1/SQLite). Matches `auth generate` output;
 // `isAnonymous` on user comes from the anonymous plugin.
@@ -86,6 +86,53 @@ export const stripeEvents = sqliteTable("stripe_events", {
   processedAt: integer("processed_at"),
   lastError: text("last_error"),
 });
+
+// Staff admin (separate staff Worker, Cloudflare Access login).
+// subject is the Access JWT `sub`; roles gate future mutations.
+export const staffUsers = sqliteTable("staff_users", {
+  subject: text("subject").primaryKey(),
+  email: text("email").notNull(),
+  role: text("role").notNull().default("read_only"),
+  active: integer("active").notNull().default(1),
+  createdAt: integer("created_at").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+});
+
+export const staffAuditEvents = sqliteTable("staff_audit_events", {
+  id: text("id").primaryKey(),
+  occurredAt: integer("occurred_at").notNull(),
+  subject: text("subject").notNull(),
+  email: text("email").notNull(),
+  role: text("role").notNull(),
+  action: text("action").notNull(),
+  targetType: text("target_type").notNull(),
+  targetId: text("target_id").notNull(),
+  reason: text("reason"),
+  result: text("result").notNull(),
+  requestId: text("request_id"),
+  beforeJson: text("before_json"),
+  afterJson: text("after_json"),
+});
+
+// Linked students: a registered account holder (e.g. a parent/teacher)
+// requests a link to a student's own registered account by email; the
+// student must accept before the holder can see their progress summary.
+// status: pending -> accepted | declined (declined rows are deleted by
+// the respond handler, so only pending/accepted persist in practice).
+export const studentLinks = sqliteTable("student_links", {
+  id: text("id").primaryKey(),
+  holderUserId: text("holder_user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  studentUserId: text("student_user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  status: text("status").notNull().default("pending"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  respondedAt: integer("responded_at", { mode: "timestamp" }),
+}, (t) => ({
+  holderStudent: uniqueIndex("student_links_holder_student").on(t.holderUserId, t.studentUserId),
+}));
 
 export const verification = sqliteTable("verification", {
   id: text("id").primaryKey(),

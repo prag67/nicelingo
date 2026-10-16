@@ -88,7 +88,7 @@ let locationStub;
 let fetchCalls;
 let reloadCalls;
 
-function installStubs(search) {
+function installStubs(search, completed = ALL) {
   documentStub = {
     created: [],
     createElement: (tag) => {
@@ -162,7 +162,7 @@ function installStubs(search) {
     if (url === "/api/lessons/en/001" || url === "/api/lessons/01")
       return { ok: true, status: 200, json: async () => manifest };
     if (String(url).startsWith("/api/progress?"))
-      return { ok: true, status: 200, json: async () => ({ completed: ALL }) };
+      return { ok: true, status: 200, json: async () => ({ completed }) };
     if (url === "/api/score")
       return { ok: true, status: 200, json: async () => ({ verdict: "green", score: 100 }) };
     return { ok: true, status: 200, json: async () => ({}) };
@@ -271,7 +271,65 @@ describe("speak countdown", () => {
   });
 });
 
-describe("paywall screen", () => {
+describe("Thai speak pass rule", () => {
+  beforeEach(() => {
+    installStubs("?demo=speak-score");
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  async function speakWith(verdict: string, pathname: string, pass = false) {
+    const online = globalThis.fetch;
+    globalThis.fetch = async (url, init) => {
+      if (url === "/api/score")
+        return { ok: true, status: 200, json: async () => ({ verdict, score: 70, pass }) };
+      if (String(url).startsWith("/api/lessons/"))
+        return { ok: true, status: 200, json: async () => manifest };
+      return online(url, init);
+    };
+    locationStub.pathname = pathname;
+    vi.useFakeTimers();
+    documentStub.created = [];
+    vi.resetModules();
+    await import("../public/app/player.js");
+    await vi.advanceTimersByTimeAsync(500);
+    const mic = findButton("🎙");
+    mic.click();
+    await vi.advanceTimersByTimeAsync(0);
+    mic.click();
+    await vi.advanceTimersByTimeAsync(0);
+  }
+
+  it("retries a first Thai yellow even though it is a minor slip", async () => {
+    await speakWith("yellow", "/lesson/th/001");
+    expect(screenText()).toContain("Almost!");
+    expect(screenText()).toContain("Try again");
+    expect(screenText()).not.toContain("Close enough!");
+  });
+
+  it("passes a Thai yellow when the server says pass (2nd consecutive Clef slip)", async () => {
+    await speakWith("yellow", "/lesson/th/001", true);
+    expect(screenText()).toContain("Close enough!");
+    expect(screenText()).toContain("Continue");
+    expect(screenText()).not.toContain("Try again");
+  });
+
+  it("still asks for a retry on a non-Thai yellow", async () => {
+    await speakWith("yellow", "/lesson/en/001");
+    expect(screenText()).toContain("Almost!");
+    expect(screenText()).not.toContain("Close enough!");
+  });
+
+  it("still fails a Thai red", async () => {
+    await speakWith("red", "/lesson/th/001");
+    expect(screenText()).toContain("Try again");
+    expect(screenText()).not.toContain("Close enough!");
+  });
+});
+
+describe("registration gate screen", () => {
   beforeEach(() => {
     installStubs("");
   });
@@ -287,10 +345,11 @@ describe("paywall screen", () => {
     await bootPlayer();
     expect(screenText()).toContain("This lesson needs a subscription.");
     expect(screenText()).toContain("Unit 1 (lessons 1-4) is free forever.");
+    expect(screenText()).toContain("$3/month or $29/year");
     expect(screenText()).toContain("Back to free Unit 1");
   });
 
-  it("shows the paywall screen for logged-out guests (401)", async () => {
+  it("shows the subscription screen for logged-out guests (401)", async () => {
     const online = globalThis.fetch;
     globalThis.fetch = async (url, init) => {
       if (String(url).startsWith("/api/lessons/")) {
@@ -301,5 +360,36 @@ describe("paywall screen", () => {
     await bootPlayer();
     expect(screenText()).toContain("This lesson needs a subscription.");
     expect(screenText()).not.toContain("Could not load the lesson.");
+  });
+});
+
+describe("lesson topbar", () => {
+  beforeEach(() => {
+    installStubs("", ["listen-match", "image-phrase"]);
+  });
+
+  it("shows the parrot as a clickable home logo", async () => {
+    await bootPlayer();
+    const brand = documentStub.created.find(
+      (el) => el.tag === "a" && el.attrs.href === "/",
+    );
+    expect(brand).toBeTruthy();
+    expect(brand.attrs["aria-label"]).toBe("Nicelingo home");
+    const img = brand.kids.find((k) => k instanceof El && k.tag === "img");
+    expect(img.attrs.src).toBe("/logo/parrot-mark.svg");
+  });
+
+  it("makes only completed stage bars clickable, and they replay that stage", async () => {
+    await bootPlayer();
+    const stageButtons = documentStub.created.filter(
+      (el) => el.tag === "button" && String(el.attrs["aria-label"] ?? "").startsWith("Stage "),
+    );
+    expect(stageButtons.map((b) => b.attrs["aria-label"])).toEqual([
+      "Stage 1: Listen and tap",
+      "Stage 2: Look and tap",
+    ]);
+    stageButtons[0].click();
+    for (let i = 0; i < 20; i++) await new Promise((r) => setTimeout(r, 10));
+    expect(screenText()).toContain("Which picture matches?");
   });
 });

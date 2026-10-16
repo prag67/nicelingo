@@ -13,6 +13,7 @@ import {
 // NOTE: fake curriculum (en/xx complete 8 lessons, yy partial 001-004).
 const GUEST = {
   progress: {},
+  registered: false,
   subscribed: false,
   paywallDisabled: true,
   user: null,
@@ -28,12 +29,15 @@ describe("GET /{lang} (course home)", () => {
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("text/html");
     const html = await res.text();
-    // Top bar: parrot, wordmark, language chip, premium, account.
+    // Top bar: parrot (links to the picker), premium, account menu.
     expect(html).toContain('data-logo="parrot"');
-    expect(html).toContain('href="/?change=1"');
-    expect(html).toContain("Xxish ▾");
+    expect(html).toContain('class="brand" href="/"');
+    expect(html).not.toContain("course-chip");
+    expect(html).not.toContain("course-switch");
     expect(html).toContain("Go Premium");
     expect(html).toContain("Sign in");
+    expect(html).toContain("account-menu");
+    expect(html).toContain("foot-lang");
     // Continue card: the one-tap path from / for a new learner.
     expect(html).toContain("Start here · Free");
     expect(html).toContain("Lesson 1 · Zorping &amp; Quuxing");
@@ -51,14 +55,16 @@ describe("GET /{lang} (course home)", () => {
     expect(html).not.toContain('id="u2"');
     expect(cardCount(html)).toBe(4);
     // Unit header counts and segment bars carry text labels.
-    expect(html).toContain("0 of 4 done");
+    expect(html).toContain("0 of 4 lessons done");
     expect(html).toContain("0 of 4 steps complete");
     // Step pills, unit badges cycling registry tile colors, thumbnails.
     expect(html).toContain("1 Listen");
     expect(html).toContain('class="ubadge" style="--tile:#8CC8FF">1<');
     expect(html).toContain("/static/lesson-001/images/thumb.jpg");
-    expect(html).toContain("Manage subscription");
+    expect(html).toContain("Free account");
     expect(html).toContain('href="/developers"');
+    expect(html).toContain('href="/terms"');
+    expect(html).toContain('href="/contact"');
     // Anonymous nudge near the continue card.
     expect(html).toContain("Your progress is saved on this device only.");
   });
@@ -91,7 +97,7 @@ describe("GET /{lang} (course home)", () => {
     const res = await app.request("/yy");
     expect(res.status).toBe(200);
     const html = await res.text();
-    expect(html).toContain("Yyish ▾");
+    expect(html).toContain("Yyish");
     expect(html).toContain("1 Wugginner");
     expect(html).toContain("2 Blargary · Coming soon");
     expect(html).toContain('data-total="4"');
@@ -112,19 +118,33 @@ describe("GET /{lang} (course home)", () => {
     expect((await app.request("/zz")).status).toBe(404);
   });
 
-  it("shows no language codes except the top-bar chip", async () => {
+  it("shows no language codes in the top bar", async () => {
     const html = await (await app.request("/xx")).text();
     for (const code of ["en", "xx", "yy"]) {
       expect(html).not.toContain(`>${code}<`);
     }
+  });
+
+  it("keeps the mobile header to one sticky row with premium + UI langs in the account menu", async () => {
+    const html = await (await app.request("/xx")).text();
+    // No language chip: the parrot links to the picker instead.
+    expect(html).toContain('class="brand" href="/"');
+    expect(html).not.toContain("course-chip");
+    // No premium button in the header; the menu carries Go Premium first.
+    expect(html).not.toContain("head-prem");
+    const menu = html.slice(html.indexOf("account-menu"));
+    expect(menu.indexOf("Go Premium")).toBeLessThan(menu.indexOf("Sign in"));
+    expect(menu).toContain("Interface language");
+    // Interface picker also lives in the footer.
+    expect(html).toContain("foot-lang");
   });
 });
 
 describe("coursePage locking and subscription states", () => {
   const locked = { ...GUEST, paywallDisabled: false };
 
-  it("locks non-free lessons for guests when the paywall is on", () => {
-    // Level 1 is the free unit; Level 2 holds the paid lessons.
+  it("locks lessons beyond Unit 1 for guests", () => {
+    // Level 1 is the open unit; Level 2 holds the account-gated lessons.
     const free = coursePage("xx", locked);
     expect(free).toContain("lbadge free");
     // Unit 1 (lessons 1-4) stays open: four free badges, four open links.
@@ -132,12 +152,12 @@ describe("coursePage locking and subscription states", () => {
     for (const n of ["001", "002", "003", "004"]) {
       expect(free).toContain(`href="/lesson/xx/${n}"`);
     }
-    const paid = coursePage("xx", { ...locked, level: 2 });
-    expect(paid).toContain('class="lcard" href="/billing?return=');
-    expect(paid).toContain("lbadge premium");
-    expect(paid).toContain("<strong>Premium</strong>");
+    const gated = coursePage("xx", { ...locked, level: 2 });
+    expect(gated).toContain('class="lcard" href="/billing?return=');
+    expect(gated).toContain("lbadge premium");
+    expect(gated).toContain("<strong>Premium</strong>");
     // Upgrade strip appears exactly once.
-    expect(paid.split("Premium opens every lesson for").length - 1).toBe(1);
+    expect(gated.split("Premium opens every lesson").length - 1).toBe(1);
     // Continue points at the paywall once Unit 1 is done.
     const done = ["listen-match", "image-phrase", "speak-score", "read-write"];
     const continued = coursePage("xx", {
@@ -152,22 +172,36 @@ describe("coursePage locking and subscription states", () => {
     expect(continued).toContain("Nice work! Next up");
     expect(continued).toContain("Unlock every lesson");
     expect(continued).toContain("You finished the free unit.");
-    expect(continued).toContain("Premium opens every Xxian lesson for");
+    expect(continued).toContain("Premium opens every Xxian lesson");
+    expect(continued).toContain("$3/month");
+    expect(continued).toContain("$29/year");
     // ...and the strip hides (the Continue card is the upgrade prompt).
-    expect(continued.split("Premium opens every lesson for").length - 1).toBe(0);
+    expect(continued.split("Premium opens every Xxian lesson for").length - 1).toBe(1);
   });
 
-  it("unlocks everything for subscribers", () => {
+  it("unlocks everything for subscribed users", () => {
     const html = coursePage("xx", {
       ...locked,
+      registered: true,
       subscribed: true,
       user: { email: "a@b.c", isAnonymous: false },
     });
     expect(html).not.toContain("lbadge premium");
-    expect(html).not.toContain("Premium opens");
-    expect(html).toContain("badge-premium-top");
+    expect(html).not.toContain("Premium opens every lesson");
     expect(html).toContain('aria-label="Account"');
     expect(html).not.toContain("saved on this device");
+  });
+
+  it("keeps paid lessons locked for registered users without a subscription", () => {
+    const html = coursePage("xx", {
+      ...locked,
+      level: 2,
+      registered: true,
+      subscribed: false,
+      user: { email: "a@b.c", isAnonymous: false },
+    });
+    expect(html).toContain("lbadge premium");
+    expect(html).toContain('class="lcard" href="/billing?return=');
   });
 
   it("marks done lessons and resumes partial ones", () => {
@@ -183,15 +217,16 @@ describe("coursePage locking and subscription states", () => {
     expect(html).toContain("Done</strong>");
     expect(html).toContain("2 of 4 steps complete");
     expect(html).toContain("Resume");
-    expect(html).toContain("1 of 4 done");
+    expect(html).toContain("1 of 4 lessons done");
     expect(html).toContain("Resume lesson 2");
     // The in-progress card gets the ink border.
     expect(html).toContain('class="lcard now"');
   });
 
-  it("cheers subscribers on with done/next step pills", () => {
+  it("cheers subscribed users on with done/next step pills", () => {
     const html = coursePage("xx", {
       ...locked,
+      registered: true,
       subscribed: true,
       user: { email: "a@b.c", isAnonymous: false },
       progress: {

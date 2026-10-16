@@ -18,28 +18,35 @@ for (const lang of ["en", "es", "de", "fr", "th", "zh"]) {
     process.exit(1);
   }
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-  for (const phrase of manifest.phrases) {
-    const file = join(root, "public", phrase.audioUrl);
+  const check = async (id, url) => {
+    const file = join(root, "public", url);
     if (!existsSync(file)) {
-      console.log(`${phrase.id}: MISSING FILE`);
+      console.log(`${id}: MISSING FILE`);
       fails++;
-      continue;
+      return;
     }
     const audio = readFileSync(file).toString("base64");
     const res = await fetch(`${base}/api/score`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phraseId: phrase.id, audio }),
+      body: JSON.stringify({ phraseId: id, audio }),
     });
     if (!res.ok) {
-      console.log(`${phrase.id}: HTTP ${res.status}`);
+      console.log(`${id}: HTTP ${res.status}`);
       fails++;
-      continue;
+      return;
     }
     const { score, transcript } = await res.json();
     const verdict = score >= 85 ? "GREEN" : score >= 60 ? "YELLOW" : "RED";
     if (score < 85) fails++;
-    console.log(`${phrase.id}: ${verdict} score=${score} transcript=${JSON.stringify(transcript)}`);
+    console.log(`${id}: ${verdict} score=${score} transcript=${JSON.stringify(transcript)}`);
+  };
+  for (const phrase of manifest.phrases) {
+    await check(phrase.id, phrase.audioUrl);
+    // Alt voices face the same green bar as the default.
+    for (const [voice, url] of Object.entries(phrase.audioUrls ?? {})) {
+      await check(`${phrase.id}[${voice}]`, url);
+    }
   }
 }
 console.log(fails === 0 ? "ALL GREEN" : `${fails} CLIP(S) BELOW GREEN`);

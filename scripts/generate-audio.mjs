@@ -251,13 +251,20 @@ async function synthGemini(text, speaker) {
 }
 
 for (const phrase of manifest.phrases) {
-  const dest = join(root, "public", phrase.audioUrl);
+  const targets = [
+    { url: phrase.audioUrl, voice: null },
+    ...Object.entries(phrase.audioUrls ?? {}).map(([v, url]) => ({ url, voice: v })),
+  ];
+  for (const target of targets) {
+  const dest = join(root, "public", target.url);
   if (existsSync(dest)) {
-    console.log(`${phrase.id}: exists, skipping`);
+    console.log(`${phrase.id}[${target.voice ?? "default"}]: exists, skipping`);
     continue;
   }
   mkdirSync(dirname(dest), { recursive: true });
   try {
+    // Alt voices always speak for themselves; overrides below apply to
+    // the default voice only (they were QA'd as replacements for it).
     // VOICE_OVERRIDES are Aura speaker names (melotts ignores them);
     // gateway voices use them as voice_id (e.g. MiniMax zh override),
     // and Gemini voices use them as voice names.
@@ -266,6 +273,7 @@ for (const phrase of manifest.phrases) {
     // reads all 8 L3 phrases cleanly. L3 (097-144) is the future level,
     // so it defaults to alvaro; explicit overrides still win either way.
     const speaker =
+      target.voice ??
       VOICE_OVERRIDES[phrase.id] ??
       (lang === "es" && lesson >= "097" && lesson <= "144" ? "alvaro" : voice.speaker);
     if (voice.provider === "workers-melotts" || voice.provider === "gateway-gemini") {
@@ -302,11 +310,12 @@ for (const phrase of manifest.phrases) {
           ? await synthGateway(TEXT_OVERRIDES[phrase.id] ?? phrase.scoreText ?? phrase.text, speaker)
           : await synthAura(phrase.text, speaker);
       writeFileSync(dest, bytes);
-      console.log(`${phrase.id}: ${bytes.length} bytes (${contentType})`);
+      console.log(`${phrase.id}[${target.voice ?? "default"}]: ${bytes.length} bytes (${contentType})`);
     }
   } catch (err) {
-    console.error(`${phrase.id}: ${err.message}`);
+    console.error(`${phrase.id}[${target.voice ?? "default"}]: ${err.message}`);
     process.exit(1);
+  }
   }
 }
 console.log("done");

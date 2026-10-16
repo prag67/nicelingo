@@ -1,0 +1,34 @@
+# Staff admin Worker (nicelingo-staff) — separate from the public app,
+# sharing the same D1. Deploy: npm run deploy:staff
+# Check only:  npm run deploy:staff:check
+#
+# Cloudflare Access setup (one-time, Zero Trust dashboard):
+# 1. Deploy this Worker; note its URL (nicelingo-staff.<account>.workers.dev).
+# 2. Zero Trust -> Access -> Applications -> Add a self-hosted application
+#    for that URL, with an Allow policy for staff identities only.
+# 3. Copy the application's Audience (AUD) tag into ACCESS_AUD below and
+#    set STAFF_ALLOWED_EMAILS to the bootstrap admin email(s), then
+#    redeploy. Until both are set the Worker fails closed (403).
+# 4. Apply the staff migration to the shared D1 before first use:
+#    npm run db:migrate:remote
+# 5. Optional analytics read-back: wrangler secret put CF_ANALYTICS_TOKEN
+#    --config wrangler.staff.toml  (Account Analytics Read token)
+name = "nicelingo-staff"
+main = "src/staff.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ACCESS_TEAM_DOMAIN = "https://pragmaticonline.cloudflareaccess.com"
+ACCESS_AUD = ""
+STAFF_ALLOWED_EMAILS = ""
+CF_ACCOUNT_ID = "30142eba9e53a37522d1c59b298db661"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "nicelingo-auth"
+database_id = "a30fd8c3-24ed-489b-8919-8f9865b4f28d"
+
+[[analytics_engine_datasets]]
+binding = "EVENTS"
+dataset = "nicelingo_events"

@@ -5,7 +5,7 @@ vi.mock("../src/lib/transcribe", () => ({ transcribeAudio: vi.fn() }));
 import app from "../src/index";
 import { lessons } from "../src/lessons/curriculum";
 import { judgePronunciation, sniffAudioMime } from "../src/lib/judge";
-import { scoreTranscript } from "../src/lib/scoring";
+import { attemptPasses, scoreTranscript } from "../src/lib/scoring";
 import { transcribeAudio } from "../src/lib/transcribe";
 
 // NOTE: fake curriculum + gibberish aliases. Scoring mechanism only;
@@ -35,13 +35,13 @@ describe("POST /api/score", () => {
   it("maps transcripts to green/yellow/red verdicts", async () => {
     let res = await scoreRequest("The snarf is zorping.");
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ score: 100, verdict: "green" });
+    expect(await res.json()).toEqual({ score: 100, verdict: "green", source: "whisper", wrongProb: null, pass: true });
 
     res = await scoreRequest("The snarf is quuxing.");
-    expect(await res.json()).toEqual({ score: 75, verdict: "yellow" });
+    expect(await res.json()).toEqual({ score: 75, verdict: "yellow", source: "whisper", wrongProb: null, pass: false });
 
     res = await scoreRequest("hello world");
-    expect(await res.json()).toEqual({ score: 0, verdict: "red" });
+    expect(await res.json()).toEqual({ score: 0, verdict: "red", source: "whisper", wrongProb: null, pass: false });
   });
 
   it("forgives systematic Whisper mishearings via aliases", async () => {
@@ -66,7 +66,7 @@ describe("POST /api/score", () => {
       body: JSON.stringify({ phraseId: "xx-001-wug-zorping", audio: "QUJD" }),
     });
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ score: 100, verdict: "green" });
+    expect(await res.json()).toEqual({ score: 100, verdict: "green", source: "whisper", wrongProb: null, pass: true });
   });
 
   it("preserves umlauts and folds ß in normalization", async () => {
@@ -141,26 +141,26 @@ describe("POST /api/score (Clef judging)", () => {
     const { AI } = clefEnv("correct", 0.7);
     const res = await clefRequest({ AI });
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ score: 100, verdict: "green" });
+    expect(await res.json()).toEqual({ score: 100, verdict: "green", source: "clef", wrongProb: null, pass: true });
     expect(mockedTranscribe).not.toHaveBeenCalled();
   });
 
   it("maps minor_slip to yellow", async () => {
     const { AI } = clefEnv("minor_slip", 0.3);
     const res = await clefRequest({ AI });
-    expect(await res.json()).toEqual({ score: 70, verdict: "yellow" });
+    expect(await res.json()).toEqual({ score: 70, verdict: "yellow", source: "clef", wrongProb: null, pass: false });
   });
 
   it("maps low-confidence correct to yellow", async () => {
     const { AI } = clefEnv("correct", 0.35);
     const res = await clefRequest({ AI });
-    expect(await res.json()).toEqual({ score: 70, verdict: "yellow" });
+    expect(await res.json()).toEqual({ score: 70, verdict: "yellow", source: "clef", wrongProb: null, pass: false });
   });
 
   it("maps wrong to red", async () => {
     const { AI } = clefEnv("wrong", 0.05);
     const res = await clefRequest({ AI });
-    expect(await res.json()).toEqual({ score: 0, verdict: "red" });
+    expect(await res.json()).toEqual({ score: 0, verdict: "red", source: "clef", wrongProb: null, pass: false });
   });
 
   it("falls back to Whisper scoring when Clef errors", async () => {
@@ -170,7 +170,7 @@ describe("POST /api/score (Clef judging)", () => {
     mockedTranscribe.mockResolvedValueOnce("The snarf is zorping.");
     const res = await clefRequest({ AI: { run } });
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ score: 100, verdict: "green" });
+    expect(await res.json()).toEqual({ score: 100, verdict: "green", source: "whisper", wrongProb: null, pass: true });
     expect(mockedTranscribe).toHaveBeenCalledWith(
       expect.anything(),
       "QUJD",
@@ -182,7 +182,7 @@ describe("POST /api/score (Clef judging)", () => {
     const run = vi.fn(async () => ({}));
     mockedTranscribe.mockResolvedValueOnce("hello world");
     const res = await clefRequest({ AI: { run } });
-    expect(await res.json()).toEqual({ score: 0, verdict: "red" });
+    expect(await res.json()).toEqual({ score: 0, verdict: "red", source: "whisper", wrongProb: null, pass: false });
   });
 
   it("accepts the REST-wrapped Clef response shape", async () => {
@@ -192,7 +192,7 @@ describe("POST /api/score (Clef judging)", () => {
       },
     }));
     const res = await clefRequest({ AI: { run } });
-    expect(await res.json()).toEqual({ score: 100, verdict: "green" });
+    expect(await res.json()).toEqual({ score: 100, verdict: "green", source: "clef", wrongProb: null, pass: true });
   });
 });
 
@@ -223,6 +223,18 @@ describe("judgePronunciation", () => {
       judgePronunciation(undefined, "QUJD", "the snarf is zorping", null, "en"),
     ).resolves.toBeNull();
   });
+
+  it("trusts a correct choice that carries no confidence signal", async () => {
+    // Clef sometimes answers with a bare choice (no probabilities).
+    // That must not demote a correct verdict to yellow: the choice is
+    // the only signal, and learners with good audio were stuck yellow.
+    const run = vi.fn(async () => ({
+      answers: { verdict: { choice: "correct" } },
+    }));
+    await expect(
+      judgePronunciation({ AI: { run } }, "QUJD", "the snarf is zorping", null, "en"),
+    ).resolves.toEqual({ score: 100, verdict: "green", source: "clef", wrongProb: null });
+  });
 });
 
 describe("sniffAudioMime", () => {
@@ -234,4 +246,14 @@ describe("sniffAudioMime", () => {
     expect(sniffAudioMime("SUQzAwAAAAAA")).toBe("audio/mpeg");
     expect(sniffAudioMime("QUJD")).toBe("audio/webm");
   });
+});
+
+describe("attemptPasses (Thai pass rule)", () => {
+  const base = { lang: "th", verdict: "yellow" as const, source: "clef" as const, wrongProb: 0.05, prevVerdict: "yellow" as const };
+  it("passes green anywhere", () => { expect(attemptPasses({ ...base, lang: "en", verdict: "green", source: "whisper", wrongProb: null, prevVerdict: null })).toBe(true); });
+  it("passes a second consecutive Clef minor slip with low p(wrong)", () => { expect(attemptPasses(base)).toBe(true); });
+  it("never passes a first yellow", () => { expect(attemptPasses({ ...base, prevVerdict: null })).toBe(false); expect(attemptPasses({ ...base, prevVerdict: "red" })).toBe(false); });
+  it("never passes Whisper-fallback yellows or high p(wrong)", () => { expect(attemptPasses({ ...base, source: "whisper", wrongProb: null })).toBe(false); expect(attemptPasses({ ...base, wrongProb: 0.5 })).toBe(false); expect(attemptPasses({ ...base, wrongProb: null })).toBe(false); });
+  it("passes a second yellow up to the 0.3 wrong ceiling", () => { expect(attemptPasses({ ...base, wrongProb: 0.25 })).toBe(true); expect(attemptPasses({ ...base, wrongProb: 0.3 })).toBe(false); });
+  it("keeps the rule Thai-only", () => { expect(attemptPasses({ ...base, lang: "zh" })).toBe(false); expect(attemptPasses({ ...base, lang: "en" })).toBe(false); });
 });
