@@ -115,6 +115,7 @@ describe("share your progress", () => {
     expect(html).toContain("https://twitter.com/intent/tweet?text=");
     expect(html).toContain("https://wa.me/?text=");
     expect(html).toContain("https://line.me/R/msg/text/?");
+    expect(html).toContain("https://t.me/share/url?url=");
     expect(html).toContain("https://www.facebook.com/sharer/sharer.php?u=");
     // Message carries the real phrase count and streak.
     const decoded = decodeURIComponent(html);
