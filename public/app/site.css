@@ -431,3 +431,13 @@ a.streak-chip { text-decoration: none; }
 .lang-row-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .lang-row-head b { font-family: var(--font-head); font-size: 1.15rem; }
 .lang-row-nums { color: var(--muted); font-weight: 600; margin: 0.35rem 0; }
+.share-section { margin-top: 1.5rem; }
+.share-section h2 { font-family: var(--font-head); }
+.share-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.share-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 44px; padding: 0.5rem 1rem; border-radius: 999px;
+  border: 2px solid var(--ink); background: #fff; color: var(--ink);
+  font: inherit; font-weight: 800; text-decoration: none; cursor: pointer;
+}
+.share-btn.share-native { background: var(--blue, #1a5feb); color: #fff; }

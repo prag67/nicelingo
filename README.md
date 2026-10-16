@@ -121,7 +121,11 @@ and counts of lessons finished and phrases learned. The streak itself
 is master (activity days are per user across languages); only badges
 and counts are per language. The master page (`/progress`) shows that
 same streak with a summary row per started language and a
-cross-language badge grid. Tapping the streak chip is the door: to
+cross-language badge grid. Both pages carry a Share your progress
+block: the message is built from real numbers ("I can say {phrases}
+phrases in {lang} — {streak}-day streak on Nicelingo!") and shared
+via the native share sheet where available, plus X, WhatsApp, and
+Facebook intent links. Tapping the streak chip is the door: to
 `/progress` from the picker, to `/{lang}/progress` from a course.
 Anonymous learners with a streak
 get a "Sign in so you don't lose your streak" nudge there. Leaving a

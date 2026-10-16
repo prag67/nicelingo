@@ -96,3 +96,44 @@ describe("master progress page", () => {
     expect((html.match(/badge-card earned/g) ?? []).length).toBe(1);
   });
 });
+
+describe("share your progress", () => {
+  it("builds X, WhatsApp, and Facebook intents from real numbers", () => {
+    const today = localDayString();
+    const phrases = ["001", "002", "003", "004"].reduce(
+      (sum, n) => sum + (lessons[n]?.xx?.phrases.length ?? 0),
+      0,
+    );
+    const html = progressPage("xx", {
+      progress: unitOneDone(),
+      registered: true,
+      user: { email: "a@b.c", isAnonymous: false },
+      streakDays: [today],
+      origin: "https://nicelingo.com",
+    });
+    expect(html).toContain("Share your progress");
+    expect(html).toContain("https://twitter.com/intent/tweet?text=");
+    expect(html).toContain("https://wa.me/?text=");
+    expect(html).toContain("https://www.facebook.com/sharer/sharer.php?u=");
+    // Message carries the real phrase count and streak.
+    const decoded = decodeURIComponent(html);
+    expect(decoded).toContain(`${phrases} phrases`);
+    expect(decoded).toContain("1-day streak");
+    expect(decoded).toContain("https://nicelingo.com/xx");
+    expect(html).toContain('class="share-btn share-native"');
+    expect(html).toContain("navigator.share");
+  });
+
+  it("master page shares cross-language totals", async () => {
+    const { masterProgressPage } = await import("../src/routes/progress");
+    const html = masterProgressPage({
+      progress: unitOneDone(),
+      registered: true,
+      user: { email: "a@b.c", isAnonymous: false },
+      streakDays: [localDayString()],
+      origin: "https://nicelingo.com",
+    });
+    expect(decodeURIComponent(html)).toContain("learning languages with Nicelingo");
+    expect(html).toContain("https://wa.me/?text=");
+  });
+});

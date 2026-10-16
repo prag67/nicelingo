@@ -136,6 +136,49 @@ function streakNoteHtml(user: CourseUser, streak: StreakInfo, ui: UiLang): strin
   return "";
 }
 
+/** Share-to-social block: the message is built from real numbers
+ *  (phrases learned, streak). Intent links work without JS; a small
+ *  inline script adds the native share sheet where available. */
+function shareSectionHtml(args: {
+  ui: UiLang;
+  streak: StreakInfo;
+  phrases: number;
+  langName?: string;
+  url: string;
+}): string {
+  const d = t(args.ui);
+  const text =
+    args.streak.current >= 1
+      ? args.langName
+        ? fmt(d.shareMsg, { phrases: args.phrases, lang: args.langName, streak: args.streak.current })
+        : fmt(d.shareMsgMaster, { phrases: args.phrases, streak: args.streak.current })
+      : args.langName
+        ? fmt(d.shareMsgCalm, { phrases: args.phrases, lang: args.langName })
+        : fmt(d.shareMsgMasterCalm, { phrases: args.phrases });
+  const encText = encodeURIComponent(text);
+  const encUrl = encodeURIComponent(args.url);
+  const full = encodeURIComponent(`${text} ${args.url}`);
+  return `<section class="share-section" aria-label="${escapeHtml(d.shareProgress)}">
+<h2>${escapeHtml(d.shareProgress)}</h2>
+<div class="share-row">
+<button class="share-btn share-native" type="button" hidden>Share…</button>
+<a class="share-btn" href="https://twitter.com/intent/tweet?text=${encText}&url=${encUrl}" target="_blank" rel="noopener">X</a>
+<a class="share-btn" href="https://wa.me/?text=${full}" target="_blank" rel="noopener">WhatsApp</a>
+<a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u=${encUrl}&quote=${encText}" target="_blank" rel="noopener">Facebook</a>
+</div>
+<script>
+(function () {
+  var btn = document.querySelector(".share-native");
+  if (!btn || !navigator.share) return;
+  btn.hidden = false;
+  btn.addEventListener("click", function () {
+    navigator.share({ title: "Nicelingo", text: ${JSON.stringify(text)}, url: ${JSON.stringify(args.url)} }).catch(function () {});
+  });
+})();
+</script>
+</section>`;
+}
+
 function headHtml(path: string, streak: StreakInfo, opts: ProgressOpts, ui: UiLang): string {
   return `<header class="site-head">${brandHtml()}<span class="head-sp"></span>${streakChipHtml(streak, ui, path)}<span data-account>${accountMenuHtml({ user: opts.user, subscribed: opts.subscribed ?? false, ui, path })}</span></header>`;
 }
@@ -162,6 +205,7 @@ ${numbersHtml([
   { value: phrases, label: labelOf(d.phrasesLearned, phrases) },
   { value: unitsDone, label: labelOf(d.unitsDone, unitsDone) },
 ])}
+${shareSectionHtml({ ui, streak, phrases, langName: info.ownName, url: `${opts.origin ?? ""}/${lang}` })}
 ${badgeSectionHtml(unitsDone, ui)}
 </main>
 ${siteFooterHtml(ui, `/${lang}`, { registered: opts.registered })}`;
@@ -211,6 +255,7 @@ ${numbersHtml([
   { value: totalPhrases, label: labelOf(d.phrasesLearned, totalPhrases) },
   { value: totalUnits, label: labelOf(d.unitsDone, totalUnits) },
 ])}
+${shareSectionHtml({ ui, streak, phrases: totalPhrases, url: `${opts.origin ?? ""}/` })}
 ${langsSection}
 ${badgeSectionHtml(totalUnits, ui)}
 </main>
