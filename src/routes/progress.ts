@@ -99,7 +99,7 @@ export function progressPage(lang: string, opts: ProgressOpts): string {
     const earned = unitsDone >= tier.units;
     return earned
       ? `<div class="badge-card earned"><span class="badge-icon">${tier.icon}</span><b>${fmt(d.unitsDone, { n: tier.units })}</b></div>`
-      : `<div class="badge-card locked"><span class="badge-icon">${tier.icon}</span><span>${fmt(d.badgeHowTo, { n: tier.units })}</span></div>`;
+      : `<div class="badge-card locked"><span class="badge-icon">${tier.icon}</span><span>${fmt(tier.units === 1 ? d.badgeHowToOne : d.badgeHowTo, { n: tier.units })}</span></div>`;
   }).join("");
 
   const lessonsDone = countDoneLessons(lang, progress);
