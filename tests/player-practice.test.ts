@@ -393,3 +393,61 @@ describe("lesson topbar", () => {
     expect(screenText()).toContain("Which picture matches?");
   });
 });
+
+describe("exit current stage dialog", () => {
+  const lastButton = (text) =>
+    documentStub.created
+      .filter((el) => (el.tag === "button" || el.tag === "a") && el.text.includes(text))
+      .at(-1);
+  it("asks before leaving a stage in progress, for bars and the parrot", async () => {
+    installStubs("?demo=listen-match", ["image-phrase"]);
+    await bootPlayer();
+    expect(screenText()).toContain("Which picture matches?");
+    const stageBtn = () =>
+      documentStub.created.filter(
+        (el) => el.tag === "button" && String(el.attrs["aria-label"] ?? "").startsWith("Stage "),
+      ).at(-1);
+    // No: stays on the current stage.
+    stageBtn().click();
+    for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 10));
+    expect(documentStub.body.text).toContain("Exit current stage?");
+    lastButton("Stay").click();
+    for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 10));
+    expect(screenText()).toContain("Which picture matches?");
+    expect(screenText()).not.toContain("Which sentence matches?");
+    // Yes: moves to the completed stage that was tapped.
+    stageBtn().click();
+    for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 10));
+    lastButton("Yes, exit").click();
+    for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 10));
+    expect(screenText()).toContain("Which sentence matches?");
+  });
+
+  it("asks before the parrot leaves mid-stage, and Yes goes home", async () => {
+    installStubs("?demo=listen-match", ["image-phrase"]);
+    await bootPlayer();
+    const brand = documentStub.created.find(
+      (el) => el.tag === "a" && el.attrs.href === "/",
+    );
+    brand.click();
+    for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 10));
+    expect(documentStub.body.text).toContain("Exit current stage?");
+    expect(locationStub.href).not.toBe("/");
+    lastButton("Yes, exit").click();
+    for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 10));
+    expect(locationStub.href).toBe("/");
+  });
+
+  it("does not ask on the start gate, where nothing is in progress", async () => {
+    installStubs("", ["listen-match"]);
+    await bootPlayer();
+    expect(screenText()).toContain("Tap to start");
+    const brand = documentStub.created.find(
+      (el) => el.tag === "a" && el.attrs.href === "/",
+    );
+    brand.click();
+    for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 10));
+    expect(documentStub.body.text).not.toContain("Exit current stage?");
+    expect(locationStub.href).toBe("/");
+  });
+});

@@ -104,10 +104,15 @@ export function accountMenuHtml(opts: {
 
 /** Daily-streak chip for page headers (🔥 + localized label). Hidden
  *  until the streak is at least 1; the inline client script repaints
- *  it from merged local + server days in the visitor's timezone. */
-export function streakChipHtml(streak: StreakInfo, ui: UiLang): string {
+ *  it from merged local + server days in the visitor's timezone. When
+ *  href is given the chip is the door to the progress page. */
+export function streakChipHtml(streak: StreakInfo, ui: UiLang, href?: string): string {
   if (streak.current < 1) return `<span class="streak-chip" data-streak hidden></span>`;
-  return `<span class="streak-chip" data-streak title="${fmt(t(ui).dayStreak, { n: streak.current })}">🔥 <b>${streak.current}</b></span>`;
+  const inner = `🔥 <b>${streak.current}</b>`;
+  const title = fmt(t(ui).dayStreak, { n: streak.current });
+  return href
+    ? `<a class="streak-chip" data-streak href="${href}" title="${escapeHtml(title)}" aria-label="${escapeHtml(title)}">${inner}</a>`
+    : `<span class="streak-chip" data-streak title="${escapeHtml(title)}">${inner}</span>`;
 }
 
 /** App-language control for the footer: one 44px control showing the

@@ -31,15 +31,14 @@ describe("unit badges", () => {
     progress["xx-lesson-005"] = ["listen-match"];
     expect(completedUnits("xx", progress)).toBe(1);
   });
-  it("renders the streak chip and badges on the course page", () => {
+  it("links the streak chip to the progress page; badges live there now", () => {
     const acts = ["listen-match", "image-phrase", "speak-score", "read-write"];
     const progress: Record<string, string[]> = {};
     for (const n of ["001", "002", "003", "004"]) progress[`xx-lesson-${n}`] = acts;
     const today = new Date();
     const day = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
     const html = coursePage("xx", { progress, registered: false, subscribed: false, paywallDisabled: false, user: null, streakDays: [day] });
-    expect(html).toContain("data-streak");
-    expect(html).toContain("1 units done");
-    expect(html).toContain("Next badge after 2 more units");
+    expect(html).toContain('data-streak href="/xx/progress"');
+    expect(html).not.toContain("Next badge after");
   });
 });

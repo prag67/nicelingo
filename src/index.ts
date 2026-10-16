@@ -20,6 +20,7 @@ import {
 import { d1ProgressStore } from "./db/progress-store";
 import { d1PrefsStore } from "./db/prefs-store";
 import { coursePage } from "./routes/course";
+import { progressPage } from "./routes/progress";
 import { developersPage } from "./routes/developers";
 import { contactPage, privacyPage, refundsPage, termsPage } from "./routes/legal";
 import {
@@ -318,6 +319,26 @@ app.get("/terms", (c) => c.html(termsPage(requestUiLang(c))));
 app.get("/privacy", (c) => c.html(privacyPage(requestUiLang(c))));
 app.get("/refunds", (c) => c.html(refundsPage(requestUiLang(c))));
 app.get("/contact", (c) => c.html(contactPage(requestUiLang(c))));
+
+// Your progress (/{lang}/progress): streak hero, 7-day strip, badges.
+// Reached by tapping the streak chip; personal, so noindex.
+app.get("/:lang{[a-z]{2}}/progress", async (c) => {
+  const lang = c.req.param("lang");
+  if (!isPickerLang(lang)) return c.text("Not found", 404);
+  const { user, progress, registered, subscribed, streakDays } = await sessionForSsr(c);
+  const origin = new URL(c.req.url).origin;
+  return c.html(
+    progressPage(lang, {
+      progress,
+      registered,
+      subscribed,
+      uiLang: requestUiLang(c),
+      streakDays,
+      user,
+      origin,
+    }),
+  );
+});
 
 // Course home. Constrained to 2-letter codes so the fixed single-segment
 // routes (/health, /developers, /register) and /api/* can never match it,

@@ -17,10 +17,9 @@ import {
 } from "../lib/lesson-progress";
 import { accountMenuHtml, brandHtml, pageShell, siteFooterHtml } from "./shell";
 import { MONTHLY_PRICE_LABEL, YEARLY_PRICE_LABEL } from "./billing";
-import { fmt, localizeLessonTitle, localizeLevelTitle, localizeUnitTitle, nextBadgeText, t, type UiLang } from "../lib/i18n";
+import { fmt, localizeLessonTitle, localizeLevelTitle, localizeUnitTitle, t, type UiLang } from "../lib/i18n";
 import { streakChipHtml } from "./shell";
 import { computeStreak, localDayString } from "../lib/streaks";
-import { badgeFor, completedUnits } from "../lib/badges";
 
 export type CourseUser = {
   email: string | null;
@@ -239,15 +238,6 @@ const CLIENT = `<script>
 })();
 </script>`;
 
-function badgesHtml(lang: string, progress: Record<string, string[]>, ui: UiLang): string {
-  const d = t(ui);
-  const done = completedUnits(lang, progress);
-  const { earned, next } = badgeFor(done);
-  if (!earned && !next) return "";
-  const earnedHtml = earned ? `<span class="badge-chip">${earned.icon} ${fmt(d.unitsDone, { n: done })}</span>` : "";
-  const nextHtml = next ? `<span class="badge-next">${nextBadgeText(ui, done, next.units)}</span>` : "";
-  return `<section class="badges" aria-label="${d.badgesTitle}"><b>${d.badgesTitle}</b>${earnedHtml}${nextHtml}</section>`;
-}
 
 export function coursePage(lang: string, opts: CourseOpts): string {
   const info = pickerLanguages().find((l) => l.code === lang);
@@ -321,7 +311,7 @@ export function coursePage(lang: string, opts: CourseOpts): string {
   for (const u of UNITS) units[u.unit] = u.lessons;
   const blob = JSON.stringify({ lang, server: progress, totals, units, ui: { stepsComplete: d.stepsComplete, lessonsDone: d.lessonsDone, doneWord: d.doneWord, resumeWord: d.resumeWord, dayStreak: d.dayStreak }, days: opts.streakDays ?? [] });
 
-  const head = `<header class="site-head">${brandHtml()}<span class="head-sp"></span>${streakChipHtml(computeStreak(opts.streakDays ?? [], localDayString()), ui)}<span data-account>${accountMenuHtml({ user, subscribed, ui, path: `/${lang}` })}</span></header>`;
-  const body = `${head}${continueCard(lang, info, locked(next.n), subscribed, returnUrl, progress, ui)}${badgesHtml(lang, progress, ui)}${signinNote}<nav class="tabs" aria-label="Levels">${tabs}</nav>${sections}${siteFooterHtml(ui, `/${lang}`, { registered })}<script type="application/json" id="course-data">${blob.replace(/</g, "\\u003c")}</script>${CLIENT}`;
+  const head = `<header class="site-head">${brandHtml()}<span class="head-sp"></span>${streakChipHtml(computeStreak(opts.streakDays ?? [], localDayString()), ui, `/${lang}/progress`)}<span data-account>${accountMenuHtml({ user, subscribed, ui, path: `/${lang}` })}</span></header>`;
+  const body = `${head}${continueCard(lang, info, locked(next.n), subscribed, returnUrl, progress, ui)}${signinNote}<nav class="tabs" aria-label="Levels">${tabs}</nav>${sections}${siteFooterHtml(ui, `/${lang}`, { registered })}<script type="application/json" id="course-data">${blob.replace(/</g, "\\u003c")}</script>${CLIENT}`;
   return pageShell({ title: `${info.ownName} course · Nicelingo`, lang: ui, origin: opts.origin ?? "", canonicalPath: `/${lang}`, body });
 }

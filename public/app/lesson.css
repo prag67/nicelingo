@@ -131,6 +131,21 @@ button.seg:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; 
 @keyframes fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .step { font-weight: 800; color: var(--ink-soft); font-size: 0.9rem; white-space: nowrap; }
 
+/* exit-stage confirmation */
+.dialog-backdrop {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(14, 27, 61, 0.45);
+  display: grid; place-items: center; padding: 1rem;
+}
+.dialog {
+  background: #fff; border-radius: 20px; padding: 1.5rem;
+  width: 100%; max-width: 22rem;
+  box-shadow: 0 18px 50px rgba(14, 27, 61, 0.35);
+}
+.dialog h2 { font-family: var(--font-head); margin: 0 0 0.5rem; font-size: 1.3rem; }
+.dialog-actions { display: flex; gap: 0.6rem; margin-top: 1.25rem; }
+.dialog-actions .btn { flex: 1; }
+
 /* prompts */
 h1 { font-family: var(--font-head); font-size: 1.4rem; margin: 0.25rem 0 0; }
 .sub { color: var(--ink-soft); margin: 0; font-size: 1.05rem; }

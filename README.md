@@ -52,7 +52,9 @@ repo); content is all rights reserved.
 - `GET|POST /api/progress` — per-activity completion, strict order, auth required
 - `POST /_nicelingo/events` — browser beacon for client events (`page_view`)
 - Pages: `/` language picker (the homepage), `/:lang` course home,
-  `/lesson/:lang/:lesson` player (public/app/player.js; parrot logo links
+  `/:lang/progress` Your progress (streak hero, 7-day strip, badges —
+  reached by tapping the streak chip; `noindex`), `/lesson/:lang/:lesson`
+  player (public/app/player.js; parrot logo links
   home, completed stage bars replay that stage), `/billing`, `/terms`,
   `/privacy`, `/refunds`, `/contact`, `/developers`, `/robots.txt`,
   `/sitemap.xml` (registry-driven), plus `noindex` auth pages
@@ -101,6 +103,24 @@ subscription state, subscription list, Analytics Engine usage reports
 (needs the `CF_ANALYTICS_TOKEN` secret on the staff Worker), and the
 staff audit log (`staff_audit_events`, written by future mutation
 tools via the `audit()` helper).
+
+## Progress, streaks, and badges
+
+Rewards follow learning only — never purchases — and are identical for
+free and Premium learners. A streak day is any local calendar day with
+at least one completed activity (`src/lib/streaks.ts`, derived from
+activity days, no extra state). Unit badges (`src/lib/badges.ts`) award
+tiers at 1/3/5/10/20/30/40/50/60 completed units. Both live on Your
+progress (`/{lang}/progress`, `src/routes/progress.ts`): streak hero
+with a 7-day strip and an encouragement/warning line, the badge grid
+(earned in colour, locked grey with how-to-earn text, plus the "Next
+badge after N more unit(s)" line that used to sit on the course page),
+and counts of lessons finished and phrases learned. Tapping the streak
+chip in the course header is the door. Anonymous learners with a streak
+get a "Sign in so you don't lose your streak" nudge there. Leaving a
+lesson stage mid-way (parrot logo or a completed stage bar) asks first
+via an "Exit current stage?" dialog. Later slices: daily-goal ring,
+streak freeze, words-you-know gallery, step badges, parrot outfits.
 
 ## Lesson media (R2)
 

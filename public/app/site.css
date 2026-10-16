@@ -280,6 +280,37 @@ button.linklike { background: none; border: none; padding: 0; color: var(--link)
 .badges { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin: 1rem 0 0; }
 .badge-chip { font-weight: 800; background: var(--wash); border: 2px solid var(--ink); border-radius: 999px; padding: 0.3rem 0.7rem; }
 .badge-next { color: var(--muted); font-weight: 700; }
+a.streak-chip { text-decoration: none; }
+
+/* Your progress (/{lang}/progress) */
+.progress-main { max-width: 44rem; margin: 0 auto; padding: 0 1rem 2rem; }
+.progress-main h1 { font-family: var(--font-head); }
+.back-line { margin: 0.5rem 0 0; }
+.streak-hero {
+  text-align: center; background: #fff; border: 2px solid #d3e2f5;
+  border-radius: 20px; padding: 1.5rem 1rem; margin-top: 1rem;
+}
+.streak-hero .flame { font-size: 3.5rem; line-height: 1; }
+.streak-num { font-family: var(--font-head); font-size: 1.6rem; font-weight: 800; margin: 0.5rem 0 1rem; }
+.week-strip { display: flex; justify-content: center; gap: 0.9rem; }
+.week-strip .day { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+.week-strip .dot { width: 1.1rem; height: 1.1rem; border-radius: 50%; background: var(--line); display: block; }
+.week-strip .dot.on { background: #ff8a1f; }
+.week-strip .day.today .dot { outline: 2px solid var(--ink); outline-offset: 2px; }
+.week-strip small { color: var(--muted); font-weight: 700; }
+.hero-line { color: var(--muted); font-weight: 600; margin: 1rem 0 0; }
+.numbers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-top: 1rem; }
+.num-card { background: #fff; border: 2px solid #d3e2f5; border-radius: 16px; padding: 1rem 0.5rem; text-align: center; display: flex; flex-direction: column; gap: 0.2rem; }
+.num-card b { font-family: var(--font-head); font-size: 1.5rem; }
+.num-card span { color: var(--muted); font-weight: 600; font-size: 0.9rem; }
+.badge-section { margin-top: 1.5rem; }
+.badge-section h2 { font-family: var(--font-head); }
+.badge-next-line { color: var(--muted); font-weight: 700; }
+.badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.75rem; }
+.badge-card { background: #fff; border: 2px solid #d3e2f5; border-radius: 16px; padding: 1rem; text-align: center; display: flex; flex-direction: column; gap: 0.35rem; align-items: center; }
+.badge-card .badge-icon { font-size: 2rem; line-height: 1.2; }
+.badge-card.locked { color: var(--muted); }
+.badge-card.locked .badge-icon { filter: grayscale(1); opacity: 0.45; }
 
 /* ---- continue card ---- */
 .cont {
