@@ -124,6 +124,9 @@ describe("share your progress", () => {
     expect(decoded).toContain("https://nicelingo.com/xx");
     expect(html).toContain('class="share-btn share-native"');
     expect(html).toContain("navigator.share");
+    expect(html).toContain("Copy link");
+    expect(html).toContain("share-copy");
+    expect(html).toContain("navigator.clipboard");
   });
 
   it("master page shares cross-language totals", async () => {

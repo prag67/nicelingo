@@ -162,6 +162,7 @@ function shareSectionHtml(args: {
 <h2>${escapeHtml(d.shareProgress)}</h2>
 <div class="share-row">
 <button class="share-btn share-native" type="button" hidden>Share…</button>
+<button class="share-btn share-copy" type="button">${escapeHtml(d.copyLink)}</button>
 <a class="share-btn" href="https://twitter.com/intent/tweet?text=${encText}&url=${encUrl}" target="_blank" rel="noopener">X</a>
 <a class="share-btn" href="https://wa.me/?text=${full}" target="_blank" rel="noopener">WhatsApp</a>
 <a class="share-btn" href="https://line.me/R/msg/text/?${full}" target="_blank" rel="noopener">LINE</a>
@@ -170,12 +171,35 @@ function shareSectionHtml(args: {
 </div>
 <script>
 (function () {
+  var url = ${JSON.stringify(args.url)};
   var btn = document.querySelector(".share-native");
-  if (!btn || !navigator.share) return;
-  btn.hidden = false;
-  btn.addEventListener("click", function () {
-    navigator.share({ title: "Nicelingo", text: ${JSON.stringify(text)}, url: ${JSON.stringify(args.url)} }).catch(function () {});
-  });
+  if (btn && navigator.share) {
+    btn.hidden = false;
+    btn.addEventListener("click", function () {
+      navigator.share({ title: "Nicelingo", text: ${JSON.stringify(text)}, url: url }).catch(function () {});
+    });
+  }
+  var copy = document.querySelector(".share-copy");
+  if (copy) {
+    copy.addEventListener("click", function () {
+      function done() {
+        var old = copy.textContent;
+        copy.textContent = ${JSON.stringify(d.copied)};
+        setTimeout(function () { copy.textContent = old; }, 2000);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done).catch(done);
+      } else {
+        var ta = document.createElement("textarea");
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (e) {}
+        ta.remove();
+        done();
+      }
+    });
+  }
 })();
 </script>
 </section>`;
