@@ -125,7 +125,9 @@ cross-language badge grid. Both pages carry a Share your progress
 block: the message is built from real numbers ("I can say {phrases}
 phrases in {lang} — {streak}-day streak on Nicelingo!") and shared
 via the native share sheet where available, a Copy link button,
-plus X, WhatsApp, LINE, Telegram, and Facebook intent links. Tapping the streak chip is the door: to
+plus X, WhatsApp, LINE, Telegram, and Facebook intent links. The
+lesson-complete screen carries the same targets as an icon-only
+row (44px round buttons) with a just-finished-lesson message. Tapping the streak chip is the door: to
 `/progress` from the picker, to `/{lang}/progress` from a course.
 Anonymous learners with a streak
 get a "Sign in so you don't lose your streak" nudge there. Leaving a

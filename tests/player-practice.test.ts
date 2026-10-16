@@ -459,3 +459,26 @@ describe("exit current stage dialog", () => {
     expect(locationStub.href).toBe("/");
   });
 });
+
+describe("lesson complete share icons", () => {
+  it("shows icon-only share buttons with the lesson message", async () => {
+    installStubs("");
+    await bootPlayer();
+    expect(screenText()).toContain("Lesson 1 complete!");
+    const shareLinks = documentStub.created.filter(
+      (el) => el.attrs.href && /twitter\.com|wa\.me|line\.me|t\.me|facebook\.com/.test(el.attrs.href),
+    );
+    expect(shareLinks.length).toBe(5);
+    const decoded = decodeURIComponent(shareLinks.map((l) => l.attrs.href).join(" "));
+    expect(decoded).toContain("I just finished Lesson 1 on Nicelingo");
+    expect(decoded).toContain("8 new phrases");
+    for (const l of shareLinks) {
+      expect(l.text.trim()).toBe("");
+      expect(l.attrs["aria-label"]).toBeTruthy();
+    }
+    const copyBtn = documentStub.created.find(
+      (el) => el.tag === "button" && el.attrs["aria-label"] === "Copy link",
+    );
+    expect(copyBtn).toBeTruthy();
+  });
+});
