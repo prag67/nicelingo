@@ -52,8 +52,10 @@ repo); content is all rights reserved.
 - `GET|POST /api/progress` — per-activity completion, strict order, auth required
 - `POST /_nicelingo/events` — browser beacon for client events (`page_view`)
 - Pages: `/` language picker (the homepage), `/:lang` course home,
-  `/:lang/progress` Your progress (streak hero, 7-day strip, badges —
-  reached by tapping the streak chip; `noindex`), `/lesson/:lang/:lesson`
+  `/:lang/progress` Your progress per language plus the master
+  `/progress` (same global streak, per-language summary rows,
+  cross-language badge grid; both reached by tapping the streak chip;
+  `noindex`), `/lesson/:lang/:lesson`
   player (public/app/player.js; parrot logo links
   home, completed stage bars replay that stage), `/billing`, `/terms`,
   `/privacy`, `/refunds`, `/contact`, `/developers`, `/robots.txt`,
@@ -115,8 +117,13 @@ progress (`/{lang}/progress`, `src/routes/progress.ts`): streak hero
 with a 7-day strip and an encouragement/warning line, the badge grid
 (earned in colour, locked grey with how-to-earn text, plus the "Next
 badge after N more unit(s)" line that used to sit on the course page),
-and counts of lessons finished and phrases learned. Tapping the streak
-chip in the course header is the door. Anonymous learners with a streak
+and counts of lessons finished and phrases learned. The streak itself
+is master (activity days are per user across languages); only badges
+and counts are per language. The master page (`/progress`) shows that
+same streak with a summary row per started language and a
+cross-language badge grid. Tapping the streak chip is the door: to
+`/progress` from the picker, to `/{lang}/progress` from a course.
+Anonymous learners with a streak
 get a "Sign in so you don't lose your streak" nudge there. Leaving a
 lesson stage mid-way (parrot logo or a completed stage bar) asks first
 via an "Exit current stage?" dialog. Later slices: daily-goal ring,

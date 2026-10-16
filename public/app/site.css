@@ -425,3 +425,9 @@ a.streak-chip { text-decoration: none; }
 .segs i.on { background: var(--blue); }
 .lstatus { display: block; font-size: 0.85rem; color: var(--muted); margin-top: 0.3rem; }
 .lstatus strong { color: var(--ink-soft); }
+.langs-section { margin-top: 1.5rem; }
+.langs-section h2 { font-family: var(--font-head); }
+.lang-row { background: #fff; border: 2px solid #d3e2f5; border-radius: 16px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+.lang-row-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.lang-row-head b { font-family: var(--font-head); font-size: 1.15rem; }
+.lang-row-nums { color: var(--muted); font-weight: 600; margin: 0.35rem 0; }

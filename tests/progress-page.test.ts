@@ -67,3 +67,32 @@ describe("progressPage", () => {
     expect(html).toContain("Sign in so you don't lose your 1-day streak");
   });
 });
+
+describe("master progress page", () => {
+  it("serves /progress, noindex, out of the sitemap", async () => {
+    const res = await app.request("/progress");
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain("Your progress");
+    expect(html).toContain('<meta name="robots" content="noindex">');
+    const xml = await (await app.request("/sitemap.xml")).text();
+    expect(xml).not.toContain("progress");
+  });
+
+  it("summarizes each started language with totals across languages", async () => {
+    const { masterProgressPage } = await import("../src/routes/progress");
+    const today = localDayString();
+    const html = masterProgressPage({
+      progress: unitOneDone(),
+      registered: true,
+      user: { email: "a@b.c", isAnonymous: false },
+      streakDays: [today],
+    });
+    expect(html).toContain("Your languages");
+    expect(html).toContain('href="/xx/progress"');
+    expect(html).toContain('href="/xx"');
+    // Cross-language badge grid uses summed units (1 here).
+    expect(html).toContain("Next badge after 2 more units");
+    expect((html.match(/badge-card earned/g) ?? []).length).toBe(1);
+  });
+});

@@ -1,18 +1,20 @@
-// "Your progress" (/{lang}/progress): the home for streaks and badges,
-// reached by tapping the streak chip. Slice one: streak hero with a
-// 7-day strip, the unit-badge grid (earned in colour, locked grey with
-// how-to-earn text), and honest numbers derived from lesson progress —
-// lessons finished and phrases in finished lessons. Rewards follow
-// learning only; the page is the same for free and Premium learners.
+// "Your progress": the home for streaks and badges, reached by tapping
+// the streak chip. Two views of one learner: the master page
+// (/progress) shows the global streak plus a summary row per started
+// language; each course page (/{lang}/progress) shows that language's
+// badges and numbers. The streak itself is master — activity days are
+// per user across languages — only badges/counts are per language.
+// Rewards follow learning only; free and Premium see the same page.
 import { UNITS, lessons } from "../lessons/curriculum";
 import { pickerLanguages } from "../lessons/languages";
 import {
   countDoneLessons,
   escapeHtml,
+  hasStarted,
   isLessonDone,
 } from "../lib/lesson-progress";
 import { fmt, nextBadgeText, t, type UiLang } from "../lib/i18n";
-import { computeStreak, localDayString } from "../lib/streaks";
+import { computeStreak, localDayString, type StreakInfo } from "../lib/streaks";
 import { UNIT_BADGE_TIERS, badgeFor, completedUnits } from "../lib/badges";
 import {
   accountMenuHtml,
@@ -65,15 +67,9 @@ function phrasesLearned(lang: string, progress: Record<string, string[]>): numbe
   return total;
 }
 
-export function progressPage(lang: string, opts: ProgressOpts): string {
-  const info = pickerLanguages().find((l) => l.code === lang);
-  if (!info) throw new Error(`unknown course language ${lang}`);
-  const ui = opts.uiLang ?? "en";
+function streakHeroHtml(streak: StreakInfo, daySet: Set<string>, ui: UiLang): string {
   const d = t(ui);
-  const { progress, user } = opts;
   const today = localDayString();
-  const streak = computeStreak(opts.streakDays ?? [], today);
-  const daySet = new Set(opts.streakDays ?? []);
   const initials = WEEKDAY_INITIALS[ui] ?? WEEKDAY_INITIALS.en;
   const strip = last7Days(today)
     .map((day) => {
@@ -89,8 +85,16 @@ export function progressPage(lang: string, opts: ProgressOpts): string {
       : streak.activeToday
         ? d.streakDoneLine
         : d.streakKeepLine;
+  return `<section class="streak-hero" aria-label="${escapeHtml(fmt(d.dayStreak, { n: streak.current }))}">
+<div class="flame" aria-hidden="true">🔥</div>
+<p class="streak-num">${escapeHtml(fmt(d.dayStreak, { n: streak.current }))}</p>
+<div class="week-strip" role="img" aria-label="${escapeHtml(fmt(d.dayStreak, { n: streak.current }))}">${strip}</div>
+<p class="hero-line">${escapeHtml(heroLine)}</p>
+</section>`;
+}
 
-  const unitsDone = completedUnits(lang, progress);
+function badgeSectionHtml(unitsDone: number, ui: UiLang): string {
+  const d = t(ui);
   const { next } = badgeFor(unitsDone);
   const nextHtml = next
     ? `<p class="badge-next-line">${nextBadgeText(ui, unitsDone, next.units)}</p>`
@@ -101,41 +105,116 @@ export function progressPage(lang: string, opts: ProgressOpts): string {
       ? `<div class="badge-card earned"><span class="badge-icon">${tier.icon}</span><b>${fmt(d.unitsDone, { n: tier.units })}</b></div>`
       : `<div class="badge-card locked"><span class="badge-icon">${tier.icon}</span><span>${fmt(tier.units === 1 ? d.badgeHowToOne : d.badgeHowTo, { n: tier.units })}</span></div>`;
   }).join("");
-
-  const lessonsDone = countDoneLessons(lang, progress);
-  const phrases = phrasesLearned(lang, progress);
-
-  const streakNote =
-    user?.isAnonymous && streak.current >= 1
-      ? `<p class="signin-line">${fmt(d.signInStreak, { n: streak.current })} <a class="linklike" href="/register">${escapeHtml(d.signInToKeep)}</a></p>`
-      : !user
-        ? `<p class="signin-line">${escapeHtml(d.savedOnDevice)} <a class="linklike" href="/sign-in">${escapeHtml(d.signInToKeep)}</a></p>`
-        : "";
-
-  const head = `<header class="site-head">${brandHtml()}<span class="head-sp"></span>${streakChipHtml(streak, ui, `/${lang}/progress`)}<span data-account>${accountMenuHtml({ user, subscribed: opts.subscribed ?? false, ui, path: `/${lang}/progress` })}</span></header>`;
-  const body = `${head}
-<main class="progress-main">
-<p class="back-line"><a class="linklike" href="/${lang}">← ${escapeHtml(d.backToCourse)}</a></p>
-<h1>${escapeHtml(d.progressTitle)}</h1>
-<section class="streak-hero" aria-label="${escapeHtml(fmt(d.dayStreak, { n: streak.current }))}">
-<div class="flame" aria-hidden="true">🔥</div>
-<p class="streak-num">${escapeHtml(fmt(d.dayStreak, { n: streak.current }))}</p>
-<div class="week-strip" role="img" aria-label="${escapeHtml(fmt(d.dayStreak, { n: streak.current }))}">${strip}</div>
-<p class="hero-line">${escapeHtml(heroLine)}</p>
-</section>
-${streakNote}
-<section class="numbers" aria-label="${escapeHtml(d.progressTitle)}">
-<div class="num-card"><b>${lessonsDone}</b><span>${escapeHtml(fmt(d.lessonsCount, { n: lessonsDone }).replace(String(lessonsDone), "").trim())}</span></div>
-<div class="num-card"><b>${phrases}</b><span>${escapeHtml(fmt(d.phrasesLearned, { n: phrases }).replace(String(phrases), "").trim())}</span></div>
-<div class="num-card"><b>${unitsDone}</b><span>${escapeHtml(fmt(d.unitsDone, { n: unitsDone }).replace(String(unitsDone), "").trim())}</span></div>
-</section>
-<section class="badge-section" aria-label="${escapeHtml(d.badgesTitle)}">
+  return `<section class="badge-section" aria-label="${escapeHtml(d.badgesTitle)}">
 <h2>${escapeHtml(d.badgesTitle)}</h2>
 ${nextHtml}
 <div class="badge-grid">${grid}</div>
-</section>
+</section>`;
+}
+
+function numbersHtml(items: { value: number; label: string }[]): string {
+  return `<section class="numbers">${items
+    .map(
+      (i) =>
+        `<div class="num-card"><b>${i.value}</b><span>${escapeHtml(i.label)}</span></div>`,
+    )
+    .join("")}</section>`;
+}
+
+function labelOf(template: string, n: number): string {
+  return fmt(template, { n }).replace(String(n), "").trim();
+}
+
+function streakNoteHtml(user: CourseUser, streak: StreakInfo, ui: UiLang): string {
+  const d = t(ui);
+  if (user?.isAnonymous && streak.current >= 1) {
+    return `<p class="signin-line">${fmt(d.signInStreak, { n: streak.current })} <a class="linklike" href="/register">${escapeHtml(d.signInToKeep)}</a></p>`;
+  }
+  if (!user) {
+    return `<p class="signin-line">${escapeHtml(d.savedOnDevice)} <a class="linklike" href="/sign-in">${escapeHtml(d.signInToKeep)}</a></p>`;
+  }
+  return "";
+}
+
+function headHtml(path: string, streak: StreakInfo, opts: ProgressOpts, ui: UiLang): string {
+  return `<header class="site-head">${brandHtml()}<span class="head-sp"></span>${streakChipHtml(streak, ui, path)}<span data-account>${accountMenuHtml({ user: opts.user, subscribed: opts.subscribed ?? false, ui, path })}</span></header>`;
+}
+
+export function progressPage(lang: string, opts: ProgressOpts): string {
+  const info = pickerLanguages().find((l) => l.code === lang);
+  if (!info) throw new Error(`unknown course language ${lang}`);
+  const ui = opts.uiLang ?? "en";
+  const d = t(ui);
+  const { progress } = opts;
+  const streak = computeStreak(opts.streakDays ?? [], localDayString());
+  const unitsDone = completedUnits(lang, progress);
+  const lessonsDone = countDoneLessons(lang, progress);
+  const phrases = phrasesLearned(lang, progress);
+
+  const body = `${headHtml(`/${lang}/progress`, streak, opts, ui)}
+<main class="progress-main">
+<p class="back-line"><a class="linklike" href="/${lang}">← ${escapeHtml(d.backToCourse)}</a></p>
+<h1>${escapeHtml(d.progressTitle)}</h1>
+${streakHeroHtml(streak, new Set(opts.streakDays ?? []), ui)}
+${streakNoteHtml(opts.user, streak, ui)}
+${numbersHtml([
+  { value: lessonsDone, label: labelOf(d.lessonsCount, lessonsDone) },
+  { value: phrases, label: labelOf(d.phrasesLearned, phrases) },
+  { value: unitsDone, label: labelOf(d.unitsDone, unitsDone) },
+])}
+${badgeSectionHtml(unitsDone, ui)}
 </main>
 ${siteFooterHtml(ui, `/${lang}`, { registered: opts.registered })}`;
+  return pageShell({
+    title: `${d.progressTitle} · Nicelingo`,
+    lang: ui,
+    origin: opts.origin ?? "",
+    noindex: true,
+    body,
+  });
+}
+
+/** Master progress (/progress): the same global streak, one summary
+ *  row per started language, cross-language totals and badge grid. */
+export function masterProgressPage(opts: ProgressOpts): string {
+  const ui = opts.uiLang ?? "en";
+  const d = t(ui);
+  const { progress } = opts;
+  const streak = computeStreak(opts.streakDays ?? [], localDayString());
+
+  const langs = pickerLanguages().filter((l) => hasStarted(l.code, progress));
+  let totalLessons = 0;
+  let totalPhrases = 0;
+  let totalUnits = 0;
+  const rows = langs
+    .map((l) => {
+      const lessonsDone = countDoneLessons(l.code, progress);
+      const phrases = phrasesLearned(l.code, progress);
+      const unitsDone = completedUnits(l.code, progress);
+      totalLessons += lessonsDone;
+      totalPhrases += phrases;
+      totalUnits += unitsDone;
+      return `<div class="lang-row"><div class="lang-row-head"><b lang="${l.code}">${escapeHtml(l.ownName)}</b><a class="linklike" href="/${l.code}/progress">${escapeHtml(d.viewProgress)}</a></div><p class="lang-row-nums">${escapeHtml(fmt(d.lessonsCount, { n: lessonsDone }))} · ${escapeHtml(fmt(d.unitsDone, { n: unitsDone }))} · ${escapeHtml(fmt(d.phrasesLearned, { n: phrases }))}</p><a class="linklike" href="/${l.code}">${escapeHtml(d.backToCourse)}</a></div>`;
+    })
+    .join("");
+  const langsSection = langs.length
+    ? `<section class="langs-section" aria-label="${escapeHtml(d.languagesTitle)}"><h2>${escapeHtml(d.languagesTitle)}</h2>${rows}</section>`
+    : `<p class="signin-line"><a class="linklike" href="/">${escapeHtml(d.pickLanguage)}</a></p>`;
+
+  const body = `${headHtml("/progress", streak, opts, ui)}
+<main class="progress-main">
+<h1>${escapeHtml(d.progressTitle)}</h1>
+${streakHeroHtml(streak, new Set(opts.streakDays ?? []), ui)}
+${streakNoteHtml(opts.user, streak, ui)}
+${numbersHtml([
+  { value: totalLessons, label: labelOf(d.lessonsCount, totalLessons) },
+  { value: totalPhrases, label: labelOf(d.phrasesLearned, totalPhrases) },
+  { value: totalUnits, label: labelOf(d.unitsDone, totalUnits) },
+])}
+${langsSection}
+${badgeSectionHtml(totalUnits, ui)}
+</main>
+${siteFooterHtml(ui, "/", { registered: opts.registered })}`;
   return pageShell({
     title: `${d.progressTitle} · Nicelingo`,
     lang: ui,

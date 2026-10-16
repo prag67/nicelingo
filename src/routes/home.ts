@@ -191,7 +191,7 @@ export function homePage(opts: PickerOpts = {}): string {
   const langs = pickerLanguages();
   const demoLang = langs.some((l) => l.code === opts.demoLang) ? opts.demoLang! : "es";
   const ui = opts.uiLang ?? "en";
-  const head = `<header class="site-head">${brandHtml()}<span class="head-sp"></span>${streakChipHtml(computeStreak(opts.streakDays ?? [], localDayString()), ui)}<span data-account>${accountMenuHtml({ user, subscribed: opts.subscribed ?? false, ui, path: "/" })}</span></header>`;
+  const head = `<header class="site-head">${brandHtml()}<span class="head-sp"></span>${streakChipHtml(computeStreak(opts.streakDays ?? [], localDayString()), ui, "/progress")}<span data-account>${accountMenuHtml({ user, subscribed: opts.subscribed ?? false, ui, path: "/" })}</span></header>`;
   const body = newVisitorHtml(langs, progress, demoLang, opts.subscribed ?? false, ui);
   const blob = JSON.stringify({ server: progress, days: opts.streakDays ?? [], ui: { lessonsDone: t(ui).lessonsDone, continueLabel: t(ui).continueLabel, dayStreak: t(ui).dayStreak } }).replace(/</g, "\\u003c");
   const origin = opts.origin ?? "";

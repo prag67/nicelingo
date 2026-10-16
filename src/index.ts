@@ -20,7 +20,7 @@ import {
 import { d1ProgressStore } from "./db/progress-store";
 import { d1PrefsStore } from "./db/prefs-store";
 import { coursePage } from "./routes/course";
-import { progressPage } from "./routes/progress";
+import { masterProgressPage, progressPage } from "./routes/progress";
 import { developersPage } from "./routes/developers";
 import { contactPage, privacyPage, refundsPage, termsPage } from "./routes/legal";
 import {
@@ -319,6 +319,24 @@ app.get("/terms", (c) => c.html(termsPage(requestUiLang(c))));
 app.get("/privacy", (c) => c.html(privacyPage(requestUiLang(c))));
 app.get("/refunds", (c) => c.html(refundsPage(requestUiLang(c))));
 app.get("/contact", (c) => c.html(contactPage(requestUiLang(c))));
+
+// Master progress (/progress): global streak hero, per-language
+// summary rows, cross-language badge grid. Personal, so noindex.
+app.get("/progress", async (c) => {
+  const { user, progress, registered, subscribed, streakDays } = await sessionForSsr(c);
+  const origin = new URL(c.req.url).origin;
+  return c.html(
+    masterProgressPage({
+      progress,
+      registered,
+      subscribed,
+      uiLang: requestUiLang(c),
+      streakDays,
+      user,
+      origin,
+    }),
+  );
+});
 
 // Your progress (/{lang}/progress): streak hero, 7-day strip, badges.
 // Reached by tapping the streak chip; personal, so noindex.
