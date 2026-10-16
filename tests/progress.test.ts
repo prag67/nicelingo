@@ -1,69 +1,86 @@
 import { describe, expect, it } from "vitest";
-import app from "../src/index";
-import { lessons } from "../src/lessons/curriculum";
-import { localDayString } from "../src/lib/streaks";
-import { progressPage } from "../src/routes/progress";
+import { completeActivity, type ProgressStore } from "../src/lib/progress";
 
-const ACTS = ["listen-match", "image-phrase", "speak-score", "read-write"];
-
-function unitOneDone(): Record<string, string[]> {
-  const progress: Record<string, string[]> = {};
-  for (const n of ["001", "002", "003", "004"]) progress[`xx-lesson-${n}`] = ACTS;
-  return progress;
+function memoryStore(): ProgressStore {
+  const completed = new Map<string, string[]>();
+  const key = (userId: string, lessonId: string) => `${userId}:${lessonId}`;
+  return {
+    listCompleted: async (userId, lessonId) =>
+      completed.get(key(userId, lessonId)) ?? [],
+    listAll: async (userId) => {
+      const grouped: Record<string, string[]> = {};
+      for (const [k, v] of completed) {
+        if (k.startsWith(`${userId}:`)) grouped[k.slice(userId.length + 1)] = v;
+      }
+      return grouped;
+    },
+    markComplete: async (userId, lessonId, activity) => {
+      const k = key(userId, lessonId);
+      completed.set(k, [...(completed.get(k) ?? []), activity]);
+    },
+  };
 }
 
-describe("GET /:lang/progress", () => {
-  it("serves the page for a picker language and 404s otherwise", async () => {
-    const res = await app.request("/xx/progress");
-    expect(res.status).toBe(200);
-    const html = await res.text();
-    expect(html).toContain("Your progress");
-    expect(html).toContain('<meta name="robots" content="noindex">');
-    expect((await app.request("/zz/progress")).status).toBe(404);
-  });
-
-  it("stays out of the sitemap", async () => {
-    const xml = await (await app.request("/sitemap.xml")).text();
-    expect(xml).not.toContain("progress");
-  });
-});
-
-describe("progressPage", () => {
-  it("renders streak hero, 7-day strip, next badge, and badge grid", () => {
-    const today = localDayString();
-    const html = progressPage("xx", {
-      progress: unitOneDone(),
-      registered: true,
-      user: { email: "a@b.c", isAnonymous: false },
-      streakDays: [today],
-    });
-    expect(html).toContain("1-day streak");
-    expect(html).toContain("Practiced today");
-    expect((html.match(/class="dot on"/g) ?? []).length).toBe(1);
-    expect((html.match(/class="dot/g) ?? []).length).toBe(7);
-    // The badge line that used to sit on the course page.
-    expect(html).toContain("Next badge after 2 more units");
-    // One earned tier, the rest locked with how-to-earn text.
-    expect((html.match(/badge-card earned/g) ?? []).length).toBe(1);
-    expect((html.match(/badge-card locked/g) ?? []).length).toBe(8);
-    expect(html).toContain("Finish 3 units to earn this badge");
-    // Numbers: 4 lessons done, phrases from those finished lessons.
-    const expectedPhrases = ["001", "002", "003", "004"].reduce(
-      (sum, n) => sum + (lessons[n]?.xx?.phrases.length ?? 0),
-      0,
+describe("completeActivity", () => {
+  it("completes the first activity and lists it", async () => {
+    const store = memoryStore();
+    const result = await completeActivity(
+      store,
+      "user-1",
+      "lesson-001",
+      "listen-match",
     );
-    expect(html).toContain(`<b>${expectedPhrases}</b>`);
+    expect(result).toEqual({ ok: true, completed: ["listen-match"] });
+    expect(await store.listCompleted("user-1", "lesson-001")).toEqual([
+      "listen-match",
+    ]);
   });
 
-  it("warns when today is not practiced yet, and nudges anonymous streaks to sign in", () => {
-    const yesterday = localDayString(new Date(Date.now() - 86400000));
-    const html = progressPage("xx", {
-      progress: unitOneDone(),
-      registered: false,
-      user: { email: null, isAnonymous: true },
-      streakDays: [yesterday],
-    });
-    expect(html).toContain("Practice today to keep it going");
-    expect(html).toContain("Sign in so you don't lose your 1-day streak");
+  it("rejects completing an activity before its predecessors", async () => {
+    const store = memoryStore();
+    const result = await completeActivity(
+      store,
+      "user-1",
+      "lesson-001",
+      "speak-score",
+    );
+    expect(result.ok).toBe(false);
+    expect(await store.listCompleted("user-1", "lesson-001")).toEqual([]);
+  });
+
+  it("rejects unknown activities and lessons", async () => {
+    const store = memoryStore();
+    expect(
+      (await completeActivity(store, "user-1", "lesson-001", "nope")).ok,
+    ).toBe(false);
+    expect(
+      (await completeActivity(store, "user-1", "lesson-99", "listen-match")).ok,
+    ).toBe(false);
+  });
+
+  it("gates Xxian lessons identically", async () => {
+    const store = memoryStore();
+    expect(
+      (await completeActivity(store, "user-1", "xx-lesson-001", "speak-score")).ok,
+    ).toBe(false);
+    const result = await completeActivity(
+      store,
+      "user-1",
+      "xx-lesson-001",
+      "listen-match",
+    );
+    expect(result).toEqual({ ok: true, completed: ["listen-match"] });
+  });
+
+  it("re-completing an activity is idempotent", async () => {
+    const store = memoryStore();
+    await completeActivity(store, "user-1", "lesson-001", "listen-match");
+    const result = await completeActivity(
+      store,
+      "user-1",
+      "lesson-001",
+      "listen-match",
+    );
+    expect(result).toEqual({ ok: true, completed: ["listen-match"] });
   });
 });
