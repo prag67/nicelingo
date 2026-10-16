@@ -139,10 +139,10 @@ function phraseNodes(phrase) {
   ];
 }
 
-// "Exit current stage?" guard: leaving mid-stage (parrot home link or
-// a completed stage bar) would lose your place in it, so confirm first.
-// No prompt when nothing is in progress (start gate) or the current
-// stage is already finished.
+// "Exit current stage?" guard. The parrot (leaving the lesson) always
+// confirms. A completed stage bar confirms only mid-stage, when leaving
+// would lose your place; on the start gate or after the current stage
+// is finished, bars navigate straight away.
 function stageInProgress(state) {
   return !!state.activity && !(state.completed ?? []).includes(state.activity);
 }
@@ -221,7 +221,9 @@ function topbar(state, onStage) {
         "aria-label": "Nicelingo home",
         onclick: async (e) => {
           e?.preventDefault();
-          if (await guardExit(state)) location.href = "/";
+          // The parrot always confirms before leaving a lesson, even
+          // on the start gate or after a stage is finished.
+          if (await confirmExitStage()) location.href = "/";
         },
       },
       h("img", { src: "/logo/parrot-mark.svg", alt: "" }),

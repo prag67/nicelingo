@@ -438,7 +438,7 @@ describe("exit current stage dialog", () => {
     expect(locationStub.href).toBe("/");
   });
 
-  it("does not ask on the start gate, where nothing is in progress", async () => {
+  it("asks on the start gate too: the parrot always confirms in a lesson", async () => {
     installStubs("", ["listen-match"]);
     await bootPlayer();
     expect(screenText()).toContain("Tap to start");
@@ -447,7 +447,15 @@ describe("exit current stage dialog", () => {
     );
     brand.click();
     for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 10));
-    expect(documentStub.body.text).not.toContain("Exit current stage?");
+    expect(documentStub.body.text).toContain("Exit current stage?");
+    expect(locationStub.href).not.toBe("/");
+    lastButton("Stay").click();
+    for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 10));
+    expect(locationStub.href).not.toBe("/");
+    brand.click();
+    for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 10));
+    lastButton("Yes, exit").click();
+    for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 10));
     expect(locationStub.href).toBe("/");
   });
 });
