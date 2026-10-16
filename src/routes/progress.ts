@@ -164,6 +164,7 @@ function shareSectionHtml(args: {
 <button class="share-btn share-native" type="button" hidden>Share…</button>
 <a class="share-btn" href="https://twitter.com/intent/tweet?text=${encText}&url=${encUrl}" target="_blank" rel="noopener">X</a>
 <a class="share-btn" href="https://wa.me/?text=${full}" target="_blank" rel="noopener">WhatsApp</a>
+<a class="share-btn" href="https://line.me/R/msg/text/?${full}" target="_blank" rel="noopener">LINE</a>
 <a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u=${encUrl}&quote=${encText}" target="_blank" rel="noopener">Facebook</a>
 </div>
 <script>
