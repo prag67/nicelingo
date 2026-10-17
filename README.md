@@ -293,3 +293,24 @@ one before deploying.
 `POST /api/auth/sign-in/anonymous` creates a guest user + session cookie with
 no PII. The client can later link Google via the normal social sign-in, which
 attaches the OAuth account to the same user.
+
+## Course expansion (spec v1.0)
+
+Phase 1 shipped: daily review on a 1/3/7/14/30/60-day schedule
+(`review_step`/`due_at` on phrase_stats, migration 0008), recall
+rounds in review, checkpoints and challenges, a daily-review strip
+on the course home, strength dots in the Words-you-know gallery,
+and level renaming (First Words A1 / What Happened A1 / Making
+Plans A1-A2 / Likes & Stories A2 / Getting Things Done A2).
+
+Phase 2/2b shipped for Spanish Level 1 (decision 8 rollout):
+conversation lessons (`bootConversation`, `/api/conversation/:lang/:unit`,
+course banner after each unit's photo lessons, Unit 1 free) with
+watch-the-scene, comprehension, spoken and typed rounds, recall in
+both roles, and a "Can't talk now" typed mode. Six Spanish scenes
+(units 1-6) with two voices and QA'd audio plus scene images are in
+R2. Remaining: the other 54 scenes and languages, per-line images,
+read cards and varied replies, Phase 2c complements (1,536 images,
+~9,200 clips), Phase 2d Thai/Mandarin levels, and Phase 3 (tips,
+Selena voice swap, word feedback after the Clef test, script track
+pending confirmation).
