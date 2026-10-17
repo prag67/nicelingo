@@ -1418,12 +1418,17 @@ async function bootCheckpoint(lang, level, unit) {
               h("h1", {}, passed ? S.checkpointPassedText : S.checkpointFail),
               h("p", { class: "sub" }, S.checkpointScoreLine.replace("{n}", String(score))),
               ...(passed ? [h("div", { class: "cp-badge" }, `Unit ${unit} ✓`)] : []),
-              ...(missedList ? [missedList] : []),
+              // Missed phrases (with play buttons) belong on the
+              // not-passed screen; on a pass they read as a stray
+              // button under the badge, and Practise these already
+              // covers reviewing them.
+              ...(!passed && missedList ? [missedList] : []),
               h("div", { class: "spacer" }),
-              continueBtn,
-              ...(missed.length
-                ? [passed ? practiseBtn : h("div", { style: "display:flex;flex-direction:column;gap:0.6rem" }, againBtn, practiseBtn)]
-                : [againBtn]))),
+              h("div", { class: "complete-actions" },
+                continueBtn,
+                ...(missed.length ? [practiseBtn] : []),
+                ...(!passed || !missed.length ? [againBtn] : [])),
+              h("p", {}, h("a", { href: `/${lang}` }, `← ${S.lessonPage}`)))),
         );
       },
     });

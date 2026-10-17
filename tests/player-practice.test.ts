@@ -610,3 +610,14 @@ describe("unit checkpoint runner", () => {
     expect(documentStub.created.length).toBeGreaterThan(0);
   });
 });
+
+describe("checkpoint result screen", () => {
+  it("spaces its actions, links back to the language page, and keeps missed phrases off the passed screen", async () => {
+    const { readFileSync } = await import("node:fs");
+    const src = readFileSync(new URL("../public/app/player.js", import.meta.url), "utf8");
+    const block = src.slice(src.indexOf("S.checkpointPassedText"), src.indexOf("async function bootReview"));
+    expect(block).toContain("complete-actions");
+    expect(block).toContain("S.lessonPage");
+    expect(block).toContain("!passed && missedList");
+  });
+});
