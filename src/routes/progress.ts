@@ -211,6 +211,10 @@ function shareSectionHtml(args: {
  *  own recording) and announce its meaning. */
 function wordsGalleryHtml(lang: string, progress: Record<string, string[]>, ui: UiLang): string {
   const d = t(ui);
+  // Individual words from finished lessons (not sentences): one
+  // card per distinct word, with the photo of the first phrase it
+  // appeared in and its own recording on tap.
+  const seen = new Set<string>();
   const cards: string[] = [];
   for (const u of UNITS) {
     for (const n of u.lessons) {
@@ -218,51 +222,70 @@ function wordsGalleryHtml(lang: string, progress: Record<string, string[]>, ui: 
       const manifest = lessons[n]?.[lang as keyof (typeof lessons)[string]];
       if (!manifest) continue;
       for (const p of manifest.phrases) {
-        const chips = p.words?.length
-          ? p.words
-              .map(
-                (w) =>
-                  `<button class="wchip" type="button" data-audio="${escapeHtml(w.audioUrl ?? p.audioUrl)}"${w.audioUrl ? "" : ` data-start="${w.start}" data-end="${w.end}"`} data-word="${escapeHtml(w.chars ?? w.text)}" data-gloss="${escapeHtml(w.gloss)}" aria-label="${escapeHtml(`${w.chars ?? w.text} — ${w.gloss}`)}">${escapeHtml(w.chars ?? w.text)}</button>`,
-              )
-              .join(" ")
-          : escapeHtml(p.text);
-        cards.push(
-          `<div class="word-card"><img src="${escapeHtml(p.imageUrl)}" alt="" loading="lazy"><p class="word-phrase">${chips}</p></div>`,
-        );
+        // The gallery lists single vocabulary words (man, woman,
+        // eating, drinking), never articles or helper words. A
+        // joined article+noun word contributes just its noun, whose
+        // standalone recording already exists.
+        const galleryWords = (p.words ?? []).flatMap((w) => {
+          const FUNCTION_GLOSS = new Set([
+            "is", "are", "was", "were", "will", "will be", "wants to",
+            "likes to", "is (doing)", "the", "a", "an",
+          ]);
+          if (/^(the|a|an) /i.test(w.gloss) && w.text.includes(" ")) {
+            const nounText = w.text.split(" ").slice(1).join(" ");
+            const slug = nounText
+              .toLowerCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .replace(/[^a-z0-9]+/g, "-")
+              .replace(/^-+|-+$/g, "");
+            return [{
+              text: nounText,
+              chars: undefined as string | undefined,
+              gloss: w.gloss.replace(/^(the|a|an) /i, ""),
+              audioUrl: `/static/lesson-001/audio/${lang}/words/${slug}.mp3?v=5`,
+            }];
+          }
+          if (FUNCTION_GLOSS.has(w.gloss.toLowerCase())) return [];
+          if (/^(the|a|an|el|la|der|die|das|le|les)$/i.test(w.text)) return [];
+          return [{ text: w.text, chars: w.chars, gloss: w.gloss, audioUrl: w.audioUrl }];
+        });
+        if (!p.words?.length) {
+          // No word data (public stand-in curriculum): fall back to
+          // a phrase card so the gallery still shows finished work.
+          cards.push(
+            `<button class="word-card" type="button" data-audio="${escapeHtml(p.audioUrl)}" aria-label="${escapeHtml(p.text)}"><img src="${escapeHtml(p.imageUrl)}" alt="" loading="lazy"><span class="word-main">${escapeHtml(p.text)}</span></button>`,
+          );
+          continue;
+        }
+        for (const w of galleryWords) {
+          const display = w.chars ?? w.text;
+          const key = `${display.toLowerCase()}|${w.gloss.toLowerCase()}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          const sub = w.chars ? `<span class="word-sub">${escapeHtml(w.text)}</span>` : "";
+          cards.push(
+            `<button class="word-card" type="button" data-audio="${escapeHtml(w.audioUrl ?? p.audioUrl)}" aria-label="${escapeHtml(`${display} — ${w.gloss}`)}"><img src="${escapeHtml(p.imageUrl)}" alt="" loading="lazy"><span class="word-main">${escapeHtml(display)}</span>${sub}<span class="word-gloss">${escapeHtml(w.gloss)}</span></button>`,
+          );
+        }
       }
     }
   }
   if (!cards.length) return "";
   return `<section class="words-section" aria-label="${escapeHtml(d.wordsYouKnow)}">
 <h2>${escapeHtml(d.wordsYouKnow)}</h2>
-<p class="word-gloss-line" aria-live="polite"></p>
 <div class="word-grid">${cards.join("")}</div>
 <script>
 (function () {
   var audio = null;
-  var line = document.querySelector(".word-gloss-line");
-  document.querySelectorAll(".wchip").forEach(function (chip) {
-    chip.addEventListener("click", function () {
+  document.querySelectorAll(".word-card").forEach(function (card) {
+    card.addEventListener("click", function () {
       if (audio) audio.pause();
-      audio = new Audio(chip.dataset.audio);
-      document.querySelectorAll(".wchip.playing").forEach(function (c) { c.classList.remove("playing"); });
-      chip.classList.add("playing");
-      if (line) line.textContent = chip.dataset.word + " — " + chip.dataset.gloss;
-      var start = parseFloat(chip.dataset.start || "0");
-      var end = parseFloat(chip.dataset.end || "0");
-      if (end > start) {
-        audio.addEventListener("loadedmetadata", function () {
-          audio.currentTime = Math.max(0, start - 0.03);
-          audio.play().catch(function () {});
-          var t = setInterval(function () {
-            if (!audio || audio.currentTime >= end + 0.03) { clearInterval(t); if (audio) audio.pause(); chip.classList.remove("playing"); }
-          }, 30);
-        });
-        audio.load();
-      } else {
-        audio.play().catch(function () {});
-        audio.onended = function () { chip.classList.remove("playing"); };
-      }
+      audio = new Audio(card.dataset.audio);
+      document.querySelectorAll(".word-card.playing").forEach(function (c) { c.classList.remove("playing"); });
+      card.classList.add("playing");
+      audio.play().catch(function () {});
+      audio.onended = function () { card.classList.remove("playing"); };
     });
   });
 })();
@@ -300,9 +323,16 @@ ${numbersHtml([
 ${shareSectionHtml({ ui, streak, phrases, langName: info.ownName, url: `${opts.origin ?? ""}/${lang}` })}
 ${badgeSectionHtml(unitsDone, ui)}
 ${(() => {
-  const passed = (opts.milestones ?? []).filter(
-    (m) => m.kind === "checkpoint" && m.lang === lang && m.passed,
-  );
+  // One badge per unit: retakes (and a later test-out of the same
+  // level) can leave several passed rows for the same unit.
+  const byUnit = new Map<number, import("../lib/attempts").Milestone>();
+  for (const m of opts.milestones ?? []) {
+    if (m.kind !== "checkpoint" || m.lang !== lang || !m.passed || m.unit == null) continue;
+    const key = m.unit;
+    const prev = byUnit.get(key);
+    if (!prev || (m.viaTestOut && !prev.viaTestOut)) byUnit.set(key, m);
+  }
+  const passed = [...byUnit.values()].sort((a, b) => (a.unit ?? 0) - (b.unit ?? 0));
   return passed.length
     ? `<section class="badge-section" aria-label="${escapeHtml(d.unitCheckpoint)}"><h2>${escapeHtml(d.unitCheckpoint)}</h2><div class="badge-grid">${passed
         .map(

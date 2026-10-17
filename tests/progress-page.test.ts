@@ -29,6 +29,20 @@ describe("GET /:lang/progress", () => {
 });
 
 describe("progressPage", () => {
+  it("shows one checkpoint badge per unit even with retake rows", () => {
+    const html = progressPage("xx", {
+      progress: unitOneDone(),
+      registered: true,
+      user: { email: "a@b.c", isAnonymous: false },
+      milestones: [
+        { kind: "checkpoint", lang: "xx", level: 1, unit: 1, score: 8, passed: true, viaTestOut: false, completedAt: "2026-10-17" },
+        { kind: "checkpoint", lang: "xx", level: 1, unit: 1, score: 10, passed: true, viaTestOut: false, completedAt: "2026-10-18" },
+      ],
+    });
+    expect((html.match(/Checkpoint passed/g) ?? []).length).toBe(1);
+    expect((html.match(/<b>Unit 1<\/b>/g) ?? []).length).toBe(1);
+  });
+
   it("renders streak hero, 7-day strip, next badge, and badge grid", () => {
     const today = localDayString();
     const html = progressPage("xx", {
@@ -148,6 +162,20 @@ describe("share your progress", () => {
 });
 
 describe("words you know gallery", () => {
+  it("shows individual words (not sentences) from finished lessons", () => {
+    const html = progressPage("xx", {
+      progress: { "xx-lesson-001": ACTS },
+      registered: true,
+      user: { email: "a@b.c", isAnonymous: false },
+      streakDays: [localDayString()],
+    });
+    expect(html).toContain("Words you know");
+    // Word cards carry a word and gloss, never the whole sentence.
+    expect(html).toContain('class="word-card"');
+    expect(html).toContain('class="word-main"');
+    expect(html).not.toContain("word-phrase");
+  });
+
   it("shows finished lessons' phrases with photos, nothing unfinished", () => {
     const html = progressPage("xx", {
       progress: { "xx-lesson-001": ACTS },
