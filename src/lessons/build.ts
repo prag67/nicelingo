@@ -26,6 +26,8 @@ export type LessonPhrase = {
   // Tap-to-hear words. Absent until word data exists for the phrase;
   // the player then shows the phrase text as plain text.
   words?: PhraseWord[];
+  // Conversation scenes only: who says this line.
+  speaker?: "A" | "B";
 };
 
 /** Split a clip duration across words, weighted by token length.
@@ -62,8 +64,23 @@ export function wordSlices(duration: number, weights: number[]): { start: number
 
 export type LessonManifest = {
   id: string;
+  kind?: "photo" | "conversation";
   phrases: LessonPhrase[];
   activities: string[];
+};
+
+/** One line in a conversation scene (Phase 2). The phrase carries
+ *  speaker so the player can render chat bubbles and role-play. */
+export type ConversationManifest = {
+  id: string;
+  unit: number;
+  title: string;
+  imageUrl: string;
+  speakers: Record<"A" | "B", { voice: string; avatarUrl?: string }>;
+  /** Lines in scene order; each is a normal phrase plus speaker. */
+  lines: (LessonPhrase & { speaker: "A" | "B"; alternatives?: string[] })[];
+  comprehension?: { prompt: LessonPhrase; options: LessonPhrase[]; answerId: string }[];
+  readCard?: { imageUrl: string; questions: { prompt: LessonPhrase; options: LessonPhrase[]; answerId: string }[] };
 };
 
 export type NounDef = { key: string; label: string; gloss?: string };

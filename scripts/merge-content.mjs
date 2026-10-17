@@ -36,6 +36,7 @@ const OWNED = [
   "tests/player-mandarin.test.ts",
   "tests/player-thai.test.ts",
   "tests/content-smoke.test.ts",
+  "tests/conversations.test.ts",
 ];
 
 const REMOTE =

@@ -1,7 +1,7 @@
 // Course home (/{lang}): continue card, level tabs, units, lesson cards.
 // Server-rendered; a small inline script hydrates progress and account
 // state from /api/progress/all plus the localStorage mirror.
-import { CURRICULUM, LEVELS, UNITS, isFreeLesson, lessons, type Lang } from "../lessons/curriculum";
+import { CURRICULUM, LEVELS, UNITS, conversations, isFreeLesson, lessons, type Lang } from "../lessons/curriculum";
 import { pickerLanguages } from "../lessons/languages";
 import {
   ACTIVITY_SHORT,
@@ -343,7 +343,12 @@ export function coursePage(lang: string, opts: CourseOpts): string {
         : cpUnlocked
           ? `<a class="cp-card" href="/${lang}/checkpoint/${selected}/${u.unit}"><span class="ubadge" style="--tile:${tile}">${u.unit}</span><span class="cp-text"><b>${escapeHtml(d.unitCheckpoint)}</b><small>${escapeHtml(d.checkpointIntro)}</small></span></a>`
           : `<div class="cp-card locked" data-cp-locked="${selected}/${u.unit}" aria-disabled="true"><span class="ubadge" style="--tile:${tile}">${u.unit}</span><span class="cp-text"><b>${escapeHtml(d.unitCheckpoint)}</b><small>${escapeHtml(d.checkpointLocked)}</small></span></div>`;
-      return `<section class="unit" id="u${u.unit}"${current}><div class="unit-head"><span class="ubadge" style="--tile:${tile}">${cpBadge}</span><h2>${d.unitWord} ${u.unit} · ${escapeHtml(localizeUnitTitle(ui, u.title))}</h2><span class="cnt" data-unitcount="${u.unit}:${st.total}">${fmt(d.lessonsDone, { done: st.done, total: st.total })}</span></div><div class="lgrid">${cards}</div>${cpCard}</section>${strip}`;
+      const scene = conversations[u.unit]?.[lang as Lang];
+      const convDone = (opts.milestones ?? []).some((m) => m.kind === "conversation" && m.lang === lang && m.unit === u.unit && m.passed);
+      const convCard = scene
+        ? `<a class="conv-card${convDone ? " done" : ""}" href="/${lang}/conversation/${u.unit}"><img src="${escapeHtml(scene.imageUrl)}" alt="" loading="lazy"><span class="conv-text"><b>\u{1F4AC} ${escapeHtml(scene.title)}</b><small>${escapeHtml(d.conversationLabel)}${convDone ? " \u{2713}" : ""}</small></span></a>`
+        : "";
+      return `<section class="unit" id="u${u.unit}"${current}><div class="unit-head"><span class="ubadge" style="--tile:${tile}">${cpBadge}</span><h2>${d.unitWord} ${u.unit} · ${escapeHtml(localizeUnitTitle(ui, u.title))}</h2><span class="cnt" data-unitcount="${u.unit}:${st.total}">${fmt(d.lessonsDone, { done: st.done, total: st.total })}</span></div><div class="lgrid">${cards}</div>${convCard}${cpCard}</section>${strip}`;
     })
     .join("");
 

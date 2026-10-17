@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
 import { createAuth, isRegisteredUser, type AuthEnv } from "./lib/auth";
-import { curriculumMap, isFreeLesson, lessons, type Lang } from "./lessons/curriculum";
+import { conversations, curriculumMap, isFreeLesson, lessons, type Lang } from "./lessons/curriculum";
 import { pickerLanguages } from "./lessons/languages";
 import { completeActivity } from "./lib/progress";
 import { judgePronunciation } from "./lib/judge";
@@ -1105,6 +1105,60 @@ app.post("/api/milestones", async (c) => {
   return c.json({ passed });
 });
 
+
+// Conversation lessons (Phase 2): one scene per unit. Unit 1's
+// conversation is free; later units follow the paywall, exactly
+// like their photo lessons. Lines are normal phrases, so scoring,
+// tap-to-hear and phrase stats work unchanged.
+app.get("/:lang/conversation/:unit", (c) => {
+  const lang = c.req.param("lang");
+  if (!isPickerLang(lang)) return c.text("Not found", 404);
+  return c.html(lessonPage(lang));
+});
+
+app.get("/api/conversation/:lang/:unit", async (c) => {
+  const lang = c.req.param("lang");
+  const unit = Number(c.req.param("unit"));
+  const scene = Number.isInteger(unit) ? conversations[unit]?.[lang as Lang] : undefined;
+  if (!scene) return c.json({ error: "unknown conversation" }, 404);
+  if (unit > 1 && !paywallDisabled(c.env)) {
+    const gate = await subscriptionGate(c);
+    if (gate) return gate;
+  }
+  const userId = await currentUserId(c);
+  let finished = false;
+  if (userId && c.env?.DB) {
+    const ms = await d1AttemptStore(c.env.DB).listMilestones(userId).catch(() => []);
+    finished = ms.some((m) => m.kind === "conversation" && m.lang === lang && m.unit === unit && m.passed);
+  }
+  return c.json({ scene, finished });
+});
+
+app.post("/api/conversation/complete", async (c) => {
+  const userId = await currentUserId(c);
+  if (!userId || !c.env?.DB) return c.json({ error: "unauthorized" }, 401);
+  const body = await c.req.json().catch(() => null);
+  const { lang, unit } = body ?? {};
+  const scene = typeof unit === "number" ? conversations[unit]?.[lang as Lang] : undefined;
+  if (!scene || !isPickerLang(lang)) return c.json({ error: "bad conversation" }, 400);
+  // Light-touch proof of work: at least half the scene's lines have
+  // a recorded attempt for this learner.
+  const stats = await d1AttemptStore(c.env.DB).getStats(userId, lang);
+  const seen = new Set(stats.map((x) => x.phraseId));
+  const done = scene.lines.filter((l) => seen.has(l.id)).length;
+  if (done < Math.ceil(scene.lines.length / 2)) return c.json({ error: "scene not finished" }, 400);
+  await d1AttemptStore(c.env.DB).recordMilestone(userId, {
+    kind: "conversation",
+    lang,
+    level: 0,
+    unit,
+    score: 1,
+    passed: true,
+    viaTestOut: false,
+    completedAt: new Date().toISOString(),
+  });
+  return c.json({ passed: true });
+});
 
 // Practise my mistakes: up to 10 weak phrases, weakest first, only
 // from lessons the learner can open. ?phrases=id1,id2 serves a given

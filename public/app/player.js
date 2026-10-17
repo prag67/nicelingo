@@ -1479,6 +1479,88 @@ async function bootCheckpoint(lang, level, unit) {
   );
 }
 
+
+// ---- Conversation lessons (Phase 2/2b) --------------------------------
+// Watch the scene, comprehension, then role-play: your lines first
+// spoken, then recalled (text hidden), then the other role. One
+// typed round is included; "Can't talk now" turns every spoken
+// round into a typed one for the session.
+async function bootConversation(lang, unit) {
+  player.screen(h("div", { class: "screen" }, h("p", { class: "sub" }, S.loading)));
+  if (!(await api.me())) await api.anonymous();
+  let data = null;
+  try {
+    const r = await fetch(`/api/conversation/${lang}/${unit}`, { credentials: "include" });
+    if (r.ok) data = await r.json();
+  } catch { /* offline */ }
+  if (!data?.scene) {
+    player.screen(h("div", { class: "screen" }, h("h1", {}, S.loadError), h("a", { class: "btn", href: `/${lang}` }, S.backToCourse ?? "Back")));
+    return;
+  }
+  const scene = data.scene;
+  let cantTalk = false;
+  const startScreen = () => {
+    const talk = h("input", { type: "checkbox" });
+    talk.checked = cantTalk;
+    talk.addEventListener("change", () => { cantTalk = talk.checked; });
+    const watch = h("button", { class: "btn ghost" }, "\u25B6 " + scene.title);
+    watch.addEventListener("click", async () => {
+      player.screen(h("div", { class: "screen" },
+        appImg({ class: "hero-img", src: scene.imageUrl, alt: "" }),
+        ...scene.lines.map((l) => h("p", { class: `bubble ${l.speaker === "A" ? "bubble-a" : "bubble-b"}` }, l.text))));
+      for (const l of scene.lines) {
+        await new Promise((resolve) => {
+          const a = new Audio(encodeURI(l.audioUrl));
+          a.addEventListener("ended", resolve, { once: true });
+          a.addEventListener("error", resolve, { once: true });
+          a.play().catch(resolve);
+        });
+      }
+      startScreen();
+    });
+    const start = h("button", { class: "btn" }, S.checkpointStart);
+    start.addEventListener("click", () => {
+      const spoken = (a) => (cantTalk ? "read-write" : a);
+      const questions = [];
+      for (const q of scene.comprehension ?? []) questions.push({ phrase: q.prompt, activity: "listen-match" });
+      for (const q of scene.readCard?.questions ?? []) questions.push({ phrase: q.prompt, activity: "image-phrase" });
+      const bLines = scene.lines.filter((l) => l.speaker === "B");
+      const aLines = scene.lines.filter((l) => l.speaker === "A");
+      for (const l of bLines) questions.push({ phrase: l, activity: spoken("speak-score") });
+      if (bLines[0] && !cantTalk) questions.push({ phrase: bLines[0], activity: "read-write" });
+      for (const l of bLines) questions.push({ phrase: l, activity: spoken("recall") });
+      for (const l of aLines) questions.push({ phrase: l, activity: spoken("recall") });
+      runSession({
+        questions,
+        pool: scene.lines,
+        title: scene.title,
+        onDone: async ({ score, total }) => {
+          await fetch("/api/conversation/complete", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ lang, unit }),
+          }).catch(() => null);
+          player.screen(h("div", { class: "screen" },
+            h("div", { class: "celebrate" },
+              h("p", { class: "big-emoji" }, "\u{1F4AC}"),
+              h("h1", {}, scene.title),
+              h("p", { class: "sub" }, `${score} / ${total}`),
+              h("div", { class: "spacer" }),
+              h("a", { class: "btn", href: `/${lang}` }, S.backToCourse ?? "Back"))));
+        },
+      });
+    });
+    player.screen(h("div", { class: "screen" },
+      appImg({ class: "hero-img", src: scene.imageUrl, alt: "" }),
+      h("h1", {}, scene.title),
+      h("label", { class: "cant-talk" }, talk, " Can\u2019t talk now"),
+      watch,
+      start));
+  };
+  startScreen();
+}
+
 async function bootReview(lang) {
   player.screen(h("div", { class: "screen" }, h("p", { class: "sub" }, S.loading)));
   if (!(await api.me())) await api.anonymous();
@@ -1747,6 +1829,7 @@ async function bootChallenge(lang, level, mode) {
 
 const cpPath = location.pathname.match(/^\/([a-z]{2})\/checkpoint\/(\d+)\/(\d+)\/?$/);
 const reviewPath = location.pathname.match(/^\/([a-z]{2})\/review\/?$/);
+const conversationPath = location.pathname.match(/^\/([a-z]{2})\/conversation\/(\d+)\/?$/);
 const challengePath = location.pathname.match(/^\/([a-z]{2})\/challenge\/(\d+)\/?$/);
 if (cpPath) {
   bootCheckpoint(cpPath[1], Number(cpPath[2]), Number(cpPath[3]));
@@ -1755,6 +1838,8 @@ if (cpPath) {
   bootChallenge(challengePath[1], Number(challengePath[2]), mode);
 } else if (reviewPath) {
   bootReview(reviewPath[1]);
+} else if (conversationPath) {
+  bootConversation(conversationPath[1], Number(conversationPath[2]));
 } else {
   player.boot();
 }

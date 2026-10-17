@@ -3,7 +3,7 @@
 // merge overlays this file). Gibberish vocabulary only: if a real word
 // ever appears here, that is a content leak. See
 // specs/content-split.md.
-import { buildManifest, type LessonManifest } from "./build";
+import { buildManifest, type ConversationManifest, type LessonManifest } from "./build";
 
 export type Lang = "en" | "xx" | "yy";
 
@@ -132,3 +132,33 @@ export const lessons: Record<
     },
   ]),
 );
+
+/** Fake conversation scenes (gibberish stand-ins, one per unit) so
+ *  public tests cover the Phase 2 conversation path. Real scenes
+ *  live in the content repo and replace this file wholesale. */
+function fakeConversation(unit: number, lang: Lang): ConversationManifest {
+  const lines = [0, 1, 2, 3].map((i) => ({
+    id: `${lang}-conv-${unit}-${i + 1}`,
+    text: `${lang === "xx" ? "Xx" : "Yy"} wug ${unit} line ${i + 1}.`,
+    audioUrl: `/static/lesson-001/audio/${lang}/conv-u${unit}-l${i + 1}.mp3`,
+    imageUrl: `/static/lesson-001/images/conv-u${unit}.jpg`,
+    speaker: (i % 2 === 0 ? "A" : "B") as "A" | "B",
+  }));
+  return {
+    id: `${lang}-conv-${unit}`,
+    unit,
+    title: `Gibberish scene ${unit}`,
+    imageUrl: `/static/lesson-001/images/conv-u${unit}.jpg`,
+    speakers: { A: { voice: "male" }, B: { voice: "female" } },
+    lines,
+    comprehension: [{ prompt: lines[0], options: lines.slice(0, 3), answerId: lines[0].id }],
+  };
+}
+
+export const conversations: Record<number, Partial<Record<Lang, ConversationManifest>>> =
+  Object.fromEntries(
+    UNITS.map((u) => [
+      u.unit,
+      Object.fromEntries((["xx", "yy"] as Lang[]).map((lang) => [lang, fakeConversation(u.unit, lang)])),
+    ]),
+  );
