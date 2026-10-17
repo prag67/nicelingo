@@ -2,6 +2,9 @@
 // specs/content-split.md). The content repo mirrors code-tree paths, so
 // the merge is a plain copy; owned test files (e.g. tests/score.test.ts)
 // are OVERWRITTEN — restore with `git checkout -- <file>` afterwards.
+// Lesson media is intentionally NOT merged: it lives in R2
+// (bucket nicelingo-media, verified file-by-file 2026-10-17) and
+// the Worker serves it at /static/... with no local copy.
 // Usage:
 //   node scripts/merge-content.mjs [--source <dir>] [--local] [--no-gates]
 // --local uses the ../nicelingo-content sibling checkout; otherwise the
@@ -20,7 +23,6 @@ const OWNED = [
   "src/lessons/word-timings.ts",
   "src/lessons/names.ts",
   "content/tts-overrides.mjs",
-  "public/static",
   "specs/vocal-only-languages.md",
   "specs/spanish.md",
   "specs/lesson-02.md",
