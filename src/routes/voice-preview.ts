@@ -30,10 +30,10 @@ export const PREVIEW_SAMPLES: PreviewSample[] = [
 export const PREVIEW_VOICES: PreviewVoice[] = [
   { id: "aquila", name: "Aquila", kind: "current", detail: "Current default voice · masculine · Latin American · expressive, casual" },
   { id: "alvaro", name: "Álvaro", kind: "candidate", detail: "Being replaced · masculine · Spain · calm, professional" },
-  { id: "selena", name: "Selena", kind: "candidate", detail: "Feminine · Latin American · young adult · friendly, calm" },
+  { id: "selena", name: "Selena", kind: "current", detail: "Feminine · Latin American · young adult · friendly, calm" },
   { id: "celeste", name: "Celeste", kind: "current", detail: "Feminine · Colombian · young adult · clear, energetic" },
   { id: "estrella", name: "Estrella", kind: "candidate", detail: "Feminine · Mexican · mature · natural, calm" },
-  { id: "diana", name: "Diana", kind: "current", detail: "Feminine · Spain · adult · expressive, confident" },
+  { id: "diana", name: "Diana", kind: "candidate", detail: "Replaced by Selena in conversations (decision 16) · Feminine · Spain · adult" },
   { id: "carina", name: "Carina", kind: "candidate", detail: "Feminine · Spain · adult · professional, energetic" },
 ];
 

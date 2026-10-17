@@ -385,3 +385,6 @@ h1 { font-family: var(--font-head); font-size: 1.4rem; margin: 0.25rem 0 0; }
 .cp-badge { font-family: var(--font-head); font-weight: 800; background: var(--sun); border: 2px solid var(--ink); border-radius: 999px; padding: 0.4rem 1rem; display: inline-block; }
 .cp-missed { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; width: 100%; }
 .cp-missed-row { display: flex; align-items: center; gap: 0.75rem; background: #fff; border: 2px solid var(--line); border-radius: 14px; padding: 0.4rem 0.75rem; text-align: left; }
+
+.wf-row{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center}.wf-word{min-height:44px;padding:.4rem .7rem;font:inherit;font-weight:700;background:#fff;border:2px solid #0E1B3D;border-radius:999px;cursor:pointer}.wf-slip{text-decoration:underline wavy #E8A33D 3px;text-underline-offset:4px}.wf-wrong{text-decoration:underline wavy #D64545 3px;text-underline-offset:4px}
+.tip-wrap{display:flex;flex-direction:column;align-items:center;gap:.4rem}.tip-chip{min-height:44px;padding:.35rem .8rem;font:inherit;font-weight:700;background:#FFF7E0;border:2px solid #0E1B3D;border-radius:999px;cursor:pointer}.tip-sheet{background:#fff;border:2px solid #0E1B3D;border-radius:14px;padding:.7rem .9rem;max-width:22rem;text-align:left}.tip-sheet p{margin:.3rem 0 0;color:#4C5873}

@@ -14,6 +14,9 @@ export type JudgedScore = PronunciationScore & {
   source: "clef";
   /** Clef's p(wrong) for this attempt (null when not reported). */
   wrongProb: number | null;
+  /** Per-word marks when Clef returned them (Phase 3a). Hints only:
+   * never part of pass rules. Absent for romanized (th/zh) judging. */
+  words?: { text: string; mark: "ok" | "slip" | "wrong" }[];
 };
 
 const CLEF_MODEL = "@cf/cloudflare/clef-omni";
@@ -62,10 +65,20 @@ export async function judgePronunciation(
       roman == null
         ? `Reference sentence: ${reference}`
         : `Reference sentence (${scriptLabel}): ${reference}\nSame sentence romanized: ${roman}`;
+    const refWords = roman == null ? reference.split(/\s+/).map((w) => w.replace(/^[\p{P}\p{S}]+|[\p{P}\p{S}]+$/gu, "")).filter(Boolean).slice(0, 12) : [];
+    const wordQuestions: Record<string, unknown> = {};
+    refWords.forEach((w, i) => {
+      wordQuestions[`w${i + 1}`] = {
+        type: "choice",
+        instructions: `How did the learner say the word "${w}"? OK: said correctly. SLIP: slightly off but recognizable. WRONG: wrong word, badly off, or not said.`,
+        criteria: { ok: "Word said correctly", slip: "Slightly off but recognizable", wrong: "Wrong word or not said" },
+      };
+    });
     const raw = await env.AI.run(CLEF_MODEL, {
       model: "clef-omni",
       state: `${refLine}\nThe attached audio is a language learner attempting to say the reference sentence.`,
       questions: {
+        ...wordQuestions,
         verdict: {
           type: "choice",
           instructions:
@@ -88,11 +101,16 @@ export async function judgePronunciation(
     const root = (raw as { answers?: unknown }).answers
       ? raw
       : (raw as { result?: unknown }).result;
-    const verdict = (
-      root as {
-        answers?: { verdict?: { choice?: unknown; probabilities?: unknown } };
-      }
-    )?.answers?.verdict;
+    const answers = (
+      root as { answers?: Record<string, { choice?: unknown } | undefined> }
+    )?.answers;
+    const verdict = answers?.verdict as { choice?: unknown; probabilities?: unknown } | undefined;
+    const words = refWords.length && answers && answers.w1
+      ? refWords.map((text, i) => {
+          const choice = answers[`w${i + 1}`]?.choice;
+          return { text, mark: (choice === "wrong" || choice === "slip" ? choice : "ok") as "ok" | "slip" | "wrong" };
+        })
+      : undefined;
     const choice = verdict?.choice;
     const pCorrect = Number(
       (verdict?.probabilities as { correct?: unknown } | undefined)?.correct,
@@ -101,8 +119,8 @@ export async function judgePronunciation(
       (verdict?.probabilities as { wrong?: unknown } | undefined)?.wrong,
     );
     const wrongProb = Number.isFinite(pWrongRaw) ? pWrongRaw : null;
-    if (choice === "wrong") return { score: 0, verdict: "red", source: "clef", wrongProb };
-    if (choice === "minor_slip") return { score: 70, verdict: "yellow", source: "clef", wrongProb };
+    if (choice === "wrong") return { score: 0, verdict: "red", source: "clef", wrongProb, words };
+    if (choice === "minor_slip") return { score: 70, verdict: "yellow", source: "clef", wrongProb, words };
     // Scores stay inside the 85/60 contract bands the client was built
     // on (it renders the verdict; the number is informational).
     // A missing confidence signal trusts the choice: the under-0.4
@@ -111,11 +129,11 @@ export async function judgePronunciation(
     // whenever Clef answered with a bare choice.
     if (choice === "correct") {
       if (!Number.isFinite(pCorrect)) {
-        return { score: 100, verdict: "green", source: "clef", wrongProb };
+        return { score: 100, verdict: "green", source: "clef", wrongProb, words };
       }
       return pCorrect >= 0.4
-        ? { score: 100, verdict: "green", source: "clef", wrongProb }
-        : { score: 70, verdict: "yellow", source: "clef", wrongProb };
+        ? { score: 100, verdict: "green", source: "clef", wrongProb, words }
+        : { score: 70, verdict: "yellow", source: "clef", wrongProb, words };
     }
     return null;
   } catch {

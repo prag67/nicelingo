@@ -304,7 +304,7 @@ and level renaming (First Words A1 / What Happened A1 / Making
 Plans A1-A2 / Likes & Stories A2 / Getting Things Done A2).
 
 Phase 2/2b shipped for Spanish Level 1 (decision 8 rollout):
-conversation lessons (`bootConversation`, `/api/conversation/:lang/:unit`,
+Spanish Level 1 conversations now cover all 12 units (units 7-12 are the trip: taxi, airport, passport control, train, hotel, room problem), with Selena as the female conversation voice (decision 16), Clef per-word feedback on speak verdicts (Phase 3a), and context tips on formal-you lines (Phase 3d). conversation lessons (`bootConversation`, `/api/conversation/:lang/:unit`,
 course banner after each unit's photo lessons, Unit 1 free) with
 watch-the-scene, comprehension, spoken and typed rounds, recall in
 both roles, and a "Can't talk now" typed mode. Six Spanish scenes

@@ -257,3 +257,20 @@ describe("attemptPasses (Thai pass rule)", () => {
   it("passes a second yellow up to the 0.3 wrong ceiling", () => { expect(attemptPasses({ ...base, wrongProb: 0.25 })).toBe(true); expect(attemptPasses({ ...base, wrongProb: 0.3 })).toBe(false); });
   it("keeps the rule Thai-only", () => { expect(attemptPasses({ ...base, lang: "zh" })).toBe(false); expect(attemptPasses({ ...base, lang: "en" })).toBe(false); });
 });
+
+describe("judgePronunciation word marks (Phase 3a)", () => {
+  it("returns per-word marks alongside the verdict", async () => {
+    const run = vi.fn(async () => ({
+      answers: {
+        verdict: { choice: "minor_slip", probabilities: { wrong: 0.2 } },
+        w1: { choice: "ok" }, w2: { choice: "ok" }, w3: { choice: "slip" }, w4: { choice: "wrong" },
+      },
+    }));
+    const judged = await judgePronunciation({ AI: { run } } as never, "QUJD", "the snarf is zorping now", null, "en");
+    expect(judged?.verdict).toBe("yellow");
+    expect(judged?.words).toEqual([
+      { text: "the", mark: "ok" }, { text: "snarf", mark: "ok" },
+      { text: "is", mark: "slip" }, { text: "zorping", mark: "wrong" }, { text: "now", mark: "ok" },
+    ]);
+  });
+});

@@ -577,6 +577,7 @@ app.post("/api/score", async (c) => {
     verdict: scored.verdict,
     source: scored.source,
     wrongProb: scored.wrongProb,
+    words: judged?.words,
     pass: attemptPasses({
       lang: language,
       verdict: scored.verdict,

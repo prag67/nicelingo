@@ -449,6 +449,18 @@ function helpButton(phrase, onToggle) {
   return b;
 }
 
+
+// Context tip chip (Phase 3d): a lightbulb under the phrase; tapping
+// opens a small sheet. Tips never block progress.
+function tipChip(phrase) {
+  if (!phrase.tip) return null;
+  const sheet = h("div", { class: "tip-sheet", hidden: true },
+    h("b", {}, phrase.tip.title), h("p", {}, phrase.tip.body));
+  const btn = h("button", { class: "tip-chip", type: "button" }, "\u{1F4A1} Tip");
+  btn.addEventListener("click", () => { sheet.hidden = !sheet.hidden; });
+  return h("div", { class: "tip-wrap" }, btn, sheet);
+}
+
 // On listen-match pages the phrase text is not on screen yet (that
 // is the question), so help reveals it in a card under the play row
 // instead of toggling an existing phrase. Returns [playRow, card].
@@ -860,10 +872,10 @@ const player = {
         reader.readAsDataURL(blob);
       });
       const prevVerdict = this.state.attempts[this.state.attempts.length - 1] ?? null;
-      const { verdict, pass, score } = await api.score(phrase.id, base64, prevVerdict);
+      const { verdict, pass, score, words } = await api.score(phrase.id, base64, prevVerdict);
       recordAttempt(phrase, "speak-score", typeof score === "number" ? score >= 70 : pass === true, typeof score === "number" ? score : null);
       this.state.attempts.push(verdict);
-      this.speakVerdict(phrase, verdict, pass === true);
+      this.speakVerdict(phrase, verdict, pass === true, words);
     } catch {
       status.textContent = S.scoringError;
       mic.disabled = false;
@@ -871,7 +883,7 @@ const player = {
     }
   },
 
-  speakVerdict(phrase, verdict, serverPass) {
+  speakVerdict(phrase, verdict, serverPass, wordMarks) {
     const { attempts, speakPlan, qIndex } = this.state;
     const last = attempts.length >= 3;
     // The server decides passes (attemptPasses): green always; a Thai
@@ -916,6 +928,16 @@ const player = {
         h("div", { class: `banner ${verdict}` },
           h("div", { class: "face" }, verdict === "green" ? "✓" : verdict === "yellow" ? "≈" : "!"),
           h("div", {}, h("b", {}, copy[0]), h("small", {}, copy[1]))),
+        ...(verdict !== "green" && Array.isArray(wordMarks) && wordMarks.some((w) => w.mark !== "ok")
+          ? [h("div", { class: "wf-row" }, ...wordMarks.filter((w) => w.mark !== "ok").map((w) => {
+              const btn = h("button", { class: `wf-word wf-${w.mark}`, type: "button" }, w.text);
+              btn.addEventListener("click", () => {
+                const entry = phrase.words?.find((x) => x.text.toLowerCase() === String(w.text).toLowerCase());
+                if (entry) playWordAudio(phrase, entry, btn); else playAudio(pickAudioUrl(phrase), null);
+              });
+              return btn;
+            }))]
+          : []),
         dots,
         h("div", { class: "spacer" }),
         passed || last ? next : h("div", { style: "display:flex;flex-direction:column;gap:0.6rem" }, next, h("div", { class: "play-row" }, replay, helpButton(phrase)))),
@@ -1353,6 +1375,7 @@ function runSession({ questions, pool, title, onDone }) {
       frame(
         appImg({ class: "hero-img", src: q.phrase.imageUrl, alt: "" }),
         h("div", { class: "phrase-card" }, ...phraseDisplay(q.phrase)),
+        ...(tipChip(q.phrase) ? [tipChip(q.phrase)] : []),
         h("div", { class: "play-row" }, speaker, helpButton(q.phrase)),
         h("div", { class: "mic-wrap" }, mic),
         status,
