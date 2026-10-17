@@ -162,8 +162,8 @@ Level scene challenges and test out (`/{lang}/challenge/{level}`,
 player challenge mode) close each level: 3 scenes of 4 spoken lines
 (`GET /api/challenge/:lang/:level` builds the scenes server-side in
 `src/lib/challenge.ts`, each line from a different unit of the
-level). You hear each line, then say it; tap-to-hear words and slow
-playback work on every line. Challenge pass is an average speak
+level). You hear each line, then say it; the help button reveals
+tap-to-hear words on every line. Challenge pass is an average speak
 score of 75 with no line below 40, with one retry per line (the
 better score counts). The challenge unlocks only when every unit
 checkpoint in the level is passed, and past Level 1 it needs a
@@ -189,7 +189,7 @@ when at least 3 phrases are weak; the end screen reports how many
 phrases were fixed and how many remain. It writes no milestone and
 affects streaks exactly like a lesson.
 
-## Tap-to-hear words and slow playback
+## Tap-to-hear words (help button)
 
 Every phrase in every language carries a `words` array (text, gloss,
 start/end in seconds) composed at manifest build time from the same
@@ -199,18 +199,20 @@ measured by `scripts/build-words.mjs` into the content repo's
 `src/lessons/word-timings.ts` — across words by length, with an 80 ms
 floor and no overlaps; `scripts/validate-words.mjs` fails the build
 if any phrase misses words, a gloss, or a valid slice (8,448 phrases
-pass). In the player, phrase text renders as dotted-underline chips:
-a tap plays just that word (30 ms pad, 10 ms fades, default voice for
-slices since timings were measured on it) and opens its meaning
-popup; only one sound plays at a time. Chips appear in phrase cards,
-on the speak result, and — never before the answer — as an
-after-answer reveal in choice questions; the write prompt chips every
-word except the blanked one. A tortoise button replays the phrase at
-70% speed, pitch preserved. Mandarin words play their own isolated
+pass). In the player, phrases render as plain text until the "?"
+help button beside the speaker is pressed; that is the only time
+the tappable dotted-underline word chips appear, and pressing it
+again hides them. A chip tap plays just that word (30 ms pad, 10 ms
+fades, default voice for slices since timings were measured on it)
+and opens its meaning popup, which stays open until it is dismissed
+on purpose (same chip again, another chip, Escape, its close
+button, or help off); only one sound plays at a time. The write
+prompt chips every word except the blanked one, so help can never
+give the answer away. Mandarin words play their own isolated
 recordings (`/static/lesson-001/audio/zh/words/{word}.mp3`) because
 tones shift in context, and show characters over pinyin. The progress
-page's Words you know gallery replays the same chips from finished
-lessons.
+page's Words you know gallery replays the same phrases from
+finished lessons.
 
 ## Lesson media (R2)
 

@@ -505,9 +505,19 @@ describe("tap-to-hear words", () => {
     for (const p of manifest.phrases) delete p.words;
   });
 
-  it("renders chips in the speak phrase card and plays a word on tap", async () => {
+  it("shows words only after the help button, then plays a word on tap", async () => {
     installStubs("?demo=speak-score", []);
     await bootPlayer();
+    // No tappable words until help is pressed.
+    expect(
+      documentStub.created.find((el) => el.className === "word-chip"),
+    ).toBeFalsy();
+    const help = documentStub.created.find(
+      (el) => el.tag === "button" && el.attrs["aria-label"] === "Help with words",
+    );
+    expect(help).toBeTruthy();
+    help.click();
+    expect(help.attrs["aria-pressed"]).toBe("true");
     const chip = documentStub.created.find(
       (el) => el.tag === "button" && el.attrs["aria-label"] === "Play eating, meaning eating",
     );
@@ -515,15 +525,28 @@ describe("tap-to-hear words", () => {
     expect(chip.className).toContain("word-chip");
     chip.click();
     for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 10));
-    // Popup announces the word and its meaning.
+    // Popup announces the word and its meaning, with a close button,
+    // and stays open (no auto-dismiss).
     const pop = documentStub.created.find((el) => el.className === "word-pop");
     expect(pop).toBeTruthy();
     expect(pop.text).toContain("eating");
+    const closeBtn = documentStub.created.find(
+      (el) => el.tag === "button" && el.attrs["aria-label"] === "Close",
+    );
+    expect(closeBtn).toBeTruthy();
+    // Pressing help again hides the words.
+    help.click();
+    expect(help.attrs["aria-pressed"]).toBe("false");
   });
 
   it("never chips the blanked word in write questions", async () => {
     installStubs("?demo=read-write", []);
     await bootPlayer();
+    expect(documentStub.created.filter((el) => el.className === "word-chip")).toHaveLength(0);
+    const help = documentStub.created.find(
+      (el) => el.tag === "button" && el.attrs["aria-label"] === "Help with words",
+    );
+    help.click();
     const chips = documentStub.created.filter((el) => el.className === "word-chip");
     // Only the non-final words of the prompt phrase are chips.
     expect(chips.length).toBeGreaterThan(0);
@@ -531,14 +554,17 @@ describe("tap-to-hear words", () => {
     expect(screenText()).toContain("______");
   });
 
-  it("offers slow playback beside the speaker", async () => {
+  it("offers a help button instead of slow playback beside the speaker", async () => {
     installStubs("?demo=listen-match", []);
     await bootPlayer();
-    const slow = documentStub.created.find(
-      (el) => el.tag === "button" && el.attrs["aria-label"] === "Play slowly",
+    const help = documentStub.created.find(
+      (el) => el.tag === "button" && el.attrs["aria-label"] === "Help with words",
     );
-    expect(slow).toBeTruthy();
-    expect(slow.text).toContain("🐢");
+    expect(help).toBeTruthy();
+    expect(help.text).toContain("?");
+    expect(
+      documentStub.created.find((el) => el.attrs["aria-label"] === "Play slowly"),
+    ).toBeFalsy();
   });
 });
 

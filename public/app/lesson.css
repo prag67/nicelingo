@@ -370,7 +370,15 @@ h1 { font-family: var(--font-head); font-size: 1.4rem; margin: 0.25rem 0 0; }
 .word-pop .pop-roman { font-size: 0.85rem; font-weight: 600; }
 .word-pop .pop-gloss { font-size: 0.9375rem; color: #4c5873; }
 .play-row { display: flex; gap: 0.75rem; justify-content: center; align-items: center; }
-.speaker.slow { font-size: 1.3rem; }
+.speaker.help { font-weight: 800; }
+.speaker.help.on { background: var(--blue); color: #fff; }
+.word-pop .pop-close {
+  position: absolute; top: -0.7rem; right: -0.7rem;
+  width: 1.75rem; height: 1.75rem; border-radius: 999px;
+  background: #fff; border: 2px solid #0e1b3d; color: #0e1b3d;
+  font-size: 1rem; font-weight: 800; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; padding: 0;
+}
 .reveal .phrase-card { margin-top: 1rem; }
 .cp-parrot { width: 6rem; height: 6rem; }
 .cp-badge { font-family: var(--font-head); font-weight: 800; background: var(--sun); border: 2px solid var(--ink); border-radius: 999px; padding: 0.4rem 1rem; display: inline-block; }
