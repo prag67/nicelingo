@@ -73,6 +73,12 @@ describe("checkpoint routes and cards", () => {
     for (const n of ["001", "002", "003", "004"]) done[`xx-lesson-${n}`] = acts;
     const lockedHtml = coursePage("xx", { progress: {}, registered: false, paywallDisabled: true, user: null });
     expect(lockedHtml).toContain("Finish all 4 lessons to unlock");
+    // The locked card is tagged so the course client can unlock it
+    // once local progress is healed to the server (see below).
+    expect(lockedHtml).toContain('data-cp-locked="1/1"');
+    // Client heals device-only completions to /api/progress so the
+    // server-side checkpoint gate agrees with the painted cards.
+    expect(lockedHtml).toContain("Heal the server copy");
     const openHtml = coursePage("xx", { progress: done, registered: false, paywallDisabled: true, user: null, level: 1 });
     expect(openHtml).toContain('href="/xx/checkpoint/1/1"');
     const passedHtml = coursePage("xx", {

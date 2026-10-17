@@ -1,6 +1,7 @@
-/** One tappable word in a phrase (tap-to-hear). Timings slice the
- *  phrase audio; a word with its own audioUrl (Mandarin, where tones
- *  shift in context) plays that instead. chars is Mandarin only: the
+/** One tappable word in a phrase (tap-to-hear). Every word now has
+ *  its own isolated recording (audioUrl, one per distinct word in
+ *  the language's default voice); the start/end slice of the phrase
+ *  audio remains only as a fallback. chars is Mandarin only: the
  *  characters, while text holds the pinyin. */
 export type PhraseWord = {
   text: string;

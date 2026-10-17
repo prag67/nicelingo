@@ -1,7 +1,9 @@
 // Validate tap-to-hear word data in the dumped manifests: every
 // phrase carries words, every word has a gloss, and timed slices are
 // ordered, non-overlapping, and at least 80 ms (words with their own
-// audioUrl, e.g. Mandarin, need no slice). Run after dump-manifests.
+// audioUrl need no slice; every word must now carry its own
+// recording (audioUrl) — slices remain only as a fallback. Run
+// after dump-manifests.
 // Usage: node scripts/validate-words.mjs
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -25,7 +27,12 @@ for (const f of readdirSync("scripts/manifests").filter((x) => x.endsWith(".json
         bad++;
       }
       if (w.gloss === w.text) unglossed.set(w.text, (unglossed.get(w.text) ?? 0) + 1);
-      if (w.audioUrl) continue;
+      if (!w.audioUrl) {
+        console.error(`NO AUDIO ${p.id} "${w.text}"`);
+        bad++;
+        continue;
+      }
+      if (w.start == null) continue;
       if (w.start == null || w.end == null || w.end - w.start < 0.08) {
         console.error(`BAD SLICE ${p.id} "${w.text}" ${w.start}-${w.end}`);
         bad++;

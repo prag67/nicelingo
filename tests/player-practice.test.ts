@@ -201,6 +201,16 @@ describe("practice again", () => {
   it("replays the lesson instead of showing the complete screen again", async () => {
     await bootPlayer();
     expect(screenText()).toContain("Lesson 1 complete!");
+    // Next lesson button and a Lesson page link back to the course
+    // page (not the homepage).
+    const nextBtn = documentStub.created.find(
+      (el) => el.tag === "a" && el.text.includes("Next lesson"),
+    );
+    expect(nextBtn?.attrs.href).toBe("/lesson/en/002");
+    const pageLink = documentStub.created.find(
+      (el) => el.tag === "a" && el.text.includes("Lesson page"),
+    );
+    expect(pageLink?.attrs.href).toBe("/en");
     findButton("Practice again").click();
     // Simulate the navigation the button triggers, then boot there.
     const reloaded = reloadCalls;
@@ -552,6 +562,10 @@ describe("tap-to-hear words", () => {
     expect(chips.length).toBeGreaterThan(0);
     expect(chips.length).toBeLessThan(4);
     expect(screenText()).toContain("______");
+    // The blanked word must not appear anywhere in the prompt text,
+    // with help off or on (regression: hidden words rendered the
+    // full phrase text, giving the answer away).
+    expect(screenText()).not.toContain("eating");
   });
 
   it("offers a help button instead of slow playback beside the speaker", async () => {

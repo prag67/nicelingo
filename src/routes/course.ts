@@ -170,12 +170,14 @@ const CLIENT = `<script>
   const server = blob.server || {};
   const totals = blob.totals || {};
   const merged = { ...server };
+  const localOnly = {};
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
       const m = k && k.match(/^nicelingo:completed:(.+)$/);
       if (!m) continue;
       const local = JSON.parse(localStorage.getItem(k) || "[]");
+      localOnly[m[1]] = local;
       merged[m[1]] = Array.from(new Set([...(merged[m[1]] || []), ...local]));
     }
   } catch {}
@@ -191,6 +193,25 @@ const CLIENT = `<script>
         if (done >= total) lbl.innerHTML = (blob.ui?.stepsComplete || "{done} of {total} steps complete").replace("{done}", done).replace("{total}", total) + " · <strong>" + (blob.ui?.doneWord || "Done") + "</strong>";
         else if (done > 0) lbl.innerHTML = (blob.ui?.stepsComplete || "{done} of {total} steps complete").replace("{done}", done).replace("{total}", total) + " · <strong>" + (blob.ui?.resumeWord || "Resume") + "</strong>";
       }
+    });
+    $$("[data-cp-locked]").forEach((el) => {
+      const [level, unitRaw] = (el.dataset.cpLocked || "").split("/");
+      const unit = Number(unitRaw);
+      const lessonsInUnit = blob.units?.[unit] ?? [];
+      if (!lessonsInUnit.length) return;
+      const allDone = lessonsInUnit.every((n) => {
+        const key = blob.lang === "en" ? "lesson-" + n : blob.lang + "-lesson-" + n;
+        const t = totals[key] || 0;
+        return t > 0 && Math.min(new Set(merged[key] || []).size, t) >= t;
+      });
+      if (!allDone) return;
+      const a = document.createElement("a");
+      a.className = el.className.replace(" locked", "");
+      a.href = "/" + blob.lang + "/checkpoint/" + level + "/" + unit;
+      a.innerHTML = el.innerHTML;
+      const small = a.querySelector("small");
+      if (small && blob.ui?.checkpointIntro) small.textContent = blob.ui.checkpointIntro;
+      el.replaceWith(a);
     });
     $$("[data-unitcount]").forEach((el) => {
       const [unit, total] = el.dataset.unitcount.split(":").map(Number);
@@ -234,6 +255,23 @@ const CLIENT = `<script>
           merged[k] = Array.from(new Set([...(merged[k] || []), ...v]));
         }
         paint(merged);
+        // Heal the server copy: activities completed on this device
+        // but never saved server-side (e.g. finished before sign-in)
+        // are posted now, so server-gated unlocks (unit checkpoint,
+        // level challenge) agree with what the learner sees as done.
+        for (const [key, acts] of Object.entries(localOnly)) {
+          const have = new Set(lessons?.[key] || []);
+          for (const activity of acts) {
+            if (have.has(activity)) continue;
+            try {
+              await fetch("/api/progress", {
+                method: "POST", credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ lessonId: key, activity }),
+              });
+            } catch { /* still usable offline; retried next visit */ }
+          }
+        }
       }
     }
   } catch { /* page stays usable offline */ }
@@ -303,7 +341,7 @@ export function coursePage(lang: string, opts: CourseOpts): string {
         ? `<a class="cp-card done" href="/${lang}/checkpoint/${selected}/${u.unit}"><span class="ubadge" style="--tile:${tile}">✓</span><span class="cp-text"><b>${escapeHtml(d.unitCheckpoint)}</b><small>${escapeHtml(d.checkpointPassedText)}</small></span></a>`
         : cpUnlocked
           ? `<a class="cp-card" href="/${lang}/checkpoint/${selected}/${u.unit}"><span class="ubadge" style="--tile:${tile}">${u.unit}</span><span class="cp-text"><b>${escapeHtml(d.unitCheckpoint)}</b><small>${escapeHtml(d.checkpointIntro)}</small></span></a>`
-          : `<div class="cp-card locked" aria-disabled="true"><span class="ubadge" style="--tile:${tile}">${u.unit}</span><span class="cp-text"><b>${escapeHtml(d.unitCheckpoint)}</b><small>${escapeHtml(d.checkpointLocked)}</small></span></div>`;
+          : `<div class="cp-card locked" data-cp-locked="${selected}/${u.unit}" aria-disabled="true"><span class="ubadge" style="--tile:${tile}">${u.unit}</span><span class="cp-text"><b>${escapeHtml(d.unitCheckpoint)}</b><small>${escapeHtml(d.checkpointLocked)}</small></span></div>`;
       return `<section class="unit" id="u${u.unit}"${current}><div class="unit-head"><span class="ubadge" style="--tile:${tile}">${cpBadge}</span><h2>${d.unitWord} ${u.unit} · ${escapeHtml(localizeUnitTitle(ui, u.title))}</h2><span class="cnt" data-unitcount="${u.unit}:${st.total}">${fmt(d.lessonsDone, { done: st.done, total: st.total })}</span></div><div class="lgrid">${cards}</div>${cpCard}</section>${strip}`;
     })
     .join("");
@@ -321,7 +359,7 @@ export function coursePage(lang: string, opts: CourseOpts): string {
   }
   const units: Record<number, string[]> = {};
   for (const u of UNITS) units[u.unit] = u.lessons;
-  const blob = JSON.stringify({ lang, server: progress, totals, units, ui: { stepsComplete: d.stepsComplete, lessonsDone: d.lessonsDone, doneWord: d.doneWord, resumeWord: d.resumeWord, dayStreak: d.dayStreak }, days: opts.streakDays ?? [] });
+  const blob = JSON.stringify({ lang, server: progress, totals, units, ui: { stepsComplete: d.stepsComplete, lessonsDone: d.lessonsDone, doneWord: d.doneWord, resumeWord: d.resumeWord, dayStreak: d.dayStreak, checkpointIntro: d.checkpointIntro }, days: opts.streakDays ?? [] });
 
   const head = `<header class="site-head">${brandHtml()}<span class="head-sp"></span>${streakChipHtml(computeStreak(opts.streakDays ?? [], localDayString()), ui, `/${lang}/progress`)}<span data-account>${accountMenuHtml({ user, subscribed, ui, path: `/${lang}` })}</span></header>`;
   const reviewBtn = (opts.weakCount ?? 0) >= 3
