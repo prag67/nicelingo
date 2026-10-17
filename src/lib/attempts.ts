@@ -14,6 +14,8 @@ export type PhraseStats = {
   lastSeenAt: string;
   weak: boolean;
   correctStreak: number;
+  /** Activity of the most recent answer (review replays the missed kind). */
+  lastActivity: string;
 };
 
 export type Attempt = {
@@ -35,6 +37,7 @@ export function emptyStats(phraseId: string, lang: string): PhraseStats {
     lastSeenAt: "",
     weak: false,
     correctStreak: 0,
+    lastActivity: "",
   };
 }
 
@@ -57,6 +60,7 @@ export function applyAttempt(prev: PhraseStats | undefined, a: Attempt): PhraseS
     lastSeenAt: a.at,
     weak,
     correctStreak,
+    lastActivity: a.activity,
   };
 }
 

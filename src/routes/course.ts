@@ -29,6 +29,7 @@ export type CourseUser = {
 export type CourseOpts = {
   progress: Record<string, string[]>;
   milestones?: import("../lib/attempts").Milestone[];
+  weakCount?: number;
   registered: boolean;
   subscribed?: boolean;
   uiLang?: UiLang;
@@ -323,6 +324,9 @@ export function coursePage(lang: string, opts: CourseOpts): string {
   const blob = JSON.stringify({ lang, server: progress, totals, units, ui: { stepsComplete: d.stepsComplete, lessonsDone: d.lessonsDone, doneWord: d.doneWord, resumeWord: d.resumeWord, dayStreak: d.dayStreak }, days: opts.streakDays ?? [] });
 
   const head = `<header class="site-head">${brandHtml()}<span class="head-sp"></span>${streakChipHtml(computeStreak(opts.streakDays ?? [], localDayString()), ui, `/${lang}/progress`)}<span data-account>${accountMenuHtml({ user, subscribed, ui, path: `/${lang}` })}</span></header>`;
-  const body = `${head}${continueCard(lang, info, locked(next.n), subscribed, returnUrl, progress, ui)}${signinNote}<nav class="tabs" aria-label="Levels">${tabs}</nav>${sections}${siteFooterHtml(ui, `/${lang}`, { registered })}<script type="application/json" id="course-data">${blob.replace(/</g, "\\u003c")}</script>${CLIENT}`;
+  const reviewBtn = (opts.weakCount ?? 0) >= 3
+    ? `<p class="review-line"><a class="btn ghost review-btn" href="/${lang}/review">${escapeHtml(fmt(d.practiseMistakes, { n: opts.weakCount ?? 0 }))}</a></p>`
+    : "";
+  const body = `${head}${continueCard(lang, info, locked(next.n), subscribed, returnUrl, progress, ui)}${reviewBtn}${signinNote}<nav class="tabs" aria-label="Levels">${tabs}</nav>${sections}${siteFooterHtml(ui, `/${lang}`, { registered })}<script type="application/json" id="course-data">${blob.replace(/</g, "\\u003c")}</script>${CLIENT}`;
   return pageShell({ title: `${info.ownName} course · Nicelingo`, lang: ui, origin: opts.origin ?? "", canonicalPath: `/${lang}`, body });
 }

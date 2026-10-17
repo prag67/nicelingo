@@ -78,6 +78,7 @@ export const phraseStats = sqliteTable("phrase_stats", {
   lastSeenAt: text("last_seen_at").notNull(),
   weak: integer("weak").notNull(),
   correctStreak: integer("correct_streak").notNull(),
+  lastActivity: text("last_activity").notNull().default(""),
 });
 
 export const milestones = sqliteTable("milestones", {

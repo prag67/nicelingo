@@ -20,6 +20,7 @@ import {
 import { d1ProgressStore } from "./db/progress-store";
 import { d1AttemptStore } from "./db/attempt-store";
 import { buildCheckpointSet, checkpointAccess, unitLessons } from "./lib/checkpoint";
+import { buildReviewSet, lessonOfPhrase, phraseById } from "./lib/review";
 import { unitStats } from "./lib/lesson-progress";
 import type { Milestone } from "./lib/attempts";
 import { d1PrefsStore } from "./db/prefs-store";
@@ -392,6 +393,14 @@ app.get("/:lang{[a-z]{2}}", async (c) => {
   });
   const level = Number(c.req.query("level"));
   const origin = new URL(c.req.url).origin;
+  let weakCount = 0;
+  if (user && c.env?.DB) {
+    try {
+      const stats = await d1AttemptStore(c.env.DB).getStats(user.id, lang);
+      const review = buildReviewSet({ lang, stats, subscribed, paywallDisabled: paywallDisabled(c.env) });
+      weakCount = review.questions.length >= 3 ? review.weakCount : 0;
+    } catch { /* attempts tables not migrated yet: no button */ }
+  }
   return c.html(
     coursePage(lang, {
       progress,
@@ -401,6 +410,7 @@ app.get("/:lang{[a-z]{2}}", async (c) => {
       streakDays,
       milestones,
       paywallDisabled: paywallDisabled(c.env),
+      weakCount,
       user,
       level: Number.isInteger(level) ? level : undefined,
       origin,
@@ -1060,6 +1070,38 @@ app.post("/api/milestones", async (c) => {
     completedAt: new Date().toISOString(),
   });
   return c.json({ passed });
+});
+
+
+// Practise my mistakes: up to 10 weak phrases, weakest first, only
+// from lessons the learner can open. ?phrases=id1,id2 serves a given
+// set (checkpoint/challenge result screens).
+app.get("/api/review/:lang", async (c) => {
+  const lang = c.req.param("lang");
+  if (!isPickerLang(lang)) return c.json({ error: "not found" }, 404);
+  const userId = await currentUserId(c);
+  if (!userId || !c.env?.DB) return c.json({ error: "unauthorized" }, 401);
+  const subscribed = await d1SubscriptionStore(c.env.DB).isSubscribed(userId).catch(() => false);
+  const stats = await d1AttemptStore(c.env.DB).getStats(userId, lang);
+  const phraseIds = (c.req.query("phrases") ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+  const built = buildReviewSet({
+    lang,
+    stats,
+    subscribed,
+    paywallDisabled: paywallDisabled(c.env),
+    phraseIds: phraseIds.length ? phraseIds : undefined,
+  });
+  // Pool for choice-question distractors: phrases from the same lessons.
+  const lessonNums = new Set(built.questions.map((q) => lessonOfPhrase(q.phrase.id)));
+  const pool = [...phraseById(lang).values()].filter((p) => lessonNums.has(lessonOfPhrase(p.id)));
+  return c.json({ lang, ...built, pool: pool.length ? pool : built.questions.map((q) => q.phrase) });
+});
+
+// Review page: same lesson shell; the player detects the path.
+app.get("/:lang/review", (c) => {
+  const lang = c.req.param("lang");
+  if (!isPickerLang(lang)) return c.text("Not found", 404);
+  return c.html(lessonPage(lang));
 });
 
 // Checkpoint page: same lesson shell; the player detects the path.

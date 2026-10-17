@@ -1,0 +1,1 @@
+ALTER TABLE `phrase_stats` ADD `last_activity` text DEFAULT '' NOT NULL;

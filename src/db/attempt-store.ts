@@ -20,6 +20,7 @@ export function d1AttemptStore(db: D1Database): AttemptStore {
     lastSeenAt: r.lastSeenAt,
     weak: r.weak === 1,
     correctStreak: r.correctStreak,
+    lastActivity: r.lastActivity,
   });
   return {
     getStats: async (userId, lang) => {
@@ -52,6 +53,7 @@ export function d1AttemptStore(db: D1Database): AttemptStore {
         lastSeenAt: next.lastSeenAt,
         weak: next.weak ? 1 : 0,
         correctStreak: next.correctStreak,
+        lastActivity: next.lastActivity,
       };
       if (rows[0]) {
         await orm

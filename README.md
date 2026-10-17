@@ -155,7 +155,18 @@ turns into a check, badge appears on the progress page) but never
 blocks the next unit. Free learners get the Unit 1 checkpoint;
 subscribers get all units; the unit's four lessons must be finished
 to unlock it. Result screens offer Continue, Try again, and
-Practise these (a mini review of the missed phrases).
+Practise these, which opens the review session with exactly those
+phrases.
+
+Practise my mistakes (`/{lang}/review`, `GET /api/review/:lang`) is
+a session of up to 10 weak phrases, weakest first (lowest best
+speak score, then most wrong, then oldest), each replayed in the
+activity it was missed in (`phrase_stats.last_activity`, migration
+0007), and only from lessons the learner can open. The course home
+shows a "Practise my mistakes (N)" button under the Continue card
+when at least 3 phrases are weak; the end screen reports how many
+phrases were fixed and how many remain. It writes no milestone and
+affects streaks exactly like a lesson.
 
 ## Tap-to-hear words and slow playback
 
