@@ -27,6 +27,7 @@ import type { CourseUser } from "./course";
 
 export type ProgressOpts = {
   progress: Record<string, string[]>;
+  milestones?: import("../lib/attempts").Milestone[];
   registered: boolean;
   subscribed?: boolean;
   uiLang?: UiLang;
@@ -297,6 +298,19 @@ ${numbersHtml([
 ])}
 ${shareSectionHtml({ ui, streak, phrases, langName: info.ownName, url: `${opts.origin ?? ""}/${lang}` })}
 ${badgeSectionHtml(unitsDone, ui)}
+${(() => {
+  const passed = (opts.milestones ?? []).filter(
+    (m) => m.kind === "checkpoint" && m.lang === lang && m.passed,
+  );
+  return passed.length
+    ? `<section class="badge-section" aria-label="${escapeHtml(d.unitCheckpoint)}"><h2>${escapeHtml(d.unitCheckpoint)}</h2><div class="badge-grid">${passed
+        .map(
+          (m) =>
+            `<div class="badge-card earned"><span class="badge-icon">✓</span><b>${escapeHtml(`${d.unitWord ?? "Unit"} ${m.unit}`)}</b><span>${escapeHtml(d.checkpointPassedText)}</span></div>`,
+        )
+        .join("")}</div></section>`
+    : "";
+})()}
 ${wordsGalleryHtml(lang, progress, ui)}
 </main>
 ${siteFooterHtml(ui, `/${lang}`, { registered: opts.registered })}`;

@@ -18,12 +18,12 @@ const ACTIVITIES = ["listen-match", "image-phrase", "speak-score", "read-write"]
 // Interface language (cookie nl_ui, set by the top-menu UI switcher;
 // independent of the course language in the URL).
 const UI_STRINGS = {
-  en: { listenTap: "Listen and tap", lookTap: "Look and tap", sayAloud: "Say it aloud", fillWord: "Fill the missing word", offline: "Offline \u2014 your progress will sync.", loading: "Getting your lesson ready\u2026", loadError: "Could not load the lesson.", loadErrorText: "Check your connection and try again.", tryAgain: "Try again", paywallTitle: "This lesson needs a subscription.", paywallText: "Unit 1 (lessons 1-4) is free forever. Unlock every lesson for $3/month or $29/year.", seePlans: "See plans", backFree: "Back to free Unit 1", tapStart: "Tap to start", tagline: "See it, hear it, say it.", whichPicture: "Which picture matches?", whichSentence: "Which sentence matches?", hearAgain: "Hear it again", needsConnection: "Needs connection", needsConnectionText: "Speaking practice needs the internet to check you. Your other progress is safe.", tapMic: "Tap the mic and say the sentence.", noMic: "No microphone found. Check permission and tap the mic to try again.", listening: "Listening\u2026 tap the mic to finish early.", checking: "Checking how you did\u2026", scoringError: "Something went wrong scoring that. Try again.", closeEnough: "Close enough!", closeEnoughText: "That was understood. Listen once more and try to match the tones as you go.", great: "Great!", greatText: "That sounded just right.", almost: "Almost!", goodEnough: "Good enough \u2014 moving on.", tryClearer: "Try once more, a little clearer.", tryAgainTitle: "Try again", goodEffort: "Good effort \u2014 moving on.", listenRepeat: "Listen and repeat after the speaker.", continueBtn: "Continue", correct: "Correct!", notQuite: "Not quite \u2014 listen again and try.", check: "Check", typeIt: "Type it\u2026", activityComplete: "Activity complete!", practiceAgain: "Practice again", practiceComplete: "Practice complete!", lessonComplete: "Lesson {n} complete!", niceWork: "Nice work \u2014 run it back anytime.", canDo: "You can hear it, read it, and say it.", finishLesson: "Finish lesson", shareDone: "I just finished Lesson {n} on Nicelingo and learned {phrases} new phrases!", playWordAria: "Play {word}, meaning {gloss}", slowPlay: "Play slowly", shareBtn: "Share", copyLink: "Copy link", copied: "Copied!", exitStage: "Exit current stage?", exitStageText: "Your place in this stage will not be saved.", exitYes: "Yes, exit", exitNo: "Stay" },
-  es: { listenTap: "Escucha y toca", lookTap: "Mira y toca", sayAloud: "Dilo en voz alta", fillWord: "Completa la palabra", offline: "Sin conexión — tu progreso se sincronizará.", loading: "Preparando tu lección…", loadError: "No se pudo cargar la lección.", loadErrorText: "Revisa tu conexión e inténtalo de nuevo.", tryAgain: "Intentar de nuevo", paywallTitle: "Esta lección necesita una suscripción.", paywallText: "La Unidad 1 (lecciones 1-4) es gratuita para siempre. Desbloquea todo por $3/mes o $29/año.", seePlans: "Ver planes", backFree: "Volver a la Unidad 1 gratuita", tapStart: "Toca para empezar", tagline: "Míralo. Escúchalo. Dilo.", whichPicture: "¿Qué imagen coincide?", whichSentence: "¿Qué frase coincide?", hearAgain: "Escuchar de nuevo", needsConnection: "Necesita conexión", needsConnectionText: "La práctica oral necesita internet para evaluarte. Tu demás progreso está a salvo.", tapMic: "Toca el micrófono y di la frase.", noMic: "No se encontró micrófono. Revisa el permiso y toca el micrófono para reintentar.", listening: "Escuchando… toca el micrófono para terminar antes.", checking: "Revisando cómo lo hiciste…", scoringError: "Algo salió mal al calificar. Inténtalo de nuevo.", closeEnough: "¡Casi perfecto!", closeEnoughText: "Se entendió. Escucha una vez más e intenta igualar los tonos.", great: "¡Genial!", greatText: "Sonó justo como debía.", almost: "¡Casi!", goodEnough: "Suficiente — seguimos.", tryClearer: "Inténtalo una vez más, un poco más claro.", tryAgainTitle: "Inténtalo de nuevo", goodEffort: "Buen esfuerzo — seguimos.", listenRepeat: "Escucha y repite después del audio.", continueBtn: "Continuar", correct: "¡Correcto!", notQuite: "Casi — escucha de nuevo e inténtalo.", check: "Comprobar", typeIt: "Escríbelo…", activityComplete: "¡Actividad completada!", practiceAgain: "Practicar de nuevo", practiceComplete: "¡Práctica completada!", lessonComplete: "¡Lección {n} completada!", niceWork: "Buen trabajo — repítelo cuando quieras.", canDo: "Ya puedes escucharlo, leerlo y decirlo.", finishLesson: "Terminar la lección", shareDone: "¡Acabo de terminar la lección {n} en Nicelingo y aprendí {phrases} frases nuevas!", playWordAria: "Escuchar {word}, que significa {gloss}", slowPlay: "Escuchar despacio", shareBtn: "Compartir", copyLink: "Copiar enlace", copied: "¡Copiado!", exitStage: "¿Salir de esta etapa?", exitStageText: "No se guardará tu lugar en esta etapa.", exitYes: "Sí, salir", exitNo: "Quedarme" },
-  de: { listenTap: "Hören und tippen", lookTap: "Sehen und tippen", sayAloud: "Laut nachsprechen", fillWord: "Fehlendes Wort ergänzen", offline: "Offline — dein Fortschritt wird synchronisiert.", loading: "Deine Lektion wird vorbereitet…", loadError: "Die Lektion konnte nicht geladen werden.", loadErrorText: "Prüfe deine Verbindung und versuche es erneut.", tryAgain: "Erneut versuchen", paywallTitle: "Diese Lektion braucht ein Abo.", paywallText: "Einheit 1 (Lektionen 1-4) ist für immer kostenlos. Schalte alles für $3/Monat oder $29/Jahr frei.", seePlans: "Pläne ansehen", backFree: "Zurück zur kostenlosen Einheit 1", tapStart: "Tippen zum Starten", tagline: "Sehen. Hören. Sprechen.", whichPicture: "Welches Bild passt?", whichSentence: "Welcher Satz passt?", hearAgain: "Nochmal anhören", needsConnection: "Verbindung nötig", needsConnectionText: "Sprechübung braucht Internet zur Prüfung. Dein übriger Fortschritt ist sicher.", tapMic: "Tippe aufs Mikro und sprich den Satz.", noMic: "Kein Mikrofon gefunden. Prüfe die Erlaubnis und tippe erneut aufs Mikro.", listening: "Höre zu… tippe aufs Mikro, um früher zu stoppen.", checking: "Prüfe, wie du warst…", scoringError: "Bei der Bewertung ging etwas schief. Versuch es erneut.", closeEnough: "Knapp genug!", closeEnoughText: "Das wurde verstanden. Höre noch einmal zu und triff die Töne.", great: "Großartig!", greatText: "Das klang genau richtig.", almost: "Fast!", goodEnough: "Gut genug — weiter geht's.", tryClearer: "Versuch es noch einmal, etwas deutlicher.", tryAgainTitle: "Erneut versuchen", goodEffort: "Guter Versuch — weiter geht's.", listenRepeat: "Höre zu und sprich nach.", continueBtn: "Weiter", correct: "Richtig!", notQuite: "Nicht ganz — höre nochmal zu und versuch es.", check: "Prüfen", typeIt: "Tippe es ein…", activityComplete: "Aktivität geschafft!", practiceAgain: "Nochmal üben", practiceComplete: "Übung geschafft!", lessonComplete: "Lektion {n} geschafft!", niceWork: "Gut gemacht — jederzeit wiederholen.", canDo: "Du kannst es hören, lesen und sagen.", finishLesson: "Lektion beenden", shareDone: "Ich habe gerade Lektion {n} bei Nicelingo geschafft und {phrases} neue Sätze gelernt!", playWordAria: "{word} abspielen, Bedeutung {gloss}", slowPlay: "Langsam abspielen", shareBtn: "Teilen", copyLink: "Link kopieren", copied: "Kopiert!", exitStage: "Diese Stufe verlassen?", exitStageText: "Dein Platz in dieser Stufe wird nicht gespeichert.", exitYes: "Ja, verlassen", exitNo: "Bleiben" },
-  fr: { listenTap: "Écoutez et touchez", lookTap: "Regardez et touchez", sayAloud: "Dites-le à voix haute", fillWord: "Complétez le mot manquant", offline: "Hors ligne — votre progression se synchronisera.", loading: "Préparation de votre leçon…", loadError: "Impossible de charger la leçon.", loadErrorText: "Vérifiez votre connexion et réessayez.", tryAgain: "Réessayer", paywallTitle: "Cette leçon nécessite un abonnement.", paywallText: "L'unité 1 (leçons 1-4) est gratuite pour toujours. Tout débloquer pour $3/mois ou $29/an.", seePlans: "Voir les offres", backFree: "Retour à l'unité 1 gratuite", tapStart: "Touchez pour commencer", tagline: "Regardez. Écoutez. Répétez.", whichPicture: "Quelle image correspond ?", whichSentence: "Quelle phrase correspond ?", hearAgain: "Réécouter", needsConnection: "Connexion requise", needsConnectionText: "L'exercice oral a besoin d'internet pour vous évaluer. Le reste de votre progression est à l'abri.", tapMic: "Touchez le micro et dites la phrase.", noMic: "Aucun micro trouvé. Vérifiez l'autorisation et touchez le micro pour réessayer.", listening: "Écoute… touchez le micro pour finir plus tôt.", checking: "Vérification de votre réponse…", scoringError: "La notation a échoué. Réessayez.", closeEnough: "Presque parfait !", closeEnoughText: "C'était compris. Réécoutez et essayez de suivre les tons.", great: "Super !", greatText: "C'était exactement ça.", almost: "Presque !", goodEnough: "Suffisant — on continue.", tryClearer: "Réessayez une fois, un peu plus clairement.", tryAgainTitle: "Réessayez", goodEffort: "Bel effort — on continue.", listenRepeat: "Écoutez et répétez après l'audio.", continueBtn: "Continuer", correct: "Correct !", notQuite: "Pas tout à fait — réécoutez et réessayez.", check: "Vérifier", typeIt: "Tapez-le…", activityComplete: "Activité terminée !", practiceAgain: "S'entraîner encore", practiceComplete: "Entraînement terminé !", lessonComplete: "Leçon {n} terminée !", niceWork: "Beau travail — recommencez quand vous voulez.", canDo: "Vous pouvez l'entendre, le lire et le dire.", finishLesson: "Terminer la leçon", shareDone: "Je viens de terminer la leçon {n} sur Nicelingo et appris {phrases} nouvelles phrases !", playWordAria: "Écouter {word}, qui signifie {gloss}", slowPlay: "Écouter lentement", shareBtn: "Partager", copyLink: "Copier le lien", copied: "Copié !", exitStage: "Quitter cette étape ?", exitStageText: "Votre place dans cette étape ne sera pas enregistrée.", exitYes: "Oui, quitter", exitNo: "Rester" },
-  th: { listenTap: "\u0e1f\u0e31\u0e07\u0e41\u0e25\u0e49\u0e27\u0e41\u0e15\u0e30", lookTap: "\u0e14\u0e39\u0e41\u0e25\u0e49\u0e27\u0e41\u0e15\u0e30", sayAloud: "\u0e1e\u0e39\u0e14\u0e2d\u0e2d\u0e01\u0e40\u0e2a\u0e35\u0e22\u0e07", fillWord: "\u0e40\u0e15\u0e34\u0e21\u0e04\u0e33\u0e17\u0e35\u0e48\u0e2b\u0e32\u0e22\u0e44\u0e1b", offline: "\u0e2d\u0e2d\u0e1f\u0e44\u0e25\u0e19\u0e4c — \u0e04\u0e27\u0e32\u0e21\u0e04\u0e37\u0e1a\u0e2b\u0e19\u0e49\u0e32\u0e08\u0e30\u0e0b\u0e34\u0e07\u0e04\u0e4c\u0e20\u0e32\u0e22\u0e2b\u0e25\u0e31\u0e07", loading: "\u0e01\u0e33\u0e25\u0e31\u0e07\u0e40\u0e15\u0e23\u0e35\u0e22\u0e21\u0e1a\u0e17\u0e40\u0e23\u0e35\u0e22\u0e19…", loadError: "\u0e42\u0e2b\u0e25\u0e14\u0e1a\u0e17\u0e40\u0e23\u0e35\u0e22\u0e19\u0e44\u0e21\u0e48\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08", loadErrorText: "\u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a\u0e01\u0e32\u0e23\u0e40\u0e0a\u0e37\u0e48\u0e2d\u0e21\u0e15\u0e48\u0e2d\u0e41\u0e25\u0e49\u0e27\u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", tryAgain: "\u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", paywallTitle: "\u0e1a\u0e17\u0e19\u0e35\u0e49\u0e15\u0e49\u0e2d\u0e07\u0e2a\u0e21\u0e31\u0e04\u0e23\u0e2a\u0e21\u0e32\u0e0a\u0e34\u0e01", paywallText: "\u0e2b\u0e19\u0e48\u0e27\u0e22\u0e17\u0e35\u0e48 1 (\u0e1a\u0e17\u0e17\u0e35\u0e48 1-4) \u0e1f\u0e23\u0e35\u0e15\u0e25\u0e2d\u0e14\u0e44\u0e1b \u0e1b\u0e25\u0e14\u0e25\u0e47\u0e2d\u0e01\u0e17\u0e38\u0e01\u0e1a\u0e17\u0e40\u0e23\u0e35\u0e22\u0e19\u0e43\u0e19\u0e23\u0e32\u0e04\u0e32 $3/\u0e40\u0e14\u0e37\u0e2d\u0e19 \u0e2b\u0e23\u0e37\u0e2d $29/\u0e1b\u0e35", seePlans: "\u0e14\u0e39\u0e41\u0e1e\u0e47\u0e01\u0e40\u0e01\u0e08", backFree: "\u0e01\u0e25\u0e31\u0e1a\u0e44\u0e1b\u0e2b\u0e19\u0e48\u0e27\u0e22\u0e17\u0e35\u0e48 1 \u0e1f\u0e23\u0e35", tapStart: "\u0e41\u0e15\u0e30\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e40\u0e23\u0e34\u0e48\u0e21", tagline: "\u0e14\u0e39 \u0e1f\u0e31\u0e07 \u0e41\u0e25\u0e49\u0e27\u0e1e\u0e39\u0e14\u0e15\u0e32\u0e21", whichPicture: "\u0e20\u0e32\u0e1e\u0e44\u0e2b\u0e19\u0e15\u0e23\u0e07\u0e01\u0e31\u0e19?", whichSentence: "\u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04\u0e44\u0e2b\u0e19\u0e15\u0e23\u0e07\u0e01\u0e31\u0e19?", hearAgain: "\u0e1f\u0e31\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", needsConnection: "\u0e15\u0e49\u0e2d\u0e07\u0e43\u0e0a\u0e49\u0e2d\u0e34\u0e19\u0e40\u0e17\u0e2d\u0e23\u0e4c\u0e40\u0e19\u0e47\u0e15", needsConnectionText: "\u0e01\u0e32\u0e23\u0e1d\u0e36\u0e01\u0e1e\u0e39\u0e14\u0e15\u0e49\u0e2d\u0e07\u0e43\u0e0a\u0e49\u0e2d\u0e34\u0e19\u0e40\u0e17\u0e2d\u0e23\u0e4c\u0e40\u0e19\u0e47\u0e15\u0e43\u0e19\u0e01\u0e32\u0e23\u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a \u0e04\u0e27\u0e32\u0e21\u0e04\u0e37\u0e1a\u0e2b\u0e19\u0e49\u0e32\u0e2d\u0e37\u0e48\u0e19\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13\u0e1b\u0e25\u0e2d\u0e14\u0e20\u0e31\u0e22", tapMic: "\u0e41\u0e15\u0e30\u0e44\u0e21\u0e04\u0e4c\u0e41\u0e25\u0e49\u0e27\u0e1e\u0e39\u0e14\u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04", noMic: "\u0e44\u0e21\u0e48\u0e1e\u0e1a\u0e44\u0e21\u0e42\u0e04\u0e23\u0e42\u0e1f\u0e19 \u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a\u0e2a\u0e34\u0e17\u0e18\u0e34\u0e4c\u0e41\u0e25\u0e49\u0e27\u0e41\u0e15\u0e30\u0e44\u0e21\u0e04\u0e4c\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", listening: "\u0e01\u0e33\u0e25\u0e31\u0e07\u0e1f\u0e31\u0e07… \u0e41\u0e15\u0e30\u0e44\u0e21\u0e04\u0e4c\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e2b\u0e22\u0e38\u0e14\u0e01\u0e48\u0e2d\u0e19", checking: "\u0e01\u0e33\u0e25\u0e31\u0e07\u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a…", scoringError: "\u0e40\u0e01\u0e34\u0e14\u0e02\u0e49\u0e2d\u0e1c\u0e34\u0e14\u0e1e\u0e25\u0e32\u0e14\u0e43\u0e19\u0e01\u0e32\u0e23\u0e43\u0e2b\u0e49\u0e04\u0e30\u0e41\u0e19\u0e19 \u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", closeEnough: "\u0e43\u0e01\u0e25\u0e49\u0e40\u0e04\u0e35\u0e22\u0e07\u0e21\u0e32\u0e01!", closeEnoughText: "\u0e40\u0e02\u0e49\u0e32\u0e43\u0e08\u0e44\u0e14\u0e49 \u0e1f\u0e31\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07\u0e41\u0e25\u0e49\u0e27\u0e1e\u0e22\u0e32\u0e22\u0e32\u0e21\u0e43\u0e2b\u0e49\u0e40\u0e2a\u0e35\u0e22\u0e07\u0e15\u0e23\u0e07\u0e01\u0e31\u0e19", great: "\u0e22\u0e2d\u0e14\u0e40\u0e22\u0e35\u0e48\u0e22\u0e21!", greatText: "\u0e1f\u0e31\u0e07\u0e14\u0e39\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07\u0e40\u0e25\u0e22", almost: "\u0e40\u0e01\u0e37\u0e2d\u0e1a\u0e41\u0e25\u0e49\u0e27!", goodEnough: "\u0e14\u0e35\u0e1e\u0e2d\u0e41\u0e25\u0e49\u0e27 — \u0e44\u0e1b\u0e15\u0e48\u0e2d\u0e40\u0e25\u0e22", tryClearer: "\u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07 \u0e1e\u0e39\u0e14\u0e43\u0e2b\u0e49\u0e0a\u0e31\u0e14\u0e01\u0e27\u0e48\u0e32\u0e19\u0e35\u0e49", tryAgainTitle: "\u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", goodEffort: "\u0e1e\u0e22\u0e32\u0e22\u0e32\u0e21\u0e14\u0e35\u0e21\u0e32\u0e01 — \u0e44\u0e1b\u0e15\u0e48\u0e2d\u0e40\u0e25\u0e22", listenRepeat: "\u0e1f\u0e31\u0e07\u0e41\u0e25\u0e49\u0e27\u0e1e\u0e39\u0e14\u0e15\u0e32\u0e21", continueBtn: "\u0e44\u0e1b\u0e15\u0e48\u0e2d", correct: "\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07!", notQuite: "\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e16\u0e39\u0e01 — \u0e1f\u0e31\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07\u0e41\u0e25\u0e49\u0e27\u0e25\u0e2d\u0e07\u0e43\u0e2b\u0e21\u0e48", check: "\u0e15\u0e23\u0e27\u0e08\u0e04\u0e33\u0e15\u0e2d\u0e1a", typeIt: "\u0e1e\u0e34\u0e21\u0e1e\u0e4c\u0e17\u0e35\u0e48\u0e19\u0e35\u0e48…", activityComplete: "\u0e17\u0e33\u0e01\u0e34\u0e08\u0e01\u0e23\u0e23\u0e21\u0e40\u0e2a\u0e23\u0e47\u0e08\u0e41\u0e25\u0e49\u0e27!", practiceAgain: "\u0e1d\u0e36\u0e01\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", practiceComplete: "\u0e1d\u0e36\u0e01\u0e40\u0e2a\u0e23\u0e47\u0e08\u0e41\u0e25\u0e49\u0e27!", lessonComplete: "\u0e08\u0e1a\u0e1a\u0e17\u0e17\u0e35\u0e48 {n} \u0e41\u0e25\u0e49\u0e27!", niceWork: "\u0e17\u0e33\u0e44\u0e14\u0e49\u0e14\u0e35\u0e21\u0e32\u0e01 — \u0e1d\u0e36\u0e01\u0e0b\u0e49\u0e33\u0e44\u0e14\u0e49\u0e17\u0e38\u0e01\u0e40\u0e21\u0e37\u0e48\u0e2d", canDo: "\u0e04\u0e38\u0e13\u0e1f\u0e31\u0e07 \u0e2d\u0e48\u0e32\u0e19 \u0e41\u0e25\u0e30\u0e1e\u0e39\u0e14\u0e44\u0e14\u0e49\u0e41\u0e25\u0e49\u0e27", finishLesson: "\u0e08\u0e1a\u0e1a\u0e17\u0e40\u0e23\u0e35\u0e22\u0e19", shareDone: "\u0e09\u0e31\u0e19\u0e40\u0e1e\u0e34\u0e48\u0e07\u0e40\u0e23\u0e35\u0e22\u0e19\u0e08\u0e1a\u0e1a\u0e17\u0e17\u0e35\u0e48 {n} \u0e1a\u0e19 Nicelingo \u0e41\u0e25\u0e30\u0e40\u0e23\u0e35\u0e22\u0e19\u0e23\u0e39\u0e49 {phrases} \u0e27\u0e25\u0e35\u0e43\u0e2b\u0e21\u0e48!", playWordAria: "\u0e40\u0e25\u0e48\u0e19 {word} \u0e2b\u0e21\u0e32\u0e22\u0e16\u0e36\u0e07 {gloss}", slowPlay: "\u0e40\u0e25\u0e48\u0e19\u0e0a\u0e49\u0e32\u0e46", shareBtn: "\u0e41\u0e0a\u0e23\u0e4c", copyLink: "\u0e04\u0e31\u0e14\u0e25\u0e2d\u0e01\u0e25\u0e34\u0e07\u0e01\u0e4c", copied: "\u0e04\u0e31\u0e14\u0e25\u0e2d\u0e01\u0e41\u0e25\u0e49\u0e27!", exitStage: "\u0e2d\u0e2d\u0e01\u0e08\u0e32\u0e01\u0e02\u0e31\u0e49\u0e19\u0e15\u0e2d\u0e19\u0e19\u0e35\u0e49?", exitStageText: "\u0e15\u0e33\u0e41\u0e2b\u0e19\u0e48\u0e07\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13\u0e43\u0e19\u0e02\u0e31\u0e49\u0e19\u0e15\u0e2d\u0e19\u0e19\u0e35\u0e49\u0e08\u0e30\u0e44\u0e21\u0e48\u0e16\u0e39\u0e01\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01", exitYes: "\u0e43\u0e0a\u0e48 \u0e2d\u0e2d\u0e01", exitNo: "\u0e2d\u0e22\u0e39\u0e48\u0e15\u0e48\u0e2d" },
-  zh: { listenTap: "\u542c\u5e76\u70b9\u9009", lookTap: "\u770b\u5e76\u70b9\u9009", sayAloud: "\u5927\u58f0\u8bf4\u51fa\u6765", fillWord: "\u586b\u5165\u7f3a\u5c11\u7684\u5355\u8bcd", offline: "\u79bb\u7ebf — \u4f60\u7684\u8fdb\u5ea6\u7a0d\u540e\u4f1a\u540c\u6b65。", loading: "\u6b63\u5728\u51c6\u5907\u4f60\u7684\u8bfe\u7a0b…", loadError: "\u65e0\u6cd5\u52a0\u8f7d\u8bfe\u7a0b。", loadErrorText: "\u68c0\u67e5\u4f60\u7684\u8fde\u63a5\u5e76\u91cd\u8bd5。", tryAgain: "\u91cd\u8bd5", paywallTitle: "\u672c\u8bfe\u9700\u8981\u8ba2\u9605。", paywallText: "\u7b2c\u4e00\u5355\u5143（\u7b2c1-4\u8bfe）\u6c38\u4e45\u514d\u8d39。\u4ee5 $3/\u6708 \u6216 $29/\u5e74 \u89e3\u9501\u6240\u6709\u8bfe\u7a0b。", seePlans: "\u67e5\u770b\u5957\u9910", backFree: "\u8fd4\u56de\u514d\u8d39\u7b2c\u4e00\u5355\u5143", tapStart: "\u70b9\u6309\u5f00\u59cb", tagline: "\u770b\u4e00\u770b，\u542c\u4e00\u542c，\u8bf4\u4e00\u8bf4。", whichPicture: "\u54ea\u5f20\u56fe\u7247\u5339\u914d？", whichSentence: "\u54ea\u4e2a\u53e5\u5b50\u5339\u914d？", hearAgain: "\u518d\u542c\u4e00\u6b21", needsConnection: "\u9700\u8981\u7f51\u7edc", needsConnectionText: "\u53e3\u8bed\u7ec3\u4e60\u9700\u8981\u7f51\u7edc\u6765\u68c0\u67e5。\u4f60\u7684\u5176\u4ed6\u8fdb\u5ea6\u662f\u5b89\u5168\u7684。", tapMic: "\u70b9\u6309\u9ea6\u514b\u98ce\u5e76\u8bf4\u51fa\u53e5\u5b50。", noMic: "\u672a\u627e\u5230\u9ea6\u514b\u98ce。\u68c0\u67e5\u6743\u9650\u540e\u70b9\u6309\u9ea6\u514b\u98ce\u91cd\u8bd5。", listening: "\u6b63\u5728\u8046\u542c…\u70b9\u6309\u9ea6\u514b\u98ce\u53ef\u63d0\u524d\u7ed3\u675f。", checking: "\u6b63\u5728\u68c0\u67e5\u4f60\u7684\u8868\u73b0…", scoringError: "\u8bc4\u5206\u51fa\u9519。\u8bf7\u91cd\u8bd5。", closeEnough: "\u975e\u5e38\u63a5\u8fd1！", closeEnoughText: "\u53ef\u4ee5\u7406\u89e3。\u518d\u542c\u4e00\u6b21，\u5c3d\u91cf\u5339\u914d\u58f0\u8c03。", great: "\u592a\u68d2\u4e86！", greatText: "\u542c\u8d77\u6765\u975e\u5e38\u6807\u51c6。", almost: "\u5dee\u4e00\u70b9！", goodEnough: "\u5df2\u7ecf\u591f\u597d\u4e86 — \u7ee7\u7eed。", tryClearer: "\u518d\u8bd5\u4e00\u6b21，\u8bf4\u5f97\u66f4\u6e05\u695a\u4e9b。", tryAgainTitle: "\u91cd\u8bd5", goodEffort: "\u52aa\u529b\u5f88\u597d — \u7ee7\u7eed。", listenRepeat: "\u542c\u5e76\u8ddf\u8bfb。", continueBtn: "\u7ee7\u7eed", correct: "\u6b63\u786e！", notQuite: "\u4e0d\u592a\u5bf9 — \u518d\u542c\u4e00\u6b21\u5e76\u91cd\u8bd5。", check: "\u68c0\u67e5", typeIt: "\u8f93\u5165…", activityComplete: "\u6d3b\u52a8\u5b8c\u6210！", practiceAgain: "\u518d\u7ec3\u4e00\u6b21", practiceComplete: "\u7ec3\u4e60\u5b8c\u6210！", lessonComplete: "\u7b2c{n}\u8bfe\u5b8c\u6210！", niceWork: "\u505a\u5f97\u5f88\u597d — \u968f\u65f6\u518d\u6765\u7ec3\u4e60。", canDo: "\u4f60\u5df2\u7ecf\u80fd\u542c、\u8bfb、\u8bf4\u4e86。", finishLesson: "\u5b8c\u6210\u8bfe\u7a0b", shareDone: "\u6211\u521a\u521a\u5728 Nicelingo \u5b8c\u6210\u4e86\u7b2c {n} \u8bfe\uff0c\u5b66\u4f1a\u4e86 {phrases} \u4e2a\u65b0\u77ed\u8bed\uff01", playWordAria: "\u64ad\u653e {word}\uff0c\u610f\u601d\u662f {gloss}", slowPlay: "\u6162\u901f\u64ad\u653e", shareBtn: "\u5206\u4eab", copyLink: "\u590d\u5236\u94fe\u63a5", copied: "\u5df2\u590d\u5236\uff01", exitStage: "\u9000\u51fa\u5f53\u524d\u9636\u6bb5\uff1f", exitStageText: "\u4f60\u5728\u5f53\u524d\u9636\u6bb5\u7684\u8fdb\u5ea6\u4e0d\u4f1a\u88ab\u4fdd\u5b58\u3002", exitYes: "\u662f\uff0c\u9000\u51fa", exitNo: "\u7559\u4e0b" }
+  en: { listenTap: "Listen and tap", lookTap: "Look and tap", sayAloud: "Say it aloud", fillWord: "Fill the missing word", offline: "Offline \u2014 your progress will sync.", loading: "Getting your lesson ready\u2026", loadError: "Could not load the lesson.", loadErrorText: "Check your connection and try again.", tryAgain: "Try again", paywallTitle: "This lesson needs a subscription.", paywallText: "Unit 1 (lessons 1-4) is free forever. Unlock every lesson for $3/month or $29/year.", seePlans: "See plans", backFree: "Back to free Unit 1", tapStart: "Tap to start", tagline: "See it, hear it, say it.", whichPicture: "Which picture matches?", whichSentence: "Which sentence matches?", hearAgain: "Hear it again", needsConnection: "Needs connection", needsConnectionText: "Speaking practice needs the internet to check you. Your other progress is safe.", tapMic: "Tap the mic and say the sentence.", noMic: "No microphone found. Check permission and tap the mic to try again.", listening: "Listening\u2026 tap the mic to finish early.", checking: "Checking how you did\u2026", scoringError: "Something went wrong scoring that. Try again.", closeEnough: "Close enough!", closeEnoughText: "That was understood. Listen once more and try to match the tones as you go.", great: "Great!", greatText: "That sounded just right.", almost: "Almost!", goodEnough: "Good enough \u2014 moving on.", tryClearer: "Try once more, a little clearer.", tryAgainTitle: "Try again", goodEffort: "Good effort \u2014 moving on.", listenRepeat: "Listen and repeat after the speaker.", continueBtn: "Continue", correct: "Correct!", notQuite: "Not quite \u2014 listen again and try.", check: "Check", typeIt: "Type it\u2026", activityComplete: "Activity complete!", practiceAgain: "Practice again", practiceComplete: "Practice complete!", lessonComplete: "Lesson {n} complete!", niceWork: "Nice work \u2014 run it back anytime.", canDo: "You can hear it, read it, and say it.", finishLesson: "Finish lesson", shareDone: "I just finished Lesson {n} on Nicelingo and learned {phrases} new phrases!", checkpointTitle: "Unit {n} checkpoint", checkpointIntro: "10 questions, about 3 minutes", checkpointStart: "Start checkpoint", checkpointPassedText: "Checkpoint passed", checkpointFail: "So close!", checkpointScoreLine: "{n} of 10", checkpointLocked: "Finish all 4 lessons to unlock", continueToUnit: "Continue to Unit {n}", tryAgainCp: "Try again", practiseThese: "Practise these", playWordAria: "Play {word}, meaning {gloss}", slowPlay: "Play slowly", shareBtn: "Share", copyLink: "Copy link", copied: "Copied!", exitStage: "Exit current stage?", exitStageText: "Your place in this stage will not be saved.", exitYes: "Yes, exit", exitNo: "Stay" },
+  es: { listenTap: "Escucha y toca", lookTap: "Mira y toca", sayAloud: "Dilo en voz alta", fillWord: "Completa la palabra", offline: "Sin conexión — tu progreso se sincronizará.", loading: "Preparando tu lección…", loadError: "No se pudo cargar la lección.", loadErrorText: "Revisa tu conexión e inténtalo de nuevo.", tryAgain: "Intentar de nuevo", paywallTitle: "Esta lección necesita una suscripción.", paywallText: "La Unidad 1 (lecciones 1-4) es gratuita para siempre. Desbloquea todo por $3/mes o $29/año.", seePlans: "Ver planes", backFree: "Volver a la Unidad 1 gratuita", tapStart: "Toca para empezar", tagline: "Míralo. Escúchalo. Dilo.", whichPicture: "¿Qué imagen coincide?", whichSentence: "¿Qué frase coincide?", hearAgain: "Escuchar de nuevo", needsConnection: "Necesita conexión", needsConnectionText: "La práctica oral necesita internet para evaluarte. Tu demás progreso está a salvo.", tapMic: "Toca el micrófono y di la frase.", noMic: "No se encontró micrófono. Revisa el permiso y toca el micrófono para reintentar.", listening: "Escuchando… toca el micrófono para terminar antes.", checking: "Revisando cómo lo hiciste…", scoringError: "Algo salió mal al calificar. Inténtalo de nuevo.", closeEnough: "¡Casi perfecto!", closeEnoughText: "Se entendió. Escucha una vez más e intenta igualar los tonos.", great: "¡Genial!", greatText: "Sonó justo como debía.", almost: "¡Casi!", goodEnough: "Suficiente — seguimos.", tryClearer: "Inténtalo una vez más, un poco más claro.", tryAgainTitle: "Inténtalo de nuevo", goodEffort: "Buen esfuerzo — seguimos.", listenRepeat: "Escucha y repite después del audio.", continueBtn: "Continuar", correct: "¡Correcto!", notQuite: "Casi — escucha de nuevo e inténtalo.", check: "Comprobar", typeIt: "Escríbelo…", activityComplete: "¡Actividad completada!", practiceAgain: "Practicar de nuevo", practiceComplete: "¡Práctica completada!", lessonComplete: "¡Lección {n} completada!", niceWork: "Buen trabajo — repítelo cuando quieras.", canDo: "Ya puedes escucharlo, leerlo y decirlo.", finishLesson: "Terminar la lección", shareDone: "¡Acabo de terminar la lección {n} en Nicelingo y aprendí {phrases} frases nuevas!", checkpointTitle: "Control de la unidad {n}", checkpointIntro: "10 preguntas, unos 3 minutos", checkpointStart: "Empezar el control", checkpointPassedText: "Control superado", checkpointFail: "¡Casi!", checkpointScoreLine: "{n} de 10", checkpointLocked: "Termina las 4 lecciones para desbloquearlo", continueToUnit: "Continuar a la unidad {n}", tryAgainCp: "Intentarlo de nuevo", practiseThese: "Practicar estos", playWordAria: "Escuchar {word}, que significa {gloss}", slowPlay: "Escuchar despacio", shareBtn: "Compartir", copyLink: "Copiar enlace", copied: "¡Copiado!", exitStage: "¿Salir de esta etapa?", exitStageText: "No se guardará tu lugar en esta etapa.", exitYes: "Sí, salir", exitNo: "Quedarme" },
+  de: { listenTap: "Hören und tippen", lookTap: "Sehen und tippen", sayAloud: "Laut nachsprechen", fillWord: "Fehlendes Wort ergänzen", offline: "Offline — dein Fortschritt wird synchronisiert.", loading: "Deine Lektion wird vorbereitet…", loadError: "Die Lektion konnte nicht geladen werden.", loadErrorText: "Prüfe deine Verbindung und versuche es erneut.", tryAgain: "Erneut versuchen", paywallTitle: "Diese Lektion braucht ein Abo.", paywallText: "Einheit 1 (Lektionen 1-4) ist für immer kostenlos. Schalte alles für $3/Monat oder $29/Jahr frei.", seePlans: "Pläne ansehen", backFree: "Zurück zur kostenlosen Einheit 1", tapStart: "Tippen zum Starten", tagline: "Sehen. Hören. Sprechen.", whichPicture: "Welches Bild passt?", whichSentence: "Welcher Satz passt?", hearAgain: "Nochmal anhören", needsConnection: "Verbindung nötig", needsConnectionText: "Sprechübung braucht Internet zur Prüfung. Dein übriger Fortschritt ist sicher.", tapMic: "Tippe aufs Mikro und sprich den Satz.", noMic: "Kein Mikrofon gefunden. Prüfe die Erlaubnis und tippe erneut aufs Mikro.", listening: "Höre zu… tippe aufs Mikro, um früher zu stoppen.", checking: "Prüfe, wie du warst…", scoringError: "Bei der Bewertung ging etwas schief. Versuch es erneut.", closeEnough: "Knapp genug!", closeEnoughText: "Das wurde verstanden. Höre noch einmal zu und triff die Töne.", great: "Großartig!", greatText: "Das klang genau richtig.", almost: "Fast!", goodEnough: "Gut genug — weiter geht's.", tryClearer: "Versuch es noch einmal, etwas deutlicher.", tryAgainTitle: "Erneut versuchen", goodEffort: "Guter Versuch — weiter geht's.", listenRepeat: "Höre zu und sprich nach.", continueBtn: "Weiter", correct: "Richtig!", notQuite: "Nicht ganz — höre nochmal zu und versuch es.", check: "Prüfen", typeIt: "Tippe es ein…", activityComplete: "Aktivität geschafft!", practiceAgain: "Nochmal üben", practiceComplete: "Übung geschafft!", lessonComplete: "Lektion {n} geschafft!", niceWork: "Gut gemacht — jederzeit wiederholen.", canDo: "Du kannst es hören, lesen und sagen.", finishLesson: "Lektion beenden", shareDone: "Ich habe gerade Lektion {n} bei Nicelingo geschafft und {phrases} neue Sätze gelernt!", checkpointTitle: "Test zu Einheit {n}", checkpointIntro: "10 Fragen, etwa 3 Minuten", checkpointStart: "Test starten", checkpointPassedText: "Test bestanden", checkpointFail: "Knapp daneben!", checkpointScoreLine: "{n} von 10", checkpointLocked: "Schließe alle 4 Lektionen ab, um ihn freizuschalten", continueToUnit: "Weiter zu Einheit {n}", tryAgainCp: "Nochmal versuchen", practiseThese: "Diese üben", playWordAria: "{word} abspielen, Bedeutung {gloss}", slowPlay: "Langsam abspielen", shareBtn: "Teilen", copyLink: "Link kopieren", copied: "Kopiert!", exitStage: "Diese Stufe verlassen?", exitStageText: "Dein Platz in dieser Stufe wird nicht gespeichert.", exitYes: "Ja, verlassen", exitNo: "Bleiben" },
+  fr: { listenTap: "Écoutez et touchez", lookTap: "Regardez et touchez", sayAloud: "Dites-le à voix haute", fillWord: "Complétez le mot manquant", offline: "Hors ligne — votre progression se synchronisera.", loading: "Préparation de votre leçon…", loadError: "Impossible de charger la leçon.", loadErrorText: "Vérifiez votre connexion et réessayez.", tryAgain: "Réessayer", paywallTitle: "Cette leçon nécessite un abonnement.", paywallText: "L'unité 1 (leçons 1-4) est gratuite pour toujours. Tout débloquer pour $3/mois ou $29/an.", seePlans: "Voir les offres", backFree: "Retour à l'unité 1 gratuite", tapStart: "Touchez pour commencer", tagline: "Regardez. Écoutez. Répétez.", whichPicture: "Quelle image correspond ?", whichSentence: "Quelle phrase correspond ?", hearAgain: "Réécouter", needsConnection: "Connexion requise", needsConnectionText: "L'exercice oral a besoin d'internet pour vous évaluer. Le reste de votre progression est à l'abri.", tapMic: "Touchez le micro et dites la phrase.", noMic: "Aucun micro trouvé. Vérifiez l'autorisation et touchez le micro pour réessayer.", listening: "Écoute… touchez le micro pour finir plus tôt.", checking: "Vérification de votre réponse…", scoringError: "La notation a échoué. Réessayez.", closeEnough: "Presque parfait !", closeEnoughText: "C'était compris. Réécoutez et essayez de suivre les tons.", great: "Super !", greatText: "C'était exactement ça.", almost: "Presque !", goodEnough: "Suffisant — on continue.", tryClearer: "Réessayez une fois, un peu plus clairement.", tryAgainTitle: "Réessayez", goodEffort: "Bel effort — on continue.", listenRepeat: "Écoutez et répétez après l'audio.", continueBtn: "Continuer", correct: "Correct !", notQuite: "Pas tout à fait — réécoutez et réessayez.", check: "Vérifier", typeIt: "Tapez-le…", activityComplete: "Activité terminée !", practiceAgain: "S'entraîner encore", practiceComplete: "Entraînement terminé !", lessonComplete: "Leçon {n} terminée !", niceWork: "Beau travail — recommencez quand vous voulez.", canDo: "Vous pouvez l'entendre, le lire et le dire.", finishLesson: "Terminer la leçon", shareDone: "Je viens de terminer la leçon {n} sur Nicelingo et appris {phrases} nouvelles phrases !", checkpointTitle: "Test de l'unité {n}", checkpointIntro: "10 questions, environ 3 minutes", checkpointStart: "Commencer le test", checkpointPassedText: "Test réussi", checkpointFail: "Dommage, si près !", checkpointScoreLine: "{n} sur 10", checkpointLocked: "Terminez les 4 leçons pour le débloquer", continueToUnit: "Continuer vers l'unité {n}", tryAgainCp: "Réessayer", practiseThese: "Pratiquer ceux-ci", playWordAria: "Écouter {word}, qui signifie {gloss}", slowPlay: "Écouter lentement", shareBtn: "Partager", copyLink: "Copier le lien", copied: "Copié !", exitStage: "Quitter cette étape ?", exitStageText: "Votre place dans cette étape ne sera pas enregistrée.", exitYes: "Oui, quitter", exitNo: "Rester" },
+  th: { listenTap: "\u0e1f\u0e31\u0e07\u0e41\u0e25\u0e49\u0e27\u0e41\u0e15\u0e30", lookTap: "\u0e14\u0e39\u0e41\u0e25\u0e49\u0e27\u0e41\u0e15\u0e30", sayAloud: "\u0e1e\u0e39\u0e14\u0e2d\u0e2d\u0e01\u0e40\u0e2a\u0e35\u0e22\u0e07", fillWord: "\u0e40\u0e15\u0e34\u0e21\u0e04\u0e33\u0e17\u0e35\u0e48\u0e2b\u0e32\u0e22\u0e44\u0e1b", offline: "\u0e2d\u0e2d\u0e1f\u0e44\u0e25\u0e19\u0e4c — \u0e04\u0e27\u0e32\u0e21\u0e04\u0e37\u0e1a\u0e2b\u0e19\u0e49\u0e32\u0e08\u0e30\u0e0b\u0e34\u0e07\u0e04\u0e4c\u0e20\u0e32\u0e22\u0e2b\u0e25\u0e31\u0e07", loading: "\u0e01\u0e33\u0e25\u0e31\u0e07\u0e40\u0e15\u0e23\u0e35\u0e22\u0e21\u0e1a\u0e17\u0e40\u0e23\u0e35\u0e22\u0e19…", loadError: "\u0e42\u0e2b\u0e25\u0e14\u0e1a\u0e17\u0e40\u0e23\u0e35\u0e22\u0e19\u0e44\u0e21\u0e48\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08", loadErrorText: "\u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a\u0e01\u0e32\u0e23\u0e40\u0e0a\u0e37\u0e48\u0e2d\u0e21\u0e15\u0e48\u0e2d\u0e41\u0e25\u0e49\u0e27\u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", tryAgain: "\u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", paywallTitle: "\u0e1a\u0e17\u0e19\u0e35\u0e49\u0e15\u0e49\u0e2d\u0e07\u0e2a\u0e21\u0e31\u0e04\u0e23\u0e2a\u0e21\u0e32\u0e0a\u0e34\u0e01", paywallText: "\u0e2b\u0e19\u0e48\u0e27\u0e22\u0e17\u0e35\u0e48 1 (\u0e1a\u0e17\u0e17\u0e35\u0e48 1-4) \u0e1f\u0e23\u0e35\u0e15\u0e25\u0e2d\u0e14\u0e44\u0e1b \u0e1b\u0e25\u0e14\u0e25\u0e47\u0e2d\u0e01\u0e17\u0e38\u0e01\u0e1a\u0e17\u0e40\u0e23\u0e35\u0e22\u0e19\u0e43\u0e19\u0e23\u0e32\u0e04\u0e32 $3/\u0e40\u0e14\u0e37\u0e2d\u0e19 \u0e2b\u0e23\u0e37\u0e2d $29/\u0e1b\u0e35", seePlans: "\u0e14\u0e39\u0e41\u0e1e\u0e47\u0e01\u0e40\u0e01\u0e08", backFree: "\u0e01\u0e25\u0e31\u0e1a\u0e44\u0e1b\u0e2b\u0e19\u0e48\u0e27\u0e22\u0e17\u0e35\u0e48 1 \u0e1f\u0e23\u0e35", tapStart: "\u0e41\u0e15\u0e30\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e40\u0e23\u0e34\u0e48\u0e21", tagline: "\u0e14\u0e39 \u0e1f\u0e31\u0e07 \u0e41\u0e25\u0e49\u0e27\u0e1e\u0e39\u0e14\u0e15\u0e32\u0e21", whichPicture: "\u0e20\u0e32\u0e1e\u0e44\u0e2b\u0e19\u0e15\u0e23\u0e07\u0e01\u0e31\u0e19?", whichSentence: "\u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04\u0e44\u0e2b\u0e19\u0e15\u0e23\u0e07\u0e01\u0e31\u0e19?", hearAgain: "\u0e1f\u0e31\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", needsConnection: "\u0e15\u0e49\u0e2d\u0e07\u0e43\u0e0a\u0e49\u0e2d\u0e34\u0e19\u0e40\u0e17\u0e2d\u0e23\u0e4c\u0e40\u0e19\u0e47\u0e15", needsConnectionText: "\u0e01\u0e32\u0e23\u0e1d\u0e36\u0e01\u0e1e\u0e39\u0e14\u0e15\u0e49\u0e2d\u0e07\u0e43\u0e0a\u0e49\u0e2d\u0e34\u0e19\u0e40\u0e17\u0e2d\u0e23\u0e4c\u0e40\u0e19\u0e47\u0e15\u0e43\u0e19\u0e01\u0e32\u0e23\u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a \u0e04\u0e27\u0e32\u0e21\u0e04\u0e37\u0e1a\u0e2b\u0e19\u0e49\u0e32\u0e2d\u0e37\u0e48\u0e19\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13\u0e1b\u0e25\u0e2d\u0e14\u0e20\u0e31\u0e22", tapMic: "\u0e41\u0e15\u0e30\u0e44\u0e21\u0e04\u0e4c\u0e41\u0e25\u0e49\u0e27\u0e1e\u0e39\u0e14\u0e1b\u0e23\u0e30\u0e42\u0e22\u0e04", noMic: "\u0e44\u0e21\u0e48\u0e1e\u0e1a\u0e44\u0e21\u0e42\u0e04\u0e23\u0e42\u0e1f\u0e19 \u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a\u0e2a\u0e34\u0e17\u0e18\u0e34\u0e4c\u0e41\u0e25\u0e49\u0e27\u0e41\u0e15\u0e30\u0e44\u0e21\u0e04\u0e4c\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", listening: "\u0e01\u0e33\u0e25\u0e31\u0e07\u0e1f\u0e31\u0e07… \u0e41\u0e15\u0e30\u0e44\u0e21\u0e04\u0e4c\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e2b\u0e22\u0e38\u0e14\u0e01\u0e48\u0e2d\u0e19", checking: "\u0e01\u0e33\u0e25\u0e31\u0e07\u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a…", scoringError: "\u0e40\u0e01\u0e34\u0e14\u0e02\u0e49\u0e2d\u0e1c\u0e34\u0e14\u0e1e\u0e25\u0e32\u0e14\u0e43\u0e19\u0e01\u0e32\u0e23\u0e43\u0e2b\u0e49\u0e04\u0e30\u0e41\u0e19\u0e19 \u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", closeEnough: "\u0e43\u0e01\u0e25\u0e49\u0e40\u0e04\u0e35\u0e22\u0e07\u0e21\u0e32\u0e01!", closeEnoughText: "\u0e40\u0e02\u0e49\u0e32\u0e43\u0e08\u0e44\u0e14\u0e49 \u0e1f\u0e31\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07\u0e41\u0e25\u0e49\u0e27\u0e1e\u0e22\u0e32\u0e22\u0e32\u0e21\u0e43\u0e2b\u0e49\u0e40\u0e2a\u0e35\u0e22\u0e07\u0e15\u0e23\u0e07\u0e01\u0e31\u0e19", great: "\u0e22\u0e2d\u0e14\u0e40\u0e22\u0e35\u0e48\u0e22\u0e21!", greatText: "\u0e1f\u0e31\u0e07\u0e14\u0e39\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07\u0e40\u0e25\u0e22", almost: "\u0e40\u0e01\u0e37\u0e2d\u0e1a\u0e41\u0e25\u0e49\u0e27!", goodEnough: "\u0e14\u0e35\u0e1e\u0e2d\u0e41\u0e25\u0e49\u0e27 — \u0e44\u0e1b\u0e15\u0e48\u0e2d\u0e40\u0e25\u0e22", tryClearer: "\u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07 \u0e1e\u0e39\u0e14\u0e43\u0e2b\u0e49\u0e0a\u0e31\u0e14\u0e01\u0e27\u0e48\u0e32\u0e19\u0e35\u0e49", tryAgainTitle: "\u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", goodEffort: "\u0e1e\u0e22\u0e32\u0e22\u0e32\u0e21\u0e14\u0e35\u0e21\u0e32\u0e01 — \u0e44\u0e1b\u0e15\u0e48\u0e2d\u0e40\u0e25\u0e22", listenRepeat: "\u0e1f\u0e31\u0e07\u0e41\u0e25\u0e49\u0e27\u0e1e\u0e39\u0e14\u0e15\u0e32\u0e21", continueBtn: "\u0e44\u0e1b\u0e15\u0e48\u0e2d", correct: "\u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07!", notQuite: "\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e16\u0e39\u0e01 — \u0e1f\u0e31\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07\u0e41\u0e25\u0e49\u0e27\u0e25\u0e2d\u0e07\u0e43\u0e2b\u0e21\u0e48", check: "\u0e15\u0e23\u0e27\u0e08\u0e04\u0e33\u0e15\u0e2d\u0e1a", typeIt: "\u0e1e\u0e34\u0e21\u0e1e\u0e4c\u0e17\u0e35\u0e48\u0e19\u0e35\u0e48…", activityComplete: "\u0e17\u0e33\u0e01\u0e34\u0e08\u0e01\u0e23\u0e23\u0e21\u0e40\u0e2a\u0e23\u0e47\u0e08\u0e41\u0e25\u0e49\u0e27!", practiceAgain: "\u0e1d\u0e36\u0e01\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", practiceComplete: "\u0e1d\u0e36\u0e01\u0e40\u0e2a\u0e23\u0e47\u0e08\u0e41\u0e25\u0e49\u0e27!", lessonComplete: "\u0e08\u0e1a\u0e1a\u0e17\u0e17\u0e35\u0e48 {n} \u0e41\u0e25\u0e49\u0e27!", niceWork: "\u0e17\u0e33\u0e44\u0e14\u0e49\u0e14\u0e35\u0e21\u0e32\u0e01 — \u0e1d\u0e36\u0e01\u0e0b\u0e49\u0e33\u0e44\u0e14\u0e49\u0e17\u0e38\u0e01\u0e40\u0e21\u0e37\u0e48\u0e2d", canDo: "\u0e04\u0e38\u0e13\u0e1f\u0e31\u0e07 \u0e2d\u0e48\u0e32\u0e19 \u0e41\u0e25\u0e30\u0e1e\u0e39\u0e14\u0e44\u0e14\u0e49\u0e41\u0e25\u0e49\u0e27", finishLesson: "\u0e08\u0e1a\u0e1a\u0e17\u0e40\u0e23\u0e35\u0e22\u0e19", shareDone: "\u0e09\u0e31\u0e19\u0e40\u0e1e\u0e34\u0e48\u0e07\u0e40\u0e23\u0e35\u0e22\u0e19\u0e08\u0e1a\u0e1a\u0e17\u0e17\u0e35\u0e48 {n} \u0e1a\u0e19 Nicelingo \u0e41\u0e25\u0e30\u0e40\u0e23\u0e35\u0e22\u0e19\u0e23\u0e39\u0e49 {phrases} \u0e27\u0e25\u0e35\u0e43\u0e2b\u0e21\u0e48!", checkpointTitle: "\u0e41\u0e1a\u0e1a\u0e17\u0e14\u0e2a\u0e2d\u0e1a\u0e2b\u0e19\u0e48\u0e27\u0e22\u0e17\u0e35\u0e48 {n}", checkpointIntro: "10 \u0e04\u0e33\u0e16\u0e32\u0e21 \u0e1b\u0e23\u0e30\u0e21\u0e32\u0e13 3 \u0e19\u0e32\u0e17\u0e35", checkpointStart: "\u0e40\u0e23\u0e34\u0e48\u0e21\u0e41\u0e1a\u0e1a\u0e17\u0e14\u0e2a\u0e2d\u0e1a", checkpointPassedText: "\u0e1c\u0e48\u0e32\u0e19\u0e41\u0e1a\u0e1a\u0e17\u0e14\u0e2a\u0e2d\u0e1a\u0e41\u0e25\u0e49\u0e27", checkpointFail: "\u0e40\u0e01\u0e37\u0e2d\u0e1a\u0e41\u0e25\u0e49\u0e27!", checkpointScoreLine: "{n} \u0e08\u0e32\u0e01 10", checkpointLocked: "\u0e40\u0e23\u0e35\u0e22\u0e19\u0e04\u0e23\u0e1a 4 \u0e1a\u0e17\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e1b\u0e25\u0e14\u0e25\u0e47\u0e2d\u0e01", continueToUnit: "\u0e44\u0e1b\u0e15\u0e48\u0e2d\u0e2b\u0e19\u0e48\u0e27\u0e22\u0e17\u0e35\u0e48 {n}", tryAgainCp: "\u0e25\u0e2d\u0e07\u0e2d\u0e35\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07", practiseThese: "\u0e1d\u0e36\u0e01\u0e04\u0e33\u0e40\u0e2b\u0e25\u0e48\u0e32\u0e19\u0e35\u0e49", playWordAria: "\u0e40\u0e25\u0e48\u0e19 {word} \u0e2b\u0e21\u0e32\u0e22\u0e16\u0e36\u0e07 {gloss}", slowPlay: "\u0e40\u0e25\u0e48\u0e19\u0e0a\u0e49\u0e32\u0e46", shareBtn: "\u0e41\u0e0a\u0e23\u0e4c", copyLink: "\u0e04\u0e31\u0e14\u0e25\u0e2d\u0e01\u0e25\u0e34\u0e07\u0e01\u0e4c", copied: "\u0e04\u0e31\u0e14\u0e25\u0e2d\u0e01\u0e41\u0e25\u0e49\u0e27!", exitStage: "\u0e2d\u0e2d\u0e01\u0e08\u0e32\u0e01\u0e02\u0e31\u0e49\u0e19\u0e15\u0e2d\u0e19\u0e19\u0e35\u0e49?", exitStageText: "\u0e15\u0e33\u0e41\u0e2b\u0e19\u0e48\u0e07\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13\u0e43\u0e19\u0e02\u0e31\u0e49\u0e19\u0e15\u0e2d\u0e19\u0e19\u0e35\u0e49\u0e08\u0e30\u0e44\u0e21\u0e48\u0e16\u0e39\u0e01\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01", exitYes: "\u0e43\u0e0a\u0e48 \u0e2d\u0e2d\u0e01", exitNo: "\u0e2d\u0e22\u0e39\u0e48\u0e15\u0e48\u0e2d" },
+  zh: { listenTap: "\u542c\u5e76\u70b9\u9009", lookTap: "\u770b\u5e76\u70b9\u9009", sayAloud: "\u5927\u58f0\u8bf4\u51fa\u6765", fillWord: "\u586b\u5165\u7f3a\u5c11\u7684\u5355\u8bcd", offline: "\u79bb\u7ebf — \u4f60\u7684\u8fdb\u5ea6\u7a0d\u540e\u4f1a\u540c\u6b65。", loading: "\u6b63\u5728\u51c6\u5907\u4f60\u7684\u8bfe\u7a0b…", loadError: "\u65e0\u6cd5\u52a0\u8f7d\u8bfe\u7a0b。", loadErrorText: "\u68c0\u67e5\u4f60\u7684\u8fde\u63a5\u5e76\u91cd\u8bd5。", tryAgain: "\u91cd\u8bd5", paywallTitle: "\u672c\u8bfe\u9700\u8981\u8ba2\u9605。", paywallText: "\u7b2c\u4e00\u5355\u5143（\u7b2c1-4\u8bfe）\u6c38\u4e45\u514d\u8d39。\u4ee5 $3/\u6708 \u6216 $29/\u5e74 \u89e3\u9501\u6240\u6709\u8bfe\u7a0b。", seePlans: "\u67e5\u770b\u5957\u9910", backFree: "\u8fd4\u56de\u514d\u8d39\u7b2c\u4e00\u5355\u5143", tapStart: "\u70b9\u6309\u5f00\u59cb", tagline: "\u770b\u4e00\u770b，\u542c\u4e00\u542c，\u8bf4\u4e00\u8bf4。", whichPicture: "\u54ea\u5f20\u56fe\u7247\u5339\u914d？", whichSentence: "\u54ea\u4e2a\u53e5\u5b50\u5339\u914d？", hearAgain: "\u518d\u542c\u4e00\u6b21", needsConnection: "\u9700\u8981\u7f51\u7edc", needsConnectionText: "\u53e3\u8bed\u7ec3\u4e60\u9700\u8981\u7f51\u7edc\u6765\u68c0\u67e5。\u4f60\u7684\u5176\u4ed6\u8fdb\u5ea6\u662f\u5b89\u5168\u7684。", tapMic: "\u70b9\u6309\u9ea6\u514b\u98ce\u5e76\u8bf4\u51fa\u53e5\u5b50。", noMic: "\u672a\u627e\u5230\u9ea6\u514b\u98ce。\u68c0\u67e5\u6743\u9650\u540e\u70b9\u6309\u9ea6\u514b\u98ce\u91cd\u8bd5。", listening: "\u6b63\u5728\u8046\u542c…\u70b9\u6309\u9ea6\u514b\u98ce\u53ef\u63d0\u524d\u7ed3\u675f。", checking: "\u6b63\u5728\u68c0\u67e5\u4f60\u7684\u8868\u73b0…", scoringError: "\u8bc4\u5206\u51fa\u9519。\u8bf7\u91cd\u8bd5。", closeEnough: "\u975e\u5e38\u63a5\u8fd1！", closeEnoughText: "\u53ef\u4ee5\u7406\u89e3。\u518d\u542c\u4e00\u6b21，\u5c3d\u91cf\u5339\u914d\u58f0\u8c03。", great: "\u592a\u68d2\u4e86！", greatText: "\u542c\u8d77\u6765\u975e\u5e38\u6807\u51c6。", almost: "\u5dee\u4e00\u70b9！", goodEnough: "\u5df2\u7ecf\u591f\u597d\u4e86 — \u7ee7\u7eed。", tryClearer: "\u518d\u8bd5\u4e00\u6b21，\u8bf4\u5f97\u66f4\u6e05\u695a\u4e9b。", tryAgainTitle: "\u91cd\u8bd5", goodEffort: "\u52aa\u529b\u5f88\u597d — \u7ee7\u7eed。", listenRepeat: "\u542c\u5e76\u8ddf\u8bfb。", continueBtn: "\u7ee7\u7eed", correct: "\u6b63\u786e！", notQuite: "\u4e0d\u592a\u5bf9 — \u518d\u542c\u4e00\u6b21\u5e76\u91cd\u8bd5。", check: "\u68c0\u67e5", typeIt: "\u8f93\u5165…", activityComplete: "\u6d3b\u52a8\u5b8c\u6210！", practiceAgain: "\u518d\u7ec3\u4e00\u6b21", practiceComplete: "\u7ec3\u4e60\u5b8c\u6210！", lessonComplete: "\u7b2c{n}\u8bfe\u5b8c\u6210！", niceWork: "\u505a\u5f97\u5f88\u597d — \u968f\u65f6\u518d\u6765\u7ec3\u4e60。", canDo: "\u4f60\u5df2\u7ecf\u80fd\u542c、\u8bfb、\u8bf4\u4e86。", finishLesson: "\u5b8c\u6210\u8bfe\u7a0b", shareDone: "\u6211\u521a\u521a\u5728 Nicelingo \u5b8c\u6210\u4e86\u7b2c {n} \u8bfe\uff0c\u5b66\u4f1a\u4e86 {phrases} \u4e2a\u65b0\u77ed\u8bed\uff01", checkpointTitle: "\u7b2c {n} \u5355\u5143\u6d4b\u8bd5", checkpointIntro: "10 \u9053\u9898\uff0c\u7ea6 3 \u5206\u949f", checkpointStart: "\u5f00\u59cb\u6d4b\u8bd5", checkpointPassedText: "\u6d4b\u8bd5\u901a\u8fc7", checkpointFail: "\u5c31\u5dee\u4e00\u70b9\uff01", checkpointScoreLine: "{n} / 10", checkpointLocked: "\u5b8c\u6210\u5168\u90e8 4 \u8bfe\u5373\u53ef\u89e3\u9501", continueToUnit: "\u7ee7\u7eed\u7b2c {n} \u5355\u5143", tryAgainCp: "\u518d\u8bd5\u4e00\u6b21", practiseThese: "\u7ec3\u4e60\u8fd9\u4e9b", playWordAria: "\u64ad\u653e {word}\uff0c\u610f\u601d\u662f {gloss}", slowPlay: "\u6162\u901f\u64ad\u653e", shareBtn: "\u5206\u4eab", copyLink: "\u590d\u5236\u94fe\u63a5", copied: "\u5df2\u590d\u5236\uff01", exitStage: "\u9000\u51fa\u5f53\u524d\u9636\u6bb5\uff1f", exitStageText: "\u4f60\u5728\u5f53\u524d\u9636\u6bb5\u7684\u8fdb\u5ea6\u4e0d\u4f1a\u88ab\u4fdd\u5b58\u3002", exitYes: "\u662f\uff0c\u9000\u51fa", exitNo: "\u7559\u4e0b" }
 };
 const uiLang = (() => {
   const m = (document.cookie || "").match(/(?:^|;\s*)nl_ui=([a-z]{2})/);
@@ -463,6 +463,26 @@ function phraseDisplay(phrase) {
   return [row];
 }
 
+// Record one answer for phraseStats. Server-first; if the POST
+// fails (offline, no session yet), keep it on the device instead.
+function recordAttempt(phrase, activity, correct, score) {
+  const lang = langFromPath(location.pathname);
+  const body = { phraseId: phrase.id, lang, activity, correct, score: score ?? null };
+  const keepLocal = () => {
+    try {
+      const arr = JSON.parse(localStorage.getItem("nl-attempts") ?? "[]");
+      arr.push({ ...body, at: new Date().toISOString() });
+      localStorage.setItem("nl-attempts", JSON.stringify(arr.slice(-500)));
+    } catch { /* storage unavailable */ }
+  };
+  fetch("/api/attempts", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  }).then((r) => { if (!r.ok) keepLocal(); }).catch(keepLocal);
+}
+
 function slowButton(phrase) {
   const b = h("button", { class: "speaker slow", "aria-label": S.slowPlay, title: S.slowPlay }, "🐢");
   b.addEventListener("click", () => playAudio(pickAudioUrl(phrase), b, 0.7));
@@ -578,8 +598,13 @@ const player = {
     let locked = false;
 
     const reveal = h("div", { class: "reveal" });
+    let attempted = false;
     const onPick = async (btn, opt) => {
       if (locked) return;
+      if (!attempted) {
+        attempted = true;
+        recordAttempt(q.target, activity, checkAnswer(q, opt.id));
+      }
       if (checkAnswer(q, opt.id)) {
         locked = true;
         btn.classList.add("correct");
@@ -753,7 +778,8 @@ const player = {
         reader.readAsDataURL(blob);
       });
       const prevVerdict = this.state.attempts[this.state.attempts.length - 1] ?? null;
-      const { verdict, pass } = await api.score(phrase.id, base64, prevVerdict);
+      const { verdict, pass, score } = await api.score(phrase.id, base64, prevVerdict);
+      recordAttempt(phrase, "speak-score", typeof score === "number" ? score >= 70 : pass === true, typeof score === "number" ? score : null);
       this.state.attempts.push(verdict);
       this.speakVerdict(phrase, verdict, pass === true);
     } catch {
@@ -839,7 +865,12 @@ const player = {
       placeholder: S.typeIt,
     });
     const msg = h("p", { class: "sub", style: "text-align:center;min-height:1.5em" }, "");
+    let attempted = false;
     const check = async () => {
+      if (!attempted) {
+        attempted = true;
+        recordAttempt(phrase, "read-write", b.check(input.value));
+      }
       if (b.check(input.value)) {
         msg.textContent = S.correct;
         setTimeout(() => {
@@ -998,4 +1029,340 @@ const player = {
   },
 };
 
-player.boot();
+// ---- Unit checkpoints (Feature 2) -------------------------------------
+// A 10-question mixed review run by a small session runner over the
+// same question kinds as lessons. The server builds the set and
+// enforces access; this runner only presents it, records attempts,
+// and posts the milestone at the end.
+
+function cpSegments(idx, total, doneCount) {
+  const ids = Array.from({ length: total }, (_, i) => `q${i}`);
+  return topbar({
+    completed: ids.slice(0, doneCount),
+    activity: ids[idx] ?? null,
+    activities: ids,
+    stepText: `${Math.min(idx + 1, total)} of ${total}`,
+  });
+}
+
+function normalizeAnswer(s) {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .replace(/[.!?]+$/, "")
+    .trim();
+}
+
+function runSession({ questions, pool, title, onDone }) {
+  let idx = 0;
+  let score = 0;
+  const missed = [];
+  const total = questions.length;
+
+  const finish = () => onDone({ score, total, missed, questions });
+  const next = () => {
+    idx++;
+    if (idx >= total) finish();
+    else render();
+  };
+  const answer = (q, correct, scoreVal) => {
+    recordAttempt(q.phrase, q.activity, correct, scoreVal ?? null);
+    if (correct) score++;
+    else missed.push(q);
+  };
+  const frame = (...kids) =>
+    player.screen(
+      h("div", { class: "screen" }, cpSegments(idx, total, idx), h("h1", {}, title), ...kids),
+    );
+
+  function renderChoice(q) {
+    const others = pool.filter((p) => p.id !== q.phrase.id);
+    const picks = [q.phrase, ...shuffleArr(others).slice(0, 3)];
+    const options = shuffleArr(picks);
+    let attempted = false;
+    let locked = false;
+    const msg = h("p", { class: "sub", style: "text-align:center;min-height:1.5em" }, "");
+    const onPick = (btn, opt) => {
+      if (locked) return;
+      const right = opt.id === q.phrase.id;
+      if (!attempted) {
+        attempted = true;
+        answer(q, right);
+      }
+      if (right) {
+        locked = true;
+        btn.classList.add("correct");
+        msg.textContent = S.correct;
+        setTimeout(next, 900);
+      } else {
+        btn.classList.add("wrong");
+        msg.textContent = S.notQuite;
+        setTimeout(() => btn.classList.remove("wrong"), 600);
+      }
+    };
+    const grid = h(
+      "div",
+      { class: "grid" },
+      ...options.map((opt) => {
+        const btn = h(
+          "button",
+          { class: "pick" },
+          ...(q.activity === "listen-match"
+            ? [appImg({ src: opt.imageUrl, alt: "" })]
+            : [h("span", { class: "opt-text" }, ...phraseNodes(opt))]),
+        );
+        btn.addEventListener("click", () => onPick(btn, opt));
+        return btn;
+      }),
+    );
+    if (q.activity === "listen-match") {
+      const speaker = h("button", { class: "speaker", "aria-label": "Play sound" }, "♪");
+      speaker.addEventListener("click", () => playAudio(pickAudioUrl(q.phrase), speaker));
+      setTimeout(() => playAudio(pickAudioUrl(q.phrase), speaker), 350);
+      frame(
+        h("div", { class: "play-row" }, speaker, slowButton(q.phrase)),
+        grid,
+        msg,
+      );
+    } else {
+      frame(appImg({ class: "hero-img", src: q.phrase.imageUrl, alt: "" }), grid, msg);
+    }
+  }
+
+  function renderWrite(q) {
+    const b = blanked(q.phrase.text);
+    const input = h("input", {
+      type: "text",
+      autocomplete: "off",
+      autocapitalize: "off",
+      "aria-label": "Missing word",
+      placeholder: S.typeIt,
+    });
+    const msg = h("p", { class: "sub", style: "text-align:center;min-height:1.5em" }, "");
+    let attempted = false;
+    const check = () => {
+      const right = normalizeAnswer(input.value) === normalizeAnswer(b.answer);
+      if (!attempted) {
+        attempted = true;
+        answer(q, right);
+      }
+      if (right) {
+        msg.textContent = S.correct;
+        setTimeout(next, 900);
+      } else {
+        msg.textContent = S.notQuite;
+      }
+    };
+    const go = h("button", { class: "btn" }, S.check);
+    go.addEventListener("click", check);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") check();
+    });
+    const speaker = h("button", { class: "speaker", "aria-label": "Play sound" }, "♪");
+    speaker.addEventListener("click", () => playAudio(pickAudioUrl(q.phrase), speaker));
+    const promptNodes = q.phrase.words?.length
+      ? [...phraseDisplay({ ...q.phrase, words: q.phrase.words.slice(0, -1) }), " ______."]
+      : [b.prompt];
+    frame(
+      h("div", { class: "play-row" }, speaker, slowButton(q.phrase)),
+      h("div", { class: "phrase-card" }, ...promptNodes),
+      h("div", { class: "write-row" }, input, go),
+      msg,
+    );
+  }
+
+  function renderSpeak(q) {
+    const mic = h("button", { class: "mic", "aria-label": "Record your voice" }, "🎙");
+    const status = h("p", { class: "sub", style: "text-align:center" }, S.tapMic);
+    const speaker = h("button", { class: "speaker", "aria-label": "Play sound" }, "♪");
+    speaker.addEventListener("click", () => playAudio(pickAudioUrl(q.phrase), speaker));
+    mic.addEventListener("click", async () => {
+      mic.disabled = true;
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch {
+        status.textContent = S.noMic;
+        mic.disabled = false;
+        return;
+      }
+      const rec = new MediaRecorder(stream);
+      const chunks = [];
+      rec.ondataavailable = (e) => chunks.push(e.data);
+      const stopped = new Promise((resolve) => { rec.onstop = resolve; });
+      const stop = () => { if (rec.state !== "inactive") rec.stop(); };
+      mic.classList.add("recording");
+      mic.addEventListener("click", stop, { once: true });
+      rec.start();
+      status.textContent = S.listening;
+      const deadline = setTimeout(stop, 8000);
+      await stopped;
+      clearTimeout(deadline);
+      stream.getTracks().forEach((t) => t.stop());
+      mic.classList.remove("recording");
+      status.textContent = S.checking;
+      try {
+        const blob = new Blob(chunks, { type: rec.mimeType || "audio/webm" });
+        const base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result).split(",")[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        const res = await api.score(q.phrase.id, base64, null);
+        const sc = typeof res.score === "number" ? res.score : res.pass ? 100 : 0;
+        answer(q, sc >= 70, sc);
+        status.textContent = sc >= 70 ? S.correct : S.notQuite;
+        const nx = h("button", { class: "btn" }, S.continueBtn);
+        nx.addEventListener("click", next);
+        frame(
+          appImg({ class: "hero-img", src: q.phrase.imageUrl, alt: "" }),
+          h("div", { class: "phrase-card" }, ...phraseDisplay(q.phrase)),
+          status,
+          nx,
+        );
+      } catch {
+        status.textContent = S.scoringError;
+        mic.disabled = false;
+      }
+    }, { once: true });
+    frame(
+      appImg({ class: "hero-img", src: q.phrase.imageUrl, alt: "" }),
+      h("div", { class: "phrase-card" }, ...phraseDisplay(q.phrase)),
+      h("div", { class: "play-row" }, speaker, slowButton(q.phrase)),
+      h("div", { class: "mic-wrap" }, mic),
+      status,
+    );
+  }
+
+  function render() {
+    const q = questions[idx];
+    if (q.activity === "speak-score") renderSpeak(q);
+    else if (q.activity === "read-write") renderWrite(q);
+    else renderChoice(q);
+  }
+
+  render();
+}
+
+function shuffleArr(items) {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+async function bootCheckpoint(lang, level, unit) {
+  player.screen(h("div", { class: "screen" }, h("p", { class: "sub" }, S.loading)));
+  if (!(await api.me())) await api.anonymous();
+  let data = null;
+  let status = 0;
+  try {
+    const r = await fetch(`/api/checkpoint/${lang}/${level}/${unit}`, { credentials: "include" });
+    status = r.status;
+    if (r.ok) data = await r.json();
+  } catch { /* offline */ }
+  const title = S.checkpointTitle.replace("{n}", String(unit));
+  if (!data) {
+    const msg =
+      status === 402
+        ? h("p", { class: "sub" }, S.checkpointLocked)
+        : status === 403
+          ? h("p", { class: "sub" }, S.checkpointLocked)
+          : h("p", { class: "sub" }, S.loadError);
+    player.screen(
+      h("div", { class: "screen" },
+        cpSegments(0, 10, 0),
+        h("h1", {}, title),
+        msg,
+        h("div", { class: "spacer" }),
+        status === 402
+          ? h("a", { class: "btn", href: "/billing" }, S.seePlans ?? "See plans")
+          : h("a", { class: "btn", href: `/${lang}` }, S.backToCourse ?? "Back")),
+    );
+    return;
+  }
+  const start = h("button", { class: "btn" }, S.checkpointStart);
+  start.addEventListener("click", () => {
+    runSession({
+      questions: data.questions,
+      pool: data.pool,
+      title,
+      onDone: async ({ score, total, missed }) => {
+        const passed = score >= 8;
+        await fetch("/api/milestones", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ kind: "checkpoint", lang, level, unit, score }),
+        }).catch(() => {});
+        if (passed) {
+          confetti();
+          setTimeout(confetti, 900);
+        }
+        const missedList = missed.length
+          ? h("div", { class: "cp-missed" },
+              ...missed.map((q) => {
+                const b = h("button", { class: "btn ghost", "aria-label": "Play sound" }, "♪");
+                b.addEventListener("click", () => playAudio(pickAudioUrl(q.phrase), b));
+                return h("div", { class: "cp-missed-row" }, b, h("span", {}, q.phrase.text));
+              }))
+          : null;
+        const continueBtn = h("a", { class: "btn", href: `/${lang}` }, S.continueToUnit.replace("{n}", String(unit + 1)));
+        const againBtn = h("button", { class: "btn ghost" }, S.tryAgainCp);
+        againBtn.addEventListener("click", () => location.reload());
+        const practiseBtn = h("button", { class: "btn ghost" }, S.practiseThese);
+        practiseBtn.addEventListener("click", () => {
+          runSession({
+            questions: missed,
+            pool: data.pool,
+            title,
+            onDone: ({ score: s2, total: t2 }) => {
+              player.screen(
+                h("div", { class: "screen" },
+                  cpSegments(t2, t2, t2),
+                  h("h1", {}, S.practiceComplete),
+                  h("p", { class: "sub" }, `${s2} of ${t2}`),
+                  h("div", { class: "spacer" }),
+                  continueBtn),
+              );
+            },
+          });
+        });
+        player.screen(
+          h("div", { class: "screen" },
+            cpSegments(total, total, total),
+            h("div", { class: "celebrate" },
+              h("img", { class: "cp-parrot", src: "/logo/parrot-mark.svg", alt: "" }),
+              h("h1", {}, passed ? S.checkpointPassedText : S.checkpointFail),
+              h("p", { class: "sub" }, S.checkpointScoreLine.replace("{n}", String(score))),
+              ...(passed ? [h("div", { class: "cp-badge" }, `Unit ${unit} ✓`)] : []),
+              ...(missedList ? [missedList] : []),
+              h("div", { class: "spacer" }),
+              continueBtn,
+              ...(missed.length
+                ? [passed ? practiseBtn : h("div", { style: "display:flex;flex-direction:column;gap:0.6rem" }, againBtn, practiseBtn)]
+                : [againBtn]))),
+        );
+      },
+    });
+  });
+  player.screen(
+    h("div", { class: "screen" },
+      cpSegments(0, data.questions.length, 0),
+      h("h1", {}, title),
+      h("p", { class: "sub" }, S.checkpointIntro),
+      h("div", { class: "spacer" }),
+      start),
+  );
+}
+
+const cpPath = location.pathname.match(/^\/([a-z]{2})\/checkpoint\/(\d+)\/(\d+)\/?$/);
+if (cpPath) {
+  bootCheckpoint(cpPath[1], Number(cpPath[2]), Number(cpPath[3]));
+} else {
+  player.boot();
+}

@@ -66,6 +66,35 @@ export const lessonProgress = sqliteTable("lesson_progress", {
   completedAt: integer("completed_at", { mode: "timestamp" }).notNull(),
 });
 
+export const phraseStats = sqliteTable("phrase_stats", {
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  phraseId: text("phrase_id").notNull(),
+  lang: text("lang").notNull(),
+  attempts: integer("attempts").notNull(),
+  correct: integer("correct").notNull(),
+  bestSpeakScore: integer("best_speak_score"),
+  lastSeenAt: text("last_seen_at").notNull(),
+  weak: integer("weak").notNull(),
+  correctStreak: integer("correct_streak").notNull(),
+});
+
+export const milestones = sqliteTable("milestones", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  kind: text("kind").notNull(),
+  lang: text("lang").notNull(),
+  level: integer("level").notNull(),
+  unit: integer("unit"),
+  score: integer("score").notNull(),
+  passed: integer("passed").notNull(),
+  viaTestOut: integer("via_test_out").notNull(),
+  completedAt: text("completed_at").notNull(),
+});
+
 export const subscriptions = sqliteTable("subscriptions", {
   userId: text("user_id")
     .primaryKey()

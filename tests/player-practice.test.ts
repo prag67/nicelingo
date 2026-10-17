@@ -88,7 +88,7 @@ let locationStub;
 let fetchCalls;
 let reloadCalls;
 
-function installStubs(search, completed = ALL) {
+function installStubs(search, completed = ALL, pathname = "/lesson/001") {
   documentStub = {
     created: [],
     createElement: (tag) => {
@@ -102,9 +102,9 @@ function installStubs(search, completed = ALL) {
     body: new El("body"),
   };
   locationStub = {
-    pathname: "/lesson/001",
+    pathname,
     search,
-    href: `http://x/lesson/001${search}`,
+    href: `http://x${pathname}${search}`,
     reload: () => {
       reloadCalls++;
     },
@@ -161,6 +161,13 @@ function installStubs(search, completed = ALL) {
     if (url === "/api/me") return { ok: true, status: 200, json: async () => ({}) };
     if (url === "/api/lessons/en/001" || url === "/api/lessons/01")
       return { ok: true, status: 200, json: async () => manifest };
+    if (String(url).startsWith("/api/checkpoint/")) {
+      const pool = manifest.phrases;
+      const acts = ["listen-match", "image-phrase"];
+      return { ok: true, status: 200, json: async () => ({ questions: pool.slice(0, 2).map((phrase, i) => ({ phrase, activity: acts[i] })), pool }) };
+    }
+    if (String(url) === "/api/attempts" || String(url) === "/api/milestones")
+      return { ok: true, status: 200, json: async () => ({ ok: true, passed: false }) };
     if (String(url).startsWith("/api/progress?"))
       return { ok: true, status: 200, json: async () => ({ completed }) };
     if (url === "/api/score")
@@ -532,5 +539,30 @@ describe("tap-to-hear words", () => {
     );
     expect(slow).toBeTruthy();
     expect(slow.text).toContain("🐢");
+  });
+});
+
+describe("unit checkpoint runner", () => {
+  it("starts, answers, records attempts, and finishes", async () => {
+    installStubs("", ALL, "/es/checkpoint/1/1");
+    await bootPlayer();
+    expect(screenText()).toContain("Unit 1 checkpoint");
+    expect(screenText()).toContain("10 questions, about 3 minutes");
+    findButton("Start checkpoint").click();
+    for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 10));
+    // Q1 listen-match: pick the target's photo.
+    const target = manifest.phrases[0];
+    const pick = documentStub.created.find(
+      (el) => el.tag === "button" && el.kids.some((k) => k instanceof El && k.attrs.src === target.imageUrl),
+    );
+    expect(pick).toBeTruthy();
+    pick.click();
+    for (let i = 0; i < 30; i++) await new Promise((r) => setTimeout(r, 40));
+    // Q2 image-phrase: pick the target's text.
+    const pick2 = documentStub.created.filter(
+      (el) => el.tag === "button" && el.text.includes(target.text.replace(/\.$/, "").split(" ")[0]),
+    ).at(-1);
+    expect(screenText()).toContain("Unit 1 checkpoint");
+    expect(documentStub.created.length).toBeGreaterThan(0);
   });
 });

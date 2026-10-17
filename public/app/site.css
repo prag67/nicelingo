@@ -454,3 +454,12 @@ a.streak-chip { text-decoration: none; }
   text-decoration: underline dotted #1247b8 2px; text-underline-offset: 4px; border-radius: 8px;
 }
 .wchip.playing { color: #1a5feb; background: #eef4ff; }
+.cp-card {
+  display: flex; align-items: center; gap: 0.75rem; margin-top: 0.75rem;
+  background: #fff; border: 2px solid #d3e2f5; border-radius: 16px;
+  padding: 0.75rem 1rem; text-decoration: none; color: var(--ink);
+  min-height: 3.5rem;
+}
+.cp-card.locked { opacity: 0.55; }
+.cp-card .cp-text { display: flex; flex-direction: column; }
+.cp-card .cp-text small { color: var(--muted); font-weight: 600; }

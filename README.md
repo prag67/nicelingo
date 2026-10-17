@@ -135,6 +135,28 @@ lesson stage mid-way (parrot logo or a completed stage bar) asks first
 via an "Exit current stage?" dialog. Later slices: daily-goal ring,
 streak freeze, words-you-know gallery, step badges, parrot outfits.
 
+## Unit checkpoints, phrase stats, and milestones
+
+Every answer in any lesson, checkpoint, or challenge posts to
+`POST /api/attempts` and updates `phrase_stats` (attempts, correct,
+best speak score, weak flag: weak after a wrong answer or a speak
+score under 70, cleared after two correct in a row; server-first,
+kept on the device when the POST fails). Finished checkpoints post
+to `POST /api/milestones`; the server enforces the pass mark itself.
+Tables: `phrase_stats`, `milestones` (migration 0006).
+
+A unit checkpoint (`/{lang}/checkpoint/{level}/{unit}`, player
+checkpoint mode) is a 10-question mixed review built server-side by
+`GET /api/checkpoint/:lang/:level/:unit` from the unit's 32 phrases
+(at least 2 per lesson; 3 listen, 3 image, 2 speak, 2 write —
+languages without read-write give those slots to listen/image).
+Pass is 8 of 10; it earns the unit badge (course-page unit number
+turns into a check, badge appears on the progress page) but never
+blocks the next unit. Free learners get the Unit 1 checkpoint;
+subscribers get all units; the unit's four lessons must be finished
+to unlock it. Result screens offer Continue, Try again, and
+Practise these (a mini review of the missed phrases).
+
 ## Tap-to-hear words and slow playback
 
 Every phrase in every language carries a `words` array (text, gloss,

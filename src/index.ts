@@ -18,6 +18,10 @@ import {
   type AnalyticsEnv,
 } from "./lib/analytics";
 import { d1ProgressStore } from "./db/progress-store";
+import { d1AttemptStore } from "./db/attempt-store";
+import { buildCheckpointSet, checkpointAccess, unitLessons } from "./lib/checkpoint";
+import { unitStats } from "./lib/lesson-progress";
+import type { Milestone } from "./lib/attempts";
 import { d1PrefsStore } from "./db/prefs-store";
 import { coursePage } from "./routes/course";
 import { masterProgressPage, progressPage } from "./routes/progress";
@@ -220,20 +224,22 @@ async function sessionForSsr(c: {
   registered: boolean;
   subscribed: boolean;
   streakDays: string[];
+  milestones: Milestone[];
 }> {
   const user = await currentUser(c);
   const registered = isRegisteredUser(user);
-  if (!user || !c.env?.DB) return { user, progress: {}, registered, subscribed: false, streakDays: [] };
+  if (!user || !c.env?.DB) return { user, progress: {}, registered, subscribed: false, streakDays: [], milestones: [] };
   try {
     const store = d1ProgressStore(c.env.DB);
-    const [progress, subscribed, streakDays] = await Promise.all([
+    const [progress, subscribed, streakDays, milestones] = await Promise.all([
       store.listAll(user.id),
       d1SubscriptionStore(c.env.DB).isSubscribed(user.id),
       store.listActivityDays(user.id),
+      d1AttemptStore(c.env.DB).listMilestones(user.id).catch(() => [] as Milestone[]),
     ]);
-    return { user, progress, registered, subscribed, streakDays };
+    return { user, progress, registered, subscribed, streakDays, milestones };
   } catch {
-    return { user, progress: {}, registered, subscribed: false, streakDays: [] };
+    return { user, progress: {}, registered, subscribed: false, streakDays: [], milestones: [] };
   }
 }
 
@@ -343,7 +349,7 @@ app.get("/progress", async (c) => {
 app.get("/:lang{[a-z]{2}}/progress", async (c) => {
   const lang = c.req.param("lang");
   if (!isPickerLang(lang)) return c.text("Not found", 404);
-  const { user, progress, registered, subscribed, streakDays } = await sessionForSsr(c);
+  const { user, progress, registered, subscribed, streakDays, milestones } = await sessionForSsr(c);
   const origin = new URL(c.req.url).origin;
   return c.html(
     progressPage(lang, {
@@ -352,6 +358,7 @@ app.get("/:lang{[a-z]{2}}/progress", async (c) => {
       subscribed,
       uiLang: requestUiLang(c),
       streakDays,
+      milestones,
       user,
       origin,
     }),
@@ -364,7 +371,7 @@ app.get("/:lang{[a-z]{2}}/progress", async (c) => {
 app.get("/:lang{[a-z]{2}}", async (c) => {
   const lang = c.req.param("lang");
   if (!isPickerLang(lang)) return c.text("Not found", 404);
-  const { user, progress, registered, subscribed, streakDays } = await sessionForSsr(c);
+  const { user, progress, registered, subscribed, streakDays, milestones } = await sessionForSsr(c);
   setCookie(c, LANG_COOKIE, lang, {
     path: "/",
     maxAge: 365 * 24 * 3600,
@@ -392,6 +399,7 @@ app.get("/:lang{[a-z]{2}}", async (c) => {
       subscribed,
       uiLang: requestUiLang(c),
       streakDays,
+      milestones,
       paywallDisabled: paywallDisabled(c.env),
       user,
       level: Number.isInteger(level) ? level : undefined,
@@ -967,6 +975,102 @@ app.post("/api/progress", async (c) => {
     ...requestContext(c),
   });
   return c.json({ lessonId, completed: result.completed });
+});
+
+
+// Unit checkpoint API: the server builds the 10-question set and
+// enforces access (free learners get Unit 1; subscribers every unit;
+// the unit's four lessons must be finished, which is the unlock).
+app.get("/api/checkpoint/:lang/:level/:unit", async (c) => {
+  const lang = c.req.param("lang");
+  const level = Number(c.req.param("level"));
+  const unit = Number(c.req.param("unit"));
+  if (!isPickerLang(lang) || !Number.isInteger(level) || !Number.isInteger(unit)) {
+    return c.json({ error: "not found" }, 404);
+  }
+  const built = buildCheckpointSet(lang, level, unit);
+  if (!built) return c.json({ error: "not found" }, 404);
+  const userId = await currentUserId(c);
+  if (!userId || !c.env?.DB) return c.json({ error: "unauthorized" }, 401);
+  const subscribed = await d1SubscriptionStore(c.env.DB).isSubscribed(userId).catch(() => false);
+  if (!checkpointAccess({ level, unit, subscribed, paywallDisabled: paywallDisabled(c.env) })) {
+    return c.json({ error: "subscription_required" }, 402);
+  }
+  const progress = await d1ProgressStore(c.env.DB).listAll(userId);
+  const st = unitStats(lang, unit, progress);
+  if (!(st.total > 0 && st.done >= st.total)) {
+    return c.json({ error: "checkpoint_locked" }, 403);
+  }
+  return c.json({ lang, level, unit, questions: built.questions, pool: built.pool });
+});
+
+const ATTEMPT_ACTIVITIES = new Set(["listen-match", "image-phrase", "speak-score", "read-write"]);
+
+// Record one answer; updates phraseStats (weak after a wrong answer
+// or a speak score below 70; clears after two correct in a row).
+app.post("/api/attempts", async (c) => {
+  const userId = await currentUserId(c);
+  if (!userId || !c.env?.DB) return c.json({ error: "unauthorized" }, 401);
+  const body = await c.req.json().catch(() => null);
+  const { phraseId, lang, activity, correct, score } = body ?? {};
+  if (
+    typeof phraseId !== "string" || !phraseId ||
+    !isPickerLang(lang) ||
+    !ATTEMPT_ACTIVITIES.has(activity) ||
+    typeof correct !== "boolean" ||
+    (score != null && (typeof score !== "number" || score < 0 || score > 100))
+  ) {
+    return c.json({ error: "bad attempt" }, 400);
+  }
+  const stats = await d1AttemptStore(c.env.DB).recordAttempt(userId, {
+    phraseId,
+    lang,
+    activity,
+    correct,
+    score: score ?? null,
+    at: new Date().toISOString(),
+  });
+  return c.json({ stats });
+});
+
+// Record a finished checkpoint. The server enforces the pass mark
+// itself (8 of 10) rather than trusting the client's passed flag.
+app.post("/api/milestones", async (c) => {
+  const userId = await currentUserId(c);
+  if (!userId || !c.env?.DB) return c.json({ error: "unauthorized" }, 401);
+  const body = await c.req.json().catch(() => null);
+  const { kind, lang, level, unit, score, viaTestOut } = body ?? {};
+  if (
+    kind !== "checkpoint" ||
+    !isPickerLang(lang) ||
+    !Number.isInteger(level) || !Number.isInteger(unit) ||
+    typeof score !== "number" || score < 0 || score > 10
+  ) {
+    return c.json({ error: "bad milestone" }, 400);
+  }
+  const passed = score >= 8;
+  await d1AttemptStore(c.env.DB).recordMilestone(userId, {
+    kind,
+    lang,
+    level,
+    unit,
+    score: Math.round(score),
+    passed,
+    viaTestOut: viaTestOut === true,
+    completedAt: new Date().toISOString(),
+  });
+  return c.json({ passed });
+});
+
+// Checkpoint page: same lesson shell; the player detects the path.
+app.get("/:lang/checkpoint/:level/:unit", (c) => {
+  const lang = c.req.param("lang");
+  const level = Number(c.req.param("level"));
+  const unit = Number(c.req.param("unit"));
+  if (!isPickerLang(lang) || !Number.isInteger(level) || !Number.isInteger(unit) || !unitLessons(level, unit)) {
+    return c.text("Not found", 404);
+  }
+  return c.html(lessonPage(lang));
 });
 
 // Better Auth handler (social callbacks, anonymous sign-in, session, ...).

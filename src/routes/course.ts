@@ -28,6 +28,7 @@ export type CourseUser = {
 
 export type CourseOpts = {
   progress: Record<string, string[]>;
+  milestones?: import("../lib/attempts").Milestone[];
   registered: boolean;
   subscribed?: boolean;
   uiLang?: UiLang;
@@ -292,7 +293,17 @@ export function coursePage(lang: string, opts: CourseOpts): string {
           ? `<section class="band" aria-label="Pricing"><div><b>${d.bandTitle}</b><span>${fmt(d.premiumOpens, { monthly: d.monthlyPrice, yearly: d.yearlyPrice })}</span></div><a class="btn btn-prem" href="/billing?return=${encodeURIComponent(returnUrl)}">${d.seePlans}</a></section>`
           : "";
       const tile = tiles[(u.unit - 1) % tiles.length];
-      return `<section class="unit" id="u${u.unit}"${current}><div class="unit-head"><span class="ubadge" style="--tile:${tile}">${u.unit}</span><h2>${d.unitWord} ${u.unit} · ${escapeHtml(localizeUnitTitle(ui, u.title))}</h2><span class="cnt" data-unitcount="${u.unit}:${st.total}">${fmt(d.lessonsDone, { done: st.done, total: st.total })}</span></div><div class="lgrid">${cards}</div></section>${strip}`;
+      const cpPassed = (opts.milestones ?? []).some(
+        (m) => m.kind === "checkpoint" && m.lang === lang && m.unit === u.unit && m.passed,
+      );
+      const cpUnlocked = st.total > 0 && st.done >= st.total;
+      const cpBadge = cpPassed ? "✓" : u.unit;
+      const cpCard = cpPassed
+        ? `<a class="cp-card done" href="/${lang}/checkpoint/${selected}/${u.unit}"><span class="ubadge" style="--tile:${tile}">✓</span><span class="cp-text"><b>${escapeHtml(d.unitCheckpoint)}</b><small>${escapeHtml(d.checkpointPassedText)}</small></span></a>`
+        : cpUnlocked
+          ? `<a class="cp-card" href="/${lang}/checkpoint/${selected}/${u.unit}"><span class="ubadge" style="--tile:${tile}">${u.unit}</span><span class="cp-text"><b>${escapeHtml(d.unitCheckpoint)}</b><small>${escapeHtml(d.checkpointIntro)}</small></span></a>`
+          : `<div class="cp-card locked" aria-disabled="true"><span class="ubadge" style="--tile:${tile}">${u.unit}</span><span class="cp-text"><b>${escapeHtml(d.unitCheckpoint)}</b><small>${escapeHtml(d.checkpointLocked)}</small></span></div>`;
+      return `<section class="unit" id="u${u.unit}"${current}><div class="unit-head"><span class="ubadge" style="--tile:${tile}">${cpBadge}</span><h2>${d.unitWord} ${u.unit} · ${escapeHtml(localizeUnitTitle(ui, u.title))}</h2><span class="cnt" data-unitcount="${u.unit}:${st.total}">${fmt(d.lessonsDone, { done: st.done, total: st.total })}</span></div><div class="lgrid">${cards}</div>${cpCard}</section>${strip}`;
     })
     .join("");
 

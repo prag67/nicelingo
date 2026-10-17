@@ -372,3 +372,7 @@ h1 { font-family: var(--font-head); font-size: 1.4rem; margin: 0.25rem 0 0; }
 .play-row { display: flex; gap: 0.75rem; justify-content: center; align-items: center; }
 .speaker.slow { font-size: 1.3rem; }
 .reveal .phrase-card { margin-top: 1rem; }
+.cp-parrot { width: 6rem; height: 6rem; }
+.cp-badge { font-family: var(--font-head); font-weight: 800; background: var(--sun); border: 2px solid var(--ink); border-radius: 999px; padding: 0.4rem 1rem; display: inline-block; }
+.cp-missed { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; width: 100%; }
+.cp-missed-row { display: flex; align-items: center; gap: 0.75rem; background: #fff; border: 2px solid var(--line); border-radius: 14px; padding: 0.4rem 0.75rem; text-align: left; }
