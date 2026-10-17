@@ -15,6 +15,8 @@ import {
 } from "../lib/lesson-progress";
 import { fmt, nextBadgeText, t, type UiLang } from "../lib/i18n";
 import { computeStreak, localDayString, type StreakInfo } from "../lib/streaks";
+import { strengthOf } from "../lib/attempts";
+import { buildDailyReview } from "../lib/review";
 import { UNIT_BADGE_TIERS, badgeFor, completedUnits } from "../lib/badges";
 import {
   accountMenuHtml,
@@ -27,6 +29,7 @@ import type { CourseUser } from "./course";
 
 export type ProgressOpts = {
   progress: Record<string, string[]>;
+  phraseStats?: import("../lib/attempts").PhraseStats[];
   milestones?: import("../lib/attempts").Milestone[];
   registered: boolean;
   subscribed?: boolean;
@@ -265,7 +268,8 @@ export function wordPhotoUrl(gloss: string, nounSlug?: string): string | undefin
 /** Words-you-know gallery: every phrase from finished lessons, with
  *  its photo and tappable word chips that replay the word (slice or
  *  own recording) and announce its meaning. */
-function wordsGalleryHtml(lang: string, progress: Record<string, string[]>, ui: UiLang): string {
+function wordsGalleryHtml(lang: string, progress: Record<string, string[]>, ui: UiLang, stats?: import("../lib/attempts").PhraseStats[]): string {
+  const stepByPhrase = new Map((stats ?? []).map((x) => [x.phraseId, x.reviewStep]));
   const d = t(ui);
   // Individual words from finished lessons (not sentences): one
   // card per distinct word, with the photo of the first phrase it
@@ -324,8 +328,9 @@ function wordsGalleryHtml(lang: string, progress: Record<string, string[]>, ui: 
           if (seen.has(key)) continue;
           seen.add(key);
           const sub = w.chars ? `<span class="word-sub">${escapeHtml(w.text)}</span>` : "";
+          const strength = strengthOf(stepByPhrase.get(p.id) ?? 0);
           cards.push(
-            `<button class="word-card" type="button" data-audio="${escapeHtml(w.audioUrl ?? p.audioUrl)}" aria-label="${escapeHtml(`${display} — ${w.gloss}`)}"><img src="${escapeHtml(w.photo ?? p.imageUrl)}" alt="" loading="lazy"><span class="word-main">${escapeHtml(display)}</span>${sub}<span class="word-gloss">${escapeHtml(w.gloss)}</span></button>`,
+            `<button class="word-card" type="button" data-audio="${escapeHtml(w.audioUrl ?? p.audioUrl)}" aria-label="${escapeHtml(`${display} — ${w.gloss}`)}"><img src="${escapeHtml(w.photo ?? p.imageUrl)}" alt="" loading="lazy"><span class="word-main">${escapeHtml(display)}</span>${sub}<span class="word-gloss">${escapeHtml(w.gloss)}</span><span class="strength-dot s-${strength}" aria-hidden="true"></span></button>`,
           );
         }
       }
@@ -374,6 +379,13 @@ export function progressPage(lang: string, opts: ProgressOpts): string {
 <h1>${escapeHtml(d.progressTitle)}</h1>
 <p class="progress-lang"><b lang="${lang}">${escapeHtml(info.ownName)}</b>${info.name && info.name !== info.ownName ? ` · <span>${escapeHtml(info.name)}</span>` : ""}</p>
 ${streakHeroHtml(streak, new Set(opts.streakDays ?? []), ui)}
+${(() => {
+  if (!opts.phraseStats?.length) return "";
+  const daily = buildDailyReview({ lang, stats: opts.phraseStats, subscribed: opts.subscribed ?? false, today: localDayString() });
+  return daily.dueCount > 0
+    ? `<p class="due-line"><a class="linklike" href="/${lang}/review">${escapeHtml(fmt(d.dueForReview, { n: daily.dueCount }))}</a></p>`
+    : "";
+})()}
 ${streakNoteHtml(opts.user, streak, ui)}
 ${numbersHtml([
   { value: lessonsDone, label: labelOf(d.lessonsCount, lessonsDone) },
@@ -402,7 +414,7 @@ ${(() => {
         .join("")}</div></section>`
     : "";
 })()}
-${wordsGalleryHtml(lang, progress, ui)}
+${wordsGalleryHtml(lang, progress, ui, opts.phraseStats)}
 </main>
 ${siteFooterHtml(ui, `/${lang}`, { registered: opts.registered })}`;
   return pageShell({

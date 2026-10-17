@@ -21,6 +21,10 @@ export function d1AttemptStore(db: D1Database): AttemptStore {
     weak: r.weak === 1,
     correctStreak: r.correctStreak,
     lastActivity: r.lastActivity,
+    reviewStep: r.reviewStep,
+    dueAt: r.dueAt,
+    recallCorrect: r.recallCorrect,
+    recallWithHelp: r.recallWithHelp,
   });
   return {
     getStats: async (userId, lang) => {
@@ -54,6 +58,10 @@ export function d1AttemptStore(db: D1Database): AttemptStore {
         weak: next.weak ? 1 : 0,
         correctStreak: next.correctStreak,
         lastActivity: next.lastActivity,
+        reviewStep: next.reviewStep,
+        dueAt: next.dueAt,
+        recallCorrect: next.recallCorrect,
+        recallWithHelp: next.recallWithHelp,
       };
       if (rows[0]) {
         await orm
@@ -69,6 +77,13 @@ export function d1AttemptStore(db: D1Database): AttemptStore {
         await orm.insert(schema.phraseStats).values(values);
       }
       return next;
+    },
+    getActivityDays: async (userId) => {
+      const rows = await orm
+        .select({ lastSeenAt: schema.phraseStats.lastSeenAt })
+        .from(schema.phraseStats)
+        .where(eq(schema.phraseStats.userId, userId));
+      return [...new Set(rows.map((r) => r.lastSeenAt.slice(0, 10)).filter(Boolean))];
     },
     listMilestones: async (userId) => {
       const rows = await orm

@@ -110,8 +110,8 @@ describe("localized rendering", () => {
     expect(localizeLessonTitle("th", "Eating & Drinking")).toContain("\u0e01\u0e34\u0e19");
     expect(localizeLessonTitle("zh", "Eating & Drinking")).toContain("\u5403");
     expect(localizeLessonTitle("th", "Animals Will Eat & Drink")).toContain("\u0e2a\u0e31\u0e15\u0e27\u0e4c");
-    expect(localizeLevelTitle("th", "Beginner")).toContain("\u0e23\u0e30\u0e14\u0e31\u0e1a");
-    expect(localizeLevelTitle("zh", "Advanced")).not.toBe("Advanced");
+    expect(localizeLevelTitle("th", "First Words (A1)")).toContain("\u0e04\u0e33\u0e41\u0e23\u0e01");
+    expect(localizeLevelTitle("zh", "Getting Things Done (A2)")).not.toBe("Getting Things Done (A2)");
     expect(localizeUnitTitle("en", "First Words")).toBe("First Words");
     expect(localizeLessonTitle("xx" as never, "Eating & Drinking")).toBe("Eating & Drinking");
   });

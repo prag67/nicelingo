@@ -53,6 +53,7 @@ export const userPrefs = sqliteTable("user_prefs", {
     .primaryKey()
     .references(() => user.id, { onDelete: "cascade" }),
   lastLang: text("last_lang").notNull(),
+  scriptDisplay: text("script_display").notNull().default("roman"),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
 
@@ -79,6 +80,10 @@ export const phraseStats = sqliteTable("phrase_stats", {
   weak: integer("weak").notNull(),
   correctStreak: integer("correct_streak").notNull(),
   lastActivity: text("last_activity").notNull().default(""),
+  reviewStep: integer("review_step").notNull().default(0),
+  dueAt: text("due_at").notNull().default(""),
+  recallCorrect: integer("recall_correct").notNull().default(0),
+  recallWithHelp: integer("recall_with_help").notNull().default(0),
 });
 
 export const milestones = sqliteTable("milestones", {

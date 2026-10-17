@@ -43,7 +43,7 @@ describe("checkpoint set", () => {
     }
     const counts: Record<string, number> = {};
     for (const q of built!.questions) counts[q.activity] = (counts[q.activity] ?? 0) + 1;
-    expect(counts).toEqual({ "listen-match": 3, "image-phrase": 3, "speak-score": 2, "read-write": 2 });
+    expect(counts).toEqual({ "listen-match": 3, "image-phrase": 3, "speak-score": 1, "recall": 1, "read-write": 2 });
   });
 
   it("rejects a unit outside the level", () => {

@@ -28,12 +28,23 @@ describe("buildReviewSet", () => {
     weak(P("006", 0), { bestSpeakScore: 10 }), // paid lesson
   ];
 
-  it("serves weakest first, openable only, with the missed activity", () => {
-    const built = buildReviewSet({ lang: "xx", stats, subscribed: false });
+  it("serves due phrases, openable only, weak always due (daily review)", () => {
+    const built = buildReviewSet({ lang: "xx", stats, subscribed: false, today: "2026-10-18" });
     const ids = built.questions.map((q) => q.phrase.id);
     expect(ids).not.toContain(P("006", 0));
-    expect(built.questions[0].activity).toBe("speak-score");
     expect(built.weakCount).toBe(4);
+    expect(built.dueCount).toBeGreaterThan(0);
+    expect(built.questions.length).toBeLessThanOrEqual(12);
+    // Daily rotation includes a recall round.
+    expect(built.questions.some((q) => q.activity === "recall")).toBe(true);
+  });
+
+  it("serves nothing before phrases are due", () => {
+    const fresh = stats.map((x) => ({ ...x, weak: false, dueAt: "2027-01-01", lastSeenAt: "2026-10-18T00:00:00.000Z" }));
+    const built = buildReviewSet({ lang: "xx", stats: fresh, subscribed: false, today: "2026-10-18" });
+    expect(built.questions).toHaveLength(0);
+    expect(built.dueCount).toBe(0);
+    expect(built.nextDueAt).toBe("2027-01-01");
   });
 
   it("subscribers may review paid lessons too", () => {
@@ -60,23 +71,24 @@ describe("review routes and course button", () => {
     expect((await app.request("/api/review/zz")).status).toBe(404);
   });
 
-  it("course button appears only with at least 3 weak phrases", () => {
-    const withWeak = coursePage("xx", {
+  it("daily review strip appears only when phrases are due", () => {
+    const withDue = coursePage("xx", {
       progress: {},
       registered: true,
       paywallDisabled: true,
       user: { email: "a@b.c", isAnonymous: false },
-      weakCount: 5,
+      reviewDue: 5,
     });
-    expect(withWeak).toContain("Practise my mistakes (5)");
-    expect(withWeak).toContain('href="/xx/review"');
-    const few = coursePage("xx", {
+    expect(withDue).toContain("phrases to review");
+    expect(withDue).toContain('href="/xx/review"');
+    expect(withDue).not.toContain("Practise my mistakes");
+    const none = coursePage("xx", {
       progress: {},
       registered: true,
       paywallDisabled: true,
       user: { email: "a@b.c", isAnonymous: false },
-      weakCount: 2,
+      reviewDue: 0,
     });
-    expect(few).not.toContain("Practise my mistakes");
+    expect(none).not.toContain("phrases to review");
   });
 });

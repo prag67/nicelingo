@@ -57,6 +57,13 @@
       "when": 1792234013426,
       "tag": "0007_nebulous_thing",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1792262341189,
+      "tag": "0008_giant_adam_warlock",
+      "breakpoints": true
     }
   ]
 }

@@ -18,7 +18,7 @@ const ACTIVITIES = ["listen-match", "image-phrase", "speak-score", "read-write"]
 // Interface language (cookie nl_ui, set by the top-menu UI switcher;
 // independent of the course language in the URL).
 const UI_STRINGS = {
-  en: { listenTap: "Listen and tap", lookTap: "Look and tap", sayAloud: "Say it aloud", fillWord: "Fill the missing word", offline: "Offline \u2014 your progress will sync.", loading: "Getting your lesson ready\u2026", loadError: "Could not load the lesson.", loadErrorText: "Check your connection and try again.", tryAgain: "Try again", paywallTitle: "This lesson needs a subscription.", paywallText: "Unit 1 (lessons 1-4) is free forever. Unlock every lesson for $3/month or $29/year.", seePlans: "See plans", backFree: "Back to free Unit 1", tapStart: "Tap to start", tagline: "See it, hear it, say it.", whichPicture: "Which picture matches?", whichSentence: "Which sentence matches?", hearAgain: "Hear it again", needsConnection: "Needs connection", needsConnectionText: "Speaking practice needs the internet to check you. Your other progress is safe.", tapMic: "Tap the mic and say the sentence.", noMic: "No microphone found. Check permission and tap the mic to try again.", listening: "Listening\u2026 tap the mic to finish early.", checking: "Checking how you did\u2026", scoringError: "Something went wrong scoring that. Try again.", closeEnough: "Close enough!", closeEnoughText: "That was understood. Listen once more and try to match the tones as you go.", great: "Great!", greatText: "That sounded just right.", almost: "Almost!", goodEnough: "Good enough \u2014 moving on.", tryClearer: "Try once more, a little clearer.", tryAgainTitle: "Try again", goodEffort: "Good effort \u2014 moving on.", listenRepeat: "Listen and repeat after the speaker.", continueBtn: "Continue", correct: "Correct!", notQuite: "Not quite \u2014 listen again and try.", check: "Check", typeIt: "Type it\u2026", activityComplete: "Activity complete!", practiceAgain: "Practice again", practiceComplete: "Practice complete!", lessonComplete: "Lesson {n} complete!", niceWork: "Nice work \u2014 run it back anytime.", canDo: "You can hear it, read it, and say it.", finishLesson: "Finish lesson", shareDone: "I just finished Lesson {n} on Nicelingo and learned {phrases} new phrases!", checkpointTitle: "Unit {n} checkpoint", practiseTitle: "Practise my mistakes", challengeTitle: "Level {n} challenge", challengeLocked: "Pass every unit checkpoint in this level to unlock", challengeIntro: "3 scenes, 12 lines to say out loud", sceneOf: "Scene {a} of {b}", levelDoneTitle: "Level {n} complete!", learnedLine: "You can say {n} phrases", startUnitOne: "Start at Unit 1 instead", subscribeToOpen: "Subscribe to open this level", phrasesFixed: "{n} phrases fixed", stillToPractise: "{n} still to practise", reviewEmpty: "No mistakes to practise right now", checkpointIntro: "10 questions, about 3 minutes", checkpointStart: "Start checkpoint", checkpointPassedText: "Checkpoint passed", checkpointFail: "So close!", checkpointScoreLine: "{n} of 10", checkpointLocked: "Finish all 4 lessons to unlock", continueToUnit: "Continue to Unit {n}", tryAgainCp: "Try again", practiseThese: "Practise these", playWordAria: "Play {word}, meaning {gloss}", helpWords: "Help with words", nextLesson: "Next lesson", lessonPage: "Lesson page", closeWord: "Close", shareBtn: "Share", copyLink: "Copy link", copied: "Copied!", exitStage: "Exit current stage?", exitStageText: "Your place in this stage will not be saved.", exitYes: "Yes, exit", exitNo: "Stay" },
+  en: { listenTap: "Listen and tap", lookTap: "Look and tap", sayAloud: "Say it aloud", fillWord: "Fill the missing word", offline: "Offline \u2014 your progress will sync.", loading: "Getting your lesson ready\u2026", loadError: "Could not load the lesson.", loadErrorText: "Check your connection and try again.", tryAgain: "Try again", paywallTitle: "This lesson needs a subscription.", paywallText: "Unit 1 (lessons 1-4) is free forever. Unlock every lesson for $3/month or $29/year.", seePlans: "See plans", backFree: "Back to free Unit 1", tapStart: "Tap to start", tagline: "See it, hear it, say it.", whichPicture: "Which picture matches?", whichSentence: "Which sentence matches?", hearAgain: "Hear it again", needsConnection: "Needs connection", needsConnectionText: "Speaking practice needs the internet to check you. Your other progress is safe.", tapMic: "Tap the mic and say the sentence.", noMic: "No microphone found. Check permission and tap the mic to try again.", listening: "Listening\u2026 tap the mic to finish early.", checking: "Checking how you did\u2026", scoringError: "Something went wrong scoring that. Try again.", closeEnough: "Close enough!", closeEnoughText: "That was understood. Listen once more and try to match the tones as you go.", great: "Great!", greatText: "That sounded just right.", almost: "Almost!", goodEnough: "Good enough \u2014 moving on.", tryClearer: "Try once more, a little clearer.", tryAgainTitle: "Try again", goodEffort: "Good effort \u2014 moving on.", listenRepeat: "Listen and repeat after the speaker.", continueBtn: "Continue", correct: "Correct!", notQuite: "Not quite \u2014 listen again and try.", check: "Check", typeIt: "Type it\u2026", activityComplete: "Activity complete!", practiceAgain: "Practice again", practiceComplete: "Practice complete!", lessonComplete: "Lesson {n} complete!", niceWork: "Nice work \u2014 run it back anytime.", canDo: "You can hear it, read it, and say it.", finishLesson: "Finish lesson", shareDone: "I just finished Lesson {n} on Nicelingo and learned {phrases} new phrases!", checkpointTitle: "Unit {n} checkpoint", practiseTitle: "Practise my mistakes", dailyReviewTitle: "Daily review", challengeTitle: "Level {n} challenge", challengeLocked: "Pass every unit checkpoint in this level to unlock", challengeIntro: "3 scenes, 12 lines to say out loud", sceneOf: "Scene {a} of {b}", levelDoneTitle: "Level {n} complete!", learnedLine: "You can say {n} phrases", startUnitOne: "Start at Unit 1 instead", subscribeToOpen: "Subscribe to open this level", phrasesFixed: "{n} phrases fixed", stillToPractise: "{n} still to practise", reviewEmpty: "No mistakes to practise right now", checkpointIntro: "10 questions, about 3 minutes", checkpointStart: "Start checkpoint", checkpointPassedText: "Checkpoint passed", checkpointFail: "So close!", checkpointScoreLine: "{n} of 10", checkpointLocked: "Finish all 4 lessons to unlock", continueToUnit: "Continue to Unit {n}", tryAgainCp: "Try again", practiseThese: "Practise these", playWordAria: "Play {word}, meaning {gloss}", helpWords: "Help with words", nextLesson: "Next lesson", lessonPage: "Lesson page", closeWord: "Close", shareBtn: "Share", copyLink: "Copy link", copied: "Copied!", exitStage: "Exit current stage?", exitStageText: "Your place in this stage will not be saved.", exitYes: "Yes, exit", exitNo: "Stay" },
   es: { listenTap: "Escucha y toca", lookTap: "Mira y toca", sayAloud: "Dilo en voz alta", fillWord: "Completa la palabra", offline: "Sin conexión — tu progreso se sincronizará.", loading: "Preparando tu lección…", loadError: "No se pudo cargar la lección.", loadErrorText: "Revisa tu conexión e inténtalo de nuevo.", tryAgain: "Intentar de nuevo", paywallTitle: "Esta lección necesita una suscripción.", paywallText: "La Unidad 1 (lecciones 1-4) es gratuita para siempre. Desbloquea todo por $3/mes o $29/año.", seePlans: "Ver planes", backFree: "Volver a la Unidad 1 gratuita", tapStart: "Toca para empezar", tagline: "Míralo. Escúchalo. Dilo.", whichPicture: "¿Qué imagen coincide?", whichSentence: "¿Qué frase coincide?", hearAgain: "Escuchar de nuevo", needsConnection: "Necesita conexión", needsConnectionText: "La práctica oral necesita internet para evaluarte. Tu demás progreso está a salvo.", tapMic: "Toca el micrófono y di la frase.", noMic: "No se encontró micrófono. Revisa el permiso y toca el micrófono para reintentar.", listening: "Escuchando… toca el micrófono para terminar antes.", checking: "Revisando cómo lo hiciste…", scoringError: "Algo salió mal al calificar. Inténtalo de nuevo.", closeEnough: "¡Casi perfecto!", closeEnoughText: "Se entendió. Escucha una vez más e intenta igualar los tonos.", great: "¡Genial!", greatText: "Sonó justo como debía.", almost: "¡Casi!", goodEnough: "Suficiente — seguimos.", tryClearer: "Inténtalo una vez más, un poco más claro.", tryAgainTitle: "Inténtalo de nuevo", goodEffort: "Buen esfuerzo — seguimos.", listenRepeat: "Escucha y repite después del audio.", continueBtn: "Continuar", correct: "¡Correcto!", notQuite: "Casi — escucha de nuevo e inténtalo.", check: "Comprobar", typeIt: "Escríbelo…", activityComplete: "¡Actividad completada!", practiceAgain: "Practicar de nuevo", practiceComplete: "¡Práctica completada!", lessonComplete: "¡Lección {n} completada!", niceWork: "Buen trabajo — repítelo cuando quieras.", canDo: "Ya puedes escucharlo, leerlo y decirlo.", finishLesson: "Terminar la lección", shareDone: "¡Acabo de terminar la lección {n} en Nicelingo y aprendí {phrases} frases nuevas!", checkpointTitle: "Control de la unidad {n}", practiseTitle: "Practicar mis errores", challengeTitle: "Desafío del nivel {n}", challengeLocked: "Supera todos los controles de unidad de este nivel para desbloquearlo", challengeIntro: "3 escenas, 12 frases para decir en voz alta", sceneOf: "Escena {a} de {b}", levelDoneTitle: "¡Nivel {n} completado!", learnedLine: "Ya puedes decir {n} frases", startUnitOne: "Empezar en la unidad 1", subscribeToOpen: "Suscríbete para abrir este nivel", phrasesFixed: "{n} frases corregidas", stillToPractise: "{n} por practicar todavía", reviewEmpty: "No hay errores que practicar ahora", checkpointIntro: "10 preguntas, unos 3 minutos", checkpointStart: "Empezar el control", checkpointPassedText: "Control superado", checkpointFail: "¡Casi!", checkpointScoreLine: "{n} de 10", checkpointLocked: "Termina las 4 lecciones para desbloquearlo", continueToUnit: "Continuar a la unidad {n}", tryAgainCp: "Intentarlo de nuevo", practiseThese: "Practicar estos", playWordAria: "Escuchar {word}, que significa {gloss}", helpWords: "Ayuda con las palabras", nextLesson: "Lección siguiente", lessonPage: "Página de lecciones", closeWord: "Cerrar", shareBtn: "Compartir", copyLink: "Copiar enlace", copied: "¡Copiado!", exitStage: "¿Salir de esta etapa?", exitStageText: "No se guardará tu lugar en esta etapa.", exitYes: "Sí, salir", exitNo: "Quedarme" },
   de: { listenTap: "Hören und tippen", lookTap: "Sehen und tippen", sayAloud: "Laut nachsprechen", fillWord: "Fehlendes Wort ergänzen", offline: "Offline — dein Fortschritt wird synchronisiert.", loading: "Deine Lektion wird vorbereitet…", loadError: "Die Lektion konnte nicht geladen werden.", loadErrorText: "Prüfe deine Verbindung und versuche es erneut.", tryAgain: "Erneut versuchen", paywallTitle: "Diese Lektion braucht ein Abo.", paywallText: "Einheit 1 (Lektionen 1-4) ist für immer kostenlos. Schalte alles für $3/Monat oder $29/Jahr frei.", seePlans: "Pläne ansehen", backFree: "Zurück zur kostenlosen Einheit 1", tapStart: "Tippen zum Starten", tagline: "Sehen. Hören. Sprechen.", whichPicture: "Welches Bild passt?", whichSentence: "Welcher Satz passt?", hearAgain: "Nochmal anhören", needsConnection: "Verbindung nötig", needsConnectionText: "Sprechübung braucht Internet zur Prüfung. Dein übriger Fortschritt ist sicher.", tapMic: "Tippe aufs Mikro und sprich den Satz.", noMic: "Kein Mikrofon gefunden. Prüfe die Erlaubnis und tippe erneut aufs Mikro.", listening: "Höre zu… tippe aufs Mikro, um früher zu stoppen.", checking: "Prüfe, wie du warst…", scoringError: "Bei der Bewertung ging etwas schief. Versuch es erneut.", closeEnough: "Knapp genug!", closeEnoughText: "Das wurde verstanden. Höre noch einmal zu und triff die Töne.", great: "Großartig!", greatText: "Das klang genau richtig.", almost: "Fast!", goodEnough: "Gut genug — weiter geht's.", tryClearer: "Versuch es noch einmal, etwas deutlicher.", tryAgainTitle: "Erneut versuchen", goodEffort: "Guter Versuch — weiter geht's.", listenRepeat: "Höre zu und sprich nach.", continueBtn: "Weiter", correct: "Richtig!", notQuite: "Nicht ganz — höre nochmal zu und versuch es.", check: "Prüfen", typeIt: "Tippe es ein…", activityComplete: "Aktivität geschafft!", practiceAgain: "Nochmal üben", practiceComplete: "Übung geschafft!", lessonComplete: "Lektion {n} geschafft!", niceWork: "Gut gemacht — jederzeit wiederholen.", canDo: "Du kannst es hören, lesen und sagen.", finishLesson: "Lektion beenden", shareDone: "Ich habe gerade Lektion {n} bei Nicelingo geschafft und {phrases} neue Sätze gelernt!", checkpointTitle: "Test zu Einheit {n}", practiseTitle: "Meine Fehler üben", challengeTitle: "Level-{n}-Challenge", challengeLocked: "Bestehe alle Einheiten-Tests dieses Levels zum Freischalten", challengeIntro: "3 Szenen, 12 Sätze zum Lautsprechen", sceneOf: "Szene {a} von {b}", levelDoneTitle: "Level {n} geschafft!", learnedLine: "Du kannst {n} Sätze sagen", startUnitOne: "Stattdessen bei Einheit 1 starten", subscribeToOpen: "Abonnieren, um dieses Level zu öffnen", phrasesFixed: "{n} Sätze gefestigt", stillToPractise: "{n} noch zu üben", reviewEmpty: "Gerade keine Fehler zu üben", checkpointIntro: "10 Fragen, etwa 3 Minuten", checkpointStart: "Test starten", checkpointPassedText: "Test bestanden", checkpointFail: "Knapp daneben!", checkpointScoreLine: "{n} von 10", checkpointLocked: "Schließe alle 4 Lektionen ab, um ihn freizuschalten", continueToUnit: "Weiter zu Einheit {n}", tryAgainCp: "Nochmal versuchen", practiseThese: "Diese üben", playWordAria: "{word} abspielen, Bedeutung {gloss}", helpWords: "Worthilfe", nextLesson: "Nächste Lektion", lessonPage: "Lektionsseite", closeWord: "Schließen", shareBtn: "Teilen", copyLink: "Link kopieren", copied: "Kopiert!", exitStage: "Diese Stufe verlassen?", exitStageText: "Dein Platz in dieser Stufe wird nicht gespeichert.", exitYes: "Ja, verlassen", exitNo: "Bleiben" },
   fr: { listenTap: "Écoutez et touchez", lookTap: "Regardez et touchez", sayAloud: "Dites-le à voix haute", fillWord: "Complétez le mot manquant", offline: "Hors ligne — votre progression se synchronisera.", loading: "Préparation de votre leçon…", loadError: "Impossible de charger la leçon.", loadErrorText: "Vérifiez votre connexion et réessayez.", tryAgain: "Réessayer", paywallTitle: "Cette leçon nécessite un abonnement.", paywallText: "L'unité 1 (leçons 1-4) est gratuite pour toujours. Tout débloquer pour $3/mois ou $29/an.", seePlans: "Voir les offres", backFree: "Retour à l'unité 1 gratuite", tapStart: "Touchez pour commencer", tagline: "Regardez. Écoutez. Répétez.", whichPicture: "Quelle image correspond ?", whichSentence: "Quelle phrase correspond ?", hearAgain: "Réécouter", needsConnection: "Connexion requise", needsConnectionText: "L'exercice oral a besoin d'internet pour vous évaluer. Le reste de votre progression est à l'abri.", tapMic: "Touchez le micro et dites la phrase.", noMic: "Aucun micro trouvé. Vérifiez l'autorisation et touchez le micro pour réessayer.", listening: "Écoute… touchez le micro pour finir plus tôt.", checking: "Vérification de votre réponse…", scoringError: "La notation a échoué. Réessayez.", closeEnough: "Presque parfait !", closeEnoughText: "C'était compris. Réécoutez et essayez de suivre les tons.", great: "Super !", greatText: "C'était exactement ça.", almost: "Presque !", goodEnough: "Suffisant — on continue.", tryClearer: "Réessayez une fois, un peu plus clairement.", tryAgainTitle: "Réessayez", goodEffort: "Bel effort — on continue.", listenRepeat: "Écoutez et répétez après l'audio.", continueBtn: "Continuer", correct: "Correct !", notQuite: "Pas tout à fait — réécoutez et réessayez.", check: "Vérifier", typeIt: "Tapez-le…", activityComplete: "Activité terminée !", practiceAgain: "S'entraîner encore", practiceComplete: "Entraînement terminé !", lessonComplete: "Leçon {n} terminée !", niceWork: "Beau travail — recommencez quand vous voulez.", canDo: "Vous pouvez l'entendre, le lire et le dire.", finishLesson: "Terminer la leçon", shareDone: "Je viens de terminer la leçon {n} sur Nicelingo et appris {phrases} nouvelles phrases !", checkpointTitle: "Test de l'unité {n}", practiseTitle: "Pratiquer mes erreurs", challengeTitle: "Défi du niveau {n}", challengeLocked: "Réussissez tous les tests d'unité de ce niveau pour le débloquer", challengeIntro: "3 scènes, 12 phrases à dire à voix haute", sceneOf: "Scène {a} sur {b}", levelDoneTitle: "Niveau {n} terminé !", learnedLine: "Vous savez dire {n} phrases", startUnitOne: "Commencer plutôt à l'unité 1", subscribeToOpen: "Abonnez-vous pour ouvrir ce niveau", phrasesFixed: "{n} phrases corrigées", stillToPractise: "{n} encore à pratiquer", reviewEmpty: "Aucune erreur à pratiquer pour le moment", checkpointIntro: "10 questions, environ 3 minutes", checkpointStart: "Commencer le test", checkpointPassedText: "Test réussi", checkpointFail: "Dommage, si près !", checkpointScoreLine: "{n} sur 10", checkpointLocked: "Terminez les 4 leçons pour le débloquer", continueToUnit: "Continuer vers l'unité {n}", tryAgainCp: "Réessayer", practiseThese: "Pratiquer ceux-ci", playWordAria: "Écouter {word}, qui signifie {gloss}", helpWords: "Aide pour les mots", nextLesson: "Leçon suivante", lessonPage: "Page des leçons", closeWord: "Fermer", shareBtn: "Partager", copyLink: "Copier le lien", copied: "Copié !", exitStage: "Quitter cette étape ?", exitStageText: "Votre place dans cette étape ne sera pas enregistrée.", exitYes: "Oui, quitter", exitNo: "Rester" },
@@ -571,9 +571,9 @@ function startMicClock(mic, recordMs) {
 
 // Record one answer for phraseStats. Server-first; if the POST
 // fails (offline, no session yet), keep it on the device instead.
-function recordAttempt(phrase, activity, correct, score) {
+function recordAttempt(phrase, activity, correct, score, helped) {
   const lang = langFromPath(location.pathname);
-  const body = { phraseId: phrase.id, lang, activity, correct, score: score ?? null };
+  const body = { phraseId: phrase.id, lang, activity, correct, score: score ?? null, helped: helped === true };
   const keepLocal = () => {
     try {
       const arr = JSON.parse(localStorage.getItem("nl-attempts") ?? "[]");
@@ -1161,7 +1161,7 @@ function runSession({ questions, pool, title, onDone }) {
     else render();
   };
   const answer = (q, correct, scoreVal) => {
-    recordAttempt(q.phrase, q.activity, correct, scoreVal ?? null);
+    recordAttempt(q.phrase, q.activity, correct, scoreVal ?? null, q.helped === true);
     if (correct) score++;
     else missed.push(q);
   };
@@ -1277,6 +1277,10 @@ function runSession({ questions, pool, title, onDone }) {
   }
 
   function renderSpeak(q) {
+    // Recall round (Phase 1b): image only, no text and no audio
+    // first. Pressing help reveals the text and turns the round
+    // into a normal speak round, recorded as recall-with-help.
+    const isRecall = q.activity === "recall";
     const mic = h("button", { class: "mic", "aria-label": "Record your voice" }, "🎙");
     const status = h("p", { class: "sub", style: "text-align:center" }, S.tapMic);
     const speaker = h("button", { class: "speaker", "aria-label": "Play sound" }, "♪");
@@ -1335,18 +1339,30 @@ function runSession({ questions, pool, title, onDone }) {
         mic.disabled = false;
       }
     }, { once: true });
-    frame(
-      appImg({ class: "hero-img", src: q.phrase.imageUrl, alt: "" }),
-      h("div", { class: "phrase-card" }, ...phraseDisplay(q.phrase)),
-      h("div", { class: "play-row" }, speaker, helpButton(q.phrase)),
-      h("div", { class: "mic-wrap" }, mic),
-      status,
-    );
+    if (isRecall) {
+      const card = h("div", { class: "phrase-card" }, ...phraseDisplay(q.phrase));
+      card.hidden = true;
+      frame(
+        appImg({ class: "hero-img", src: q.phrase.imageUrl, alt: "" }),
+        card,
+        h("div", { class: "play-row" }, helpButton(q.phrase, (on) => { if (on) { q.helped = true; card.hidden = false; } else card.hidden = true; })),
+        h("div", { class: "mic-wrap" }, mic),
+        status,
+      );
+    } else {
+      frame(
+        appImg({ class: "hero-img", src: q.phrase.imageUrl, alt: "" }),
+        h("div", { class: "phrase-card" }, ...phraseDisplay(q.phrase)),
+        h("div", { class: "play-row" }, speaker, helpButton(q.phrase)),
+        h("div", { class: "mic-wrap" }, mic),
+        status,
+      );
+    }
   }
 
   function render() {
     const q = questions[idx];
-    if (q.activity === "speak-score") renderSpeak(q);
+    if (q.activity === "speak-score" || q.activity === "recall") renderSpeak(q);
     else if (q.activity === "read-write") renderWrite(q);
     else renderChoice(q);
   }
@@ -1488,7 +1504,7 @@ async function bootReview(lang) {
   runSession({
     questions: data.questions,
     pool: data.pool,
-    title: S.practiseTitle,
+    title: S.dailyReviewTitle ?? S.practiseTitle,
     onDone: async () => {
       let fixed = 0;
       let remaining = 0;
@@ -1561,11 +1577,15 @@ async function bootChallenge(lang, level, mode) {
 
   function renderLine() {
     const phrase = lines[idx];
+    // Phase 1b: the final line of each scene is a recall line —
+    // scene image only, no audio or text first (never in test out).
+    const isRecallLine = mode !== "testout" && idx % 4 === 3;
+    let lineHelped = false;
     const mic = h("button", { class: "mic", "aria-label": "Record your voice" }, "🎙");
     const status = h("p", { class: "sub", style: "text-align:center" }, S.tapMic);
     const speaker = h("button", { class: "speaker", "aria-label": "Play sound" }, "♪");
     speaker.addEventListener("click", () => playAudio(pickAudioUrl(phrase), speaker));
-    setTimeout(() => playAudio(pickAudioUrl(phrase), speaker), 350);
+    if (!isRecallLine) setTimeout(() => playAudio(pickAudioUrl(phrase), speaker), 350);
     mic.addEventListener("click", async () => {
       // Not disabled while recording: a disabled button fires no
       // clicks, which would break tap-again-to-finish-early.
@@ -1607,7 +1627,7 @@ async function bootChallenge(lang, level, mode) {
         const sc = typeof res.score === "number" ? res.score : res.pass ? 100 : 0;
         tried[idx]++;
         best[idx] = Math.max(best[idx], sc);
-        recordAttempt(phrase, "speak-score", sc >= 70, sc);
+        recordAttempt(phrase, isRecallLine ? "recall" : "speak-score", sc >= 70, sc, lineHelped);
         const canRetry = mode !== "testout" && tried[idx] < 2;
         const nx = h("button", { class: "btn" }, S.continueBtn);
         nx.addEventListener("click", () => {
@@ -1628,13 +1648,25 @@ async function bootChallenge(lang, level, mode) {
         mic.disabled = false;
       }
     }, { once: true });
-    frame(
-      appImg({ class: "hero-img", src: phrase.imageUrl, alt: "" }),
-      h("div", { class: "phrase-card" }, ...phraseDisplay(phrase)),
-      h("div", { class: "play-row" }, speaker, helpButton(phrase)),
-      h("div", { class: "mic-wrap" }, mic),
-      status,
-    );
+    if (isRecallLine) {
+      const card = h("div", { class: "phrase-card" }, ...phraseDisplay(phrase));
+      card.hidden = true;
+      frame(
+        appImg({ class: "hero-img", src: phrase.imageUrl, alt: "" }),
+        card,
+        h("div", { class: "play-row" }, helpButton(phrase, (on) => { if (on) { lineHelped = true; card.hidden = false; } else card.hidden = true; })),
+        h("div", { class: "mic-wrap" }, mic),
+        status,
+      );
+    } else {
+      frame(
+        appImg({ class: "hero-img", src: phrase.imageUrl, alt: "" }),
+        h("div", { class: "phrase-card" }, ...phraseDisplay(phrase)),
+        h("div", { class: "play-row" }, speaker, helpButton(phrase)),
+        h("div", { class: "mic-wrap" }, mic),
+        status,
+      );
+    }
   }
 
   async function finish() {

@@ -46,6 +46,6 @@ on a 360px phone and a desktop.
 
 ## Acceptance criteria
 
-- [ ] Full lesson completable end to end in a desktop browser.
-- [ ] Refresh mid-lesson resumes at the first incomplete activity.
-- [ ] No-mic and denied-mic states show a retry message.
+- [x] Full lesson completable end to end in a desktop browser.
+- [x] Refresh mid-lesson resumes at the first incomplete activity.
+- [x] No-mic and denied-mic states show a retry message.

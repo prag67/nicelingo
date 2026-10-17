@@ -235,12 +235,17 @@ async function sessionForSsr(c: {
   if (!user || !c.env?.DB) return { user, progress: {}, registered, subscribed: false, streakDays: [], milestones: [] };
   try {
     const store = d1ProgressStore(c.env.DB);
-    const [progress, subscribed, streakDays, milestones] = await Promise.all([
+    const attemptStore = d1AttemptStore(c.env.DB);
+    const [progress, subscribed, progressDays, milestones, attemptDays] = await Promise.all([
       store.listAll(user.id),
       d1SubscriptionStore(c.env.DB).isSubscribed(user.id),
       store.listActivityDays(user.id),
-      d1AttemptStore(c.env.DB).listMilestones(user.id).catch(() => [] as Milestone[]),
+      attemptStore.listMilestones(user.id).catch(() => [] as Milestone[]),
+      attemptStore.getActivityDays?.(user.id).catch(() => [] as string[]) ?? Promise.resolve([] as string[]),
     ]);
+    // Any day with a recorded attempt counts toward the streak,
+    // so a finished daily review keeps the streak alive (Phase 1a).
+    const streakDays = [...new Set([...progressDays, ...attemptDays])];
     return { user, progress, registered, subscribed, streakDays, milestones };
   } catch {
     return { user, progress: {}, registered, subscribed: false, streakDays: [], milestones: [] };
@@ -372,6 +377,10 @@ app.get("/:lang{[a-z]{2}}/progress", async (c) => {
   const lang = c.req.param("lang");
   if (!isPickerLang(lang)) return c.text("Not found", 404);
   const { user, progress, registered, subscribed, streakDays, milestones } = await sessionForSsr(c);
+  let phraseStats: import("./lib/attempts").PhraseStats[] = [];
+  if (user && c.env?.DB) {
+    try { phraseStats = await d1AttemptStore(c.env.DB).getStats(user.id, lang); } catch { /* not migrated yet */ }
+  }
   const origin = new URL(c.req.url).origin;
   return c.html(
     progressPage(lang, {
@@ -381,6 +390,7 @@ app.get("/:lang{[a-z]{2}}/progress", async (c) => {
       uiLang: requestUiLang(c),
       streakDays,
       milestones,
+      phraseStats,
       user,
       origin,
     }),
@@ -419,7 +429,7 @@ app.get("/:lang{[a-z]{2}}", async (c) => {
     try {
       const stats = await d1AttemptStore(c.env.DB).getStats(user.id, lang);
       const review = buildReviewSet({ lang, stats, subscribed, paywallDisabled: paywallDisabled(c.env) });
-      weakCount = review.questions.length >= 3 ? review.weakCount : 0;
+      weakCount = review.dueCount;
     } catch { /* attempts tables not migrated yet: no button */ }
   }
   return c.html(
@@ -432,6 +442,7 @@ app.get("/:lang{[a-z]{2}}", async (c) => {
       milestones,
       paywallDisabled: paywallDisabled(c.env),
       weakCount,
+      reviewDue: weakCount,
       user,
       level: Number.isInteger(level) ? level : undefined,
       origin,
@@ -1035,7 +1046,7 @@ app.get("/api/checkpoint/:lang/:level/:unit", async (c) => {
   return c.json({ lang, level, unit, questions: built.questions, pool: built.pool });
 });
 
-const ATTEMPT_ACTIVITIES = new Set(["listen-match", "image-phrase", "speak-score", "read-write"]);
+const ATTEMPT_ACTIVITIES = new Set(["listen-match", "image-phrase", "speak-score", "read-write", "recall"]);
 
 // Record one answer; updates phraseStats (weak after a wrong answer
 // or a speak score below 70; clears after two correct in a row).
@@ -1043,7 +1054,7 @@ app.post("/api/attempts", async (c) => {
   const userId = await currentUserId(c);
   if (!userId || !c.env?.DB) return c.json({ error: "unauthorized" }, 401);
   const body = await c.req.json().catch(() => null);
-  const { phraseId, lang, activity, correct, score } = body ?? {};
+  const { phraseId, lang, activity, correct, score, helped } = body ?? {};
   if (
     typeof phraseId !== "string" || !phraseId ||
     !isPickerLang(lang) ||
@@ -1059,6 +1070,7 @@ app.post("/api/attempts", async (c) => {
     activity,
     correct,
     score: score ?? null,
+    helped: helped === true,
     at: new Date().toISOString(),
   });
   return c.json({ stats });

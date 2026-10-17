@@ -9,7 +9,7 @@ on spotty connections.
 - Full lesson shell, all 4 activity screens, manifest, 8 audio clips,
   8 images — served from the service-worker cache.
 - Choice + write activities fully playable; completions queued locally.
-- Speak activity requires the network (Whisper scoring): offline it shows
+- Speak activity requires the network (Whisper or Clef scoring): offline it shows
   a "needs connection" state instead of the mic. No attempts consumed.
 
 ## Sync rules
@@ -33,7 +33,7 @@ on spotty connections.
 
 ## Non-goals
 
-- Offline scoring (needs Whisper; explicitly out).
+- Offline scoring (needs Whisper or Clef; explicitly out). Level challenges cannot be finished offline, because every line is speak-scored.
 - Background sync API (online/boot flush is enough).
 - iOS standalone install prompts.
 

@@ -57,9 +57,11 @@ export function buildCheckpointSet(
 
   const hasWrite = (lessons[lessonIds[0]]?.[lang as keyof (typeof lessons)[string]]?.activities ?? [])
     .includes("read-write");
+  // Phase 1b: one of the two speak slots becomes a recall round
+  // (image only, no text until help is pressed).
   const activities = hasWrite
-    ? ["listen-match", "listen-match", "listen-match", "image-phrase", "image-phrase", "image-phrase", "speak-score", "speak-score", "read-write", "read-write"]
-    : ["listen-match", "listen-match", "listen-match", "listen-match", "image-phrase", "image-phrase", "image-phrase", "image-phrase", "speak-score", "speak-score"];
+    ? ["listen-match", "listen-match", "listen-match", "image-phrase", "image-phrase", "image-phrase", "speak-score", "recall", "read-write", "read-write"]
+    : ["listen-match", "listen-match", "listen-match", "listen-match", "image-phrase", "image-phrase", "image-phrase", "image-phrase", "speak-score", "recall"];
   const rotated = shuffle(activities, rng);
   return {
     questions: chosen.map((phrase, i) => ({ phrase, activity: rotated[i] })),

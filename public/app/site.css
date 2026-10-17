@@ -471,3 +471,13 @@ a.streak-chip { text-decoration: none; }
 .testout-line { margin: 0.5rem 0 0; }
 .progress-lang { font-size: 1.05rem; color: #4c5873; margin: 0.15rem 0 0.75rem; }
 .progress-lang b { color: #0e1b3d; font-family: var(--font-head); }
+
+/* Daily review strip, due line, word strength dots (Phase 1) */
+.review-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;padding:10px 16px;margin:0 0 12px;border:2px solid #D3E2F5;border-radius:16px;background:#EFF5FF}
+.review-strip-text{font-weight:700;color:#0E1B3D}
+.review-start{min-height:48px}
+.due-line{margin:8px 0;font-weight:600}
+.strength-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-left:6px;vertical-align:middle}
+.strength-dot.s-weak{background:#E4572E}
+.strength-dot.s-learning{background:#F2B01E}
+.strength-dot.s-strong{background:#2E9E5B}

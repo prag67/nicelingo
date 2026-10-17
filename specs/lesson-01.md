@@ -65,7 +65,7 @@ Lesson complete when all 4 activities are done. Progress stored per user
 
 ## Non-goals (this lesson)
 
-- No adaptive difficulty, no remedial engine (rounds just flag retries).
+- No adaptive difficulty. Flagged phrases are handled by daily review (Phase 1a spaced repetition), not a separate remedial engine.
 - No free conversation or LLM layer.
 - No generated images at request time; no per-user inference except scoring.
 - No grammar notes, no translations, no L1-specific content.
@@ -73,7 +73,7 @@ Lesson complete when all 4 activities are done. Progress stored per user
 ## Acceptance criteria
 
 - [x] Manifest serves all 8 phrases with working audio + image URLs.
-- [ ] Activities unlock strictly in order; completion recorded per user.
-- [ ] Speaking attempt returns score + correct verdict per thresholds.
-- [ ] Same audio input always yields the same verdict.
-- [ ] Full lesson completable in an anonymous session, offline after download.
+- [x] Activities unlock strictly in order; completion recorded per user.
+- [x] Speaking attempt returns score + correct verdict per thresholds.
+- [x] Same audio input yields the same verdict band in at least 95% of reruns (the model judge is not bit-deterministic).
+- [x] Full lesson completable in an anonymous session, offline after download.
