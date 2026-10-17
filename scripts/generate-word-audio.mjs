@@ -58,13 +58,15 @@ for (const f of readdirSync(join(root, "scripts/manifests")).filter((x) => x.end
   for (const p of m.phrases) {
     for (const w of p.words ?? []) {
       if (!w.audioUrl || byUrl.has(w.audioUrl)) continue;
+      const cleanUrl = w.audioUrl.split("?")[0];
+      if (byUrl.has(cleanUrl)) continue;
       let ttsText = w.chars ?? w.text;
       if (lang === "th") {
-        const slug = w.audioUrl.split("/").pop().replace(/\.mp3$/, "");
+        const slug = cleanUrl.split("/").pop().replace(/\.mp3$/, "");
         ttsText = thScript.get(slug);
         if (!ttsText) throw new Error(`no Thai script for word slug ${slug} (${w.text})`);
       }
-      byUrl.set(w.audioUrl, ttsText);
+      byUrl.set(cleanUrl, ttsText);
     }
   }
   wanted.set(lang, byUrl);

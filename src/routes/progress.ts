@@ -289,6 +289,7 @@ export function progressPage(lang: string, opts: ProgressOpts): string {
 <main class="progress-main">
 <p class="back-line"><a class="linklike" href="/${lang}">← ${escapeHtml(d.backToCourse)}</a></p>
 <h1>${escapeHtml(d.progressTitle)}</h1>
+<p class="progress-lang"><b lang="${lang}">${escapeHtml(info.ownName)}</b>${info.name && info.name !== info.ownName ? ` · <span>${escapeHtml(info.name)}</span>` : ""}</p>
 ${streakHeroHtml(streak, new Set(opts.streakDays ?? []), ui)}
 ${streakNoteHtml(opts.user, streak, ui)}
 ${numbersHtml([
@@ -315,7 +316,7 @@ ${wordsGalleryHtml(lang, progress, ui)}
 </main>
 ${siteFooterHtml(ui, `/${lang}`, { registered: opts.registered })}`;
   return pageShell({
-    title: `${d.progressTitle} · Nicelingo`,
+    title: `${d.progressTitle} · ${info.ownName} · Nicelingo`,
     lang: ui,
     origin: opts.origin ?? "",
     noindex: true,

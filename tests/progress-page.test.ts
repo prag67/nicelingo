@@ -37,6 +37,9 @@ describe("progressPage", () => {
       user: { email: "a@b.c", isAnonymous: false },
       streakDays: [today],
     });
+    // The page names its language in the body (not only the URL).
+    expect(html).toContain('class="progress-lang"');
+    expect(html).toContain('lang="xx"');
     expect(html).toContain("1-day streak");
     expect(html).toContain("Practiced today");
     expect((html.match(/class="dot on"/g) ?? []).length).toBe(1);

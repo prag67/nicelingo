@@ -466,3 +466,5 @@ a.streak-chip { text-decoration: none; }
 .review-line { margin: 0.75rem 0 0; }
 .review-btn { min-height: 44px; display: inline-flex; align-items: center; }
 .testout-line { margin: 0.5rem 0 0; }
+.progress-lang { font-size: 1.05rem; color: #4c5873; margin: 0.15rem 0 0.75rem; }
+.progress-lang b { color: #0e1b3d; font-family: var(--font-head); }
