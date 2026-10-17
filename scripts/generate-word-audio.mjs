@@ -12,7 +12,7 @@
 // Usage: set -a && . /root/.env && set +a &&
 //   node scripts/generate-word-audio.mjs [lang ...]
 import { mkdirSync, existsSync, readFileSync, readdirSync, writeFileSync, unlinkSync } from "node:fs";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -121,6 +121,25 @@ async function synth(voice, text) {
   return { bytes: new Uint8Array(await audio.arrayBuffer()) };
 }
 
+// Some voices render single words near-silent (Spanish "el" peaked
+// at -32 dB and was inaudible). Peak-normalize anything under
+// -10 dB up to -3 dB so every word plays at a usable level.
+function normalizeClip(dest) {
+  try {
+    const probe = spawnSync(
+      "ffmpeg", ["-i", dest, "-af", "volumedetect", "-f", "null", "-"],
+      { encoding: "utf8" },
+    ).stderr ?? "";
+    const m = probe.match(/max_volume: (-[\d.]+) dB/);
+    if (!m) return;
+    const peak = Number.parseFloat(m[1]);
+    if (peak >= -10) return;
+    const tmp = `${dest}.tmp.mp3`;
+    execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", dest, "-af", `volume=${(-3 - peak).toFixed(1)}dB`, "-codec:a", "libmp3lame", "-q:a", "4", tmp], { stdio: "pipe" });
+    execFileSync("mv", [tmp, dest]);
+  } catch { /* probe failure leaves the clip as generated */ }
+}
+
 const langs = process.argv.slice(2).length ? process.argv.slice(2) : [...wanted.keys()];
 let made = 0, skipped = 0, failed = 0;
 for (const lang of langs) {
@@ -150,6 +169,7 @@ for (const lang of langs) {
         } else {
           writeFileSync(dest, out.bytes);
         }
+        normalizeClip(dest);
         made++;
       } catch (err) {
         failed++;

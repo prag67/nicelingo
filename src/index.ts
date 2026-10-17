@@ -30,8 +30,10 @@ import { masterProgressPage, progressPage } from "./routes/progress";
 import { developersPage } from "./routes/developers";
 import { contactPage, privacyPage, refundsPage, termsPage } from "./routes/legal";
 import {
+  isPreviewLangVoice,
   isPreviewSample,
   isPreviewVoice,
+  previewLang,
   voicePreviewPage,
 } from "./routes/voice-preview";
 import { homePage } from "./routes/home";
@@ -305,6 +307,24 @@ app.get("/sitemap.xml", (c) => {
 app.get("/voice-preview", (c) =>
   c.html(voicePreviewPage(), 200, { "X-Robots-Tag": "noindex, nofollow" }),
 );
+app.get("/voice-preview/audio/:lang/:voice/:file", async (c) => {
+  const lang = c.req.param("lang");
+  const voice = c.req.param("voice");
+  const file = c.req.param("file");
+  if (!previewLang(lang) || !isPreviewLangVoice(lang, voice) || file !== "sample.mp3") {
+    return c.text("Not found", 404);
+  }
+  const media = c.env?.MEDIA;
+  if (!media) return c.text("Not found", 404);
+  const obj = await media.get(`voice-preview/${lang}/${voice}/${file}`);
+  if (!obj) return c.text("Not found", 404);
+  const headers = new Headers();
+  obj.writeHttpMetadata(headers);
+  headers.set("Content-Type", "audio/mpeg");
+  headers.set("Cache-Control", "public, max-age=86400");
+  headers.set("X-Robots-Tag", "noindex, nofollow");
+  return new Response(await obj.arrayBuffer(), { headers });
+});
 app.get("/voice-preview/audio/:voice/:file", async (c) => {
   const voice = c.req.param("voice");
   const file = c.req.param("file");

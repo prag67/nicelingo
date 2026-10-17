@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import app from "../src/index";
-import { PREVIEW_SAMPLES, PREVIEW_VOICES } from "../src/routes/voice-preview";
+import { PREVIEW_LANGS, PREVIEW_SAMPLES, PREVIEW_VOICES } from "../src/routes/voice-preview";
 
 function r2With(files: Record<string, string>) {
   return {
@@ -29,8 +29,15 @@ describe("GET /voice-preview", () => {
       }
     }
     expect((html.match(/<audio /g) ?? []).length).toBe(
-      PREVIEW_VOICES.length * PREVIEW_SAMPLES.length,
+      PREVIEW_VOICES.length * PREVIEW_SAMPLES.length +
+        PREVIEW_LANGS.reduce((n, l) => n + l.voices.length, 0),
     );
+    for (const l of PREVIEW_LANGS) {
+      expect(html).toContain(l.name);
+      for (const v of l.voices) {
+        expect(html).toContain(`/voice-preview/audio/${l.code}/${v.id}/sample.mp3`);
+      }
+    }
     expect(html).toContain('id="slow"');
     expect(html).toContain("0.85");
   });
@@ -38,6 +45,34 @@ describe("GET /voice-preview", () => {
   it("stays out of the sitemap", async () => {
     const res = await app.request("/sitemap.xml");
     expect(await res.text()).not.toContain("voice-preview");
+  });
+});
+
+describe("GET /voice-preview/audio/:lang/:voice/:file", () => {
+  it("serves an allowlisted language sample from R2", async () => {
+    const media = r2With({ "voice-preview/de/sweetlady/sample.mp3": "MP3BYTES" });
+    const res = await app.request(
+      "/voice-preview/audio/de/sweetlady/sample.mp3",
+      {},
+      { MEDIA: media },
+    );
+    expect(res.status).toBe(200);
+    expect(await res.text()).toBe("MP3BYTES");
+    expect(media.get).toHaveBeenCalledWith("voice-preview/de/sweetlady/sample.mp3");
+  });
+
+  it("404s unknown languages, voices, and files", async () => {
+    const media = r2With({});
+    for (const path of [
+      "/voice-preview/audio/xx/sweetlady/sample.mp3",
+      "/voice-preview/audio/de/nope/sample.mp3",
+      "/voice-preview/audio/de/sweetlady/other.mp3",
+      "/voice-preview/audio/de/sweetlady/sample.mp3",
+    ]) {
+      const res = await app.request(path, {}, { MEDIA: media });
+      expect(res.status).toBe(404);
+    }
+    expect(media.get).toHaveBeenCalledTimes(1);
   });
 });
 
