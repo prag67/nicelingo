@@ -426,7 +426,7 @@ function renderPhraseWrap(wrap) {
 
 // The help button that replaces slow playback: pressing it reveals
 // the phrase's tappable words; pressing it again hides them.
-function helpButton(phrase) {
+function helpButton(phrase, onToggle) {
   const b = h(
     "button",
     { class: "speaker help", "aria-label": S.helpWords, title: S.helpWords, "aria-pressed": "false" },
@@ -444,8 +444,24 @@ function helpButton(phrase) {
         renderPhraseWrap(wrap);
       }
     }
+    onToggle?.(on);
   });
   return b;
+}
+
+// On listen-match pages the phrase text is not on screen yet (that
+// is the question), so help reveals it in a card under the play row
+// instead of toggling an existing phrase. Returns [playRow, card].
+function listenHelpRow(phrase, speaker) {
+  const card = h("div", { class: "phrase-card help-reveal" }, ...phraseDisplay(phrase));
+  card.hidden = true;
+  const row = h(
+    "div",
+    { class: "play-row" },
+    speaker,
+    helpButton(phrase, (on) => { card.hidden = !on; }),
+  );
+  return [row, card];
 }
 
 // Tappable word chips for one phrase. Tapping a chip plays the word
@@ -720,11 +736,11 @@ const player = {
       activity === "listen-match"
         ? [
             h("h1", {}, S.whichPicture),
-            (() => {
+            ...(() => {
               const b = h("button", { class: "speaker", "aria-label": "Play sound" }, "♪");
               b.addEventListener("click", () => playAudio(pickAudioUrl(q.target), b));
               setTimeout(() => playAudio(pickAudioUrl(q.target), b), 350);
-              return h("div", { class: "play-row" }, b, helpButton(q.target));
+              return listenHelpRow(q.target, b);
             })(),
             grid,
             reveal,
@@ -1199,7 +1215,7 @@ function runSession({ questions, pool, title, onDone }) {
       speaker.addEventListener("click", () => playAudio(pickAudioUrl(q.phrase), speaker));
       setTimeout(() => playAudio(pickAudioUrl(q.phrase), speaker), 350);
       frame(
-        h("div", { class: "play-row" }, speaker, helpButton(q.phrase)),
+        ...listenHelpRow(q.phrase, speaker),
         grid,
         msg,
       );
@@ -1264,7 +1280,8 @@ function runSession({ questions, pool, title, onDone }) {
     const speaker = h("button", { class: "speaker", "aria-label": "Play sound" }, "♪");
     speaker.addEventListener("click", () => playAudio(pickAudioUrl(q.phrase), speaker));
     mic.addEventListener("click", async () => {
-      mic.disabled = true;
+      // Not disabled while recording: a disabled button fires no
+      // clicks, which would break tap-again-to-finish-early.
       let stream;
       try {
         stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -1289,6 +1306,7 @@ function runSession({ questions, pool, title, onDone }) {
       clearTimeout(deadline);
       stream.getTracks().forEach((t) => t.stop());
       mic.classList.remove("recording");
+      mic.disabled = true;
       status.textContent = S.checking;
       try {
         const blob = new Blob(chunks, { type: rec.mimeType || "audio/webm" });
@@ -1547,7 +1565,8 @@ async function bootChallenge(lang, level, mode) {
     speaker.addEventListener("click", () => playAudio(pickAudioUrl(phrase), speaker));
     setTimeout(() => playAudio(pickAudioUrl(phrase), speaker), 350);
     mic.addEventListener("click", async () => {
-      mic.disabled = true;
+      // Not disabled while recording: a disabled button fires no
+      // clicks, which would break tap-again-to-finish-early.
       let stream;
       try {
         stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -1572,6 +1591,7 @@ async function bootChallenge(lang, level, mode) {
       clearTimeout(deadline);
       stream.getTracks().forEach((t) => t.stop());
       mic.classList.remove("recording");
+      mic.disabled = true;
       status.textContent = S.checking;
       try {
         const blob = new Blob(chunks, { type: rec.mimeType || "audio/webm" });

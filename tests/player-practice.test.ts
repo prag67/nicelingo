@@ -273,6 +273,33 @@ describe("speak countdown", () => {
     expect(screenText()).toContain("Great!");
   });
 
+  it("tap again finishes early instead of waiting out the window", async () => {
+    vi.useFakeTimers();
+    documentStub.created = [];
+    vi.resetModules();
+    await import("../public/app/player.js");
+    await vi.advanceTimersByTimeAsync(500);
+    const mic = findButton("🎙");
+    mic.click();
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(screenText()).toContain("Listening");
+    mic.click();
+    await vi.advanceTimersByTimeAsync(500);
+    expect(
+      fetchCalls.some((c) => c.url === "/api/score" && c.method === "POST"),
+    ).toBe(true);
+  });
+
+  it("checkpoint and challenge mics stay clickable while recording", async () => {
+    const { readFileSync } = await import("node:fs");
+    const src = readFileSync(new URL("../public/app/player.js", import.meta.url), "utf8");
+    // Regression: disabling the mic at record start made the
+    // tap-again-to-finish listener unreachable (disabled buttons
+    // fire no click events).
+    expect(src).not.toContain("mic.disabled = true;\n      let stream");
+    expect(src.match(/startMicClock\(mic, /g)?.length).toBe(4); // definition + 3 recorders
+  });
+
   it("tapping again finishes early and still submits", async () => {
     vi.useFakeTimers();
     documentStub.created = [];
@@ -583,6 +610,19 @@ describe("tap-to-hear words", () => {
     expect(
       documentStub.created.find((el) => el.attrs["aria-label"] === "Play slowly"),
     ).toBeFalsy();
+    // On listen pages the phrase is not on screen yet, so help
+    // reveals it (as tappable words) in a card under the play row;
+    // pressing help again hides it.
+    const card = documentStub.created.find((el) => el.className === "phrase-card help-reveal");
+    expect(card).toBeTruthy();
+    expect(card.hidden).toBe(true);
+    help.click();
+    expect(card.hidden).toBe(false);
+    expect(
+      documentStub.created.find((el) => el.className === "word-chip"),
+    ).toBeTruthy();
+    help.click();
+    expect(card.hidden).toBe(true);
   });
 });
 
