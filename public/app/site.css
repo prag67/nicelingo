@@ -441,3 +441,16 @@ a.streak-chip { text-decoration: none; }
   font: inherit; font-weight: 800; text-decoration: none; cursor: pointer;
 }
 .share-btn.share-native { background: var(--blue, #1a5feb); color: #fff; }
+.words-section { margin-top: 1.5rem; }
+.words-section h2 { font-family: var(--font-head); }
+.word-gloss-line { min-height: 1.4em; color: var(--muted); font-weight: 700; }
+.word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.75rem; }
+.word-card { background: #fff; border: 2px solid #d3e2f5; border-radius: 16px; overflow: hidden; }
+.word-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+.word-phrase { margin: 0; padding: 0.5rem 0.6rem; font-weight: 600; }
+.wchip {
+  font: inherit; font-weight: 600; background: none; border: 0; cursor: pointer;
+  min-height: 2.75rem; padding: 0.3rem 0.15rem;
+  text-decoration: underline dotted #1247b8 2px; text-underline-offset: 4px; border-radius: 8px;
+}
+.wchip.playing { color: #1a5feb; background: #eef4ff; }

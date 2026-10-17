@@ -482,3 +482,55 @@ describe("lesson complete share icons", () => {
     expect(copyBtn).toBeTruthy();
   });
 });
+
+describe("tap-to-hear words", () => {
+  beforeEach(() => {
+    for (const p of manifest.phrases) {
+      p.words = [
+        { text: "The", gloss: "the", start: 0, end: 0.2 },
+        { text: "man", gloss: "man", start: 0.2, end: 0.6 },
+        { text: "is", gloss: "is", start: 0.6, end: 0.9 },
+        { text: "eating", gloss: "eating", start: 0.9, end: 1.5 },
+      ];
+    }
+  });
+  afterEach(() => {
+    for (const p of manifest.phrases) delete p.words;
+  });
+
+  it("renders chips in the speak phrase card and plays a word on tap", async () => {
+    installStubs("?demo=speak-score", []);
+    await bootPlayer();
+    const chip = documentStub.created.find(
+      (el) => el.tag === "button" && el.attrs["aria-label"] === "Play eating, meaning eating",
+    );
+    expect(chip).toBeTruthy();
+    expect(chip.className).toContain("word-chip");
+    chip.click();
+    for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 10));
+    // Popup announces the word and its meaning.
+    const pop = documentStub.created.find((el) => el.className === "word-pop");
+    expect(pop).toBeTruthy();
+    expect(pop.text).toContain("eating");
+  });
+
+  it("never chips the blanked word in write questions", async () => {
+    installStubs("?demo=read-write", []);
+    await bootPlayer();
+    const chips = documentStub.created.filter((el) => el.className === "word-chip");
+    // Only the non-final words of the prompt phrase are chips.
+    expect(chips.length).toBeGreaterThan(0);
+    expect(chips.length).toBeLessThan(4);
+    expect(screenText()).toContain("______");
+  });
+
+  it("offers slow playback beside the speaker", async () => {
+    installStubs("?demo=listen-match", []);
+    await bootPlayer();
+    const slow = documentStub.created.find(
+      (el) => el.tag === "button" && el.attrs["aria-label"] === "Play slowly",
+    );
+    expect(slow).toBeTruthy();
+    expect(slow.text).toContain("🐢");
+  });
+});

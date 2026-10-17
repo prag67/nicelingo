@@ -205,6 +205,70 @@ function shareSectionHtml(args: {
 </section>`;
 }
 
+/** Words-you-know gallery: every phrase from finished lessons, with
+ *  its photo and tappable word chips that replay the word (slice or
+ *  own recording) and announce its meaning. */
+function wordsGalleryHtml(lang: string, progress: Record<string, string[]>, ui: UiLang): string {
+  const d = t(ui);
+  const cards: string[] = [];
+  for (const u of UNITS) {
+    for (const n of u.lessons) {
+      if (!isLessonDone(lang, n, progress)) continue;
+      const manifest = lessons[n]?.[lang as keyof (typeof lessons)[string]];
+      if (!manifest) continue;
+      for (const p of manifest.phrases) {
+        const chips = p.words?.length
+          ? p.words
+              .map(
+                (w) =>
+                  `<button class="wchip" type="button" data-audio="${escapeHtml(w.audioUrl ?? p.audioUrl)}"${w.audioUrl ? "" : ` data-start="${w.start}" data-end="${w.end}"`} data-word="${escapeHtml(w.chars ?? w.text)}" data-gloss="${escapeHtml(w.gloss)}" aria-label="${escapeHtml(`${w.chars ?? w.text} — ${w.gloss}`)}">${escapeHtml(w.chars ?? w.text)}</button>`,
+              )
+              .join(" ")
+          : escapeHtml(p.text);
+        cards.push(
+          `<div class="word-card"><img src="${escapeHtml(p.imageUrl)}" alt="" loading="lazy"><p class="word-phrase">${chips}</p></div>`,
+        );
+      }
+    }
+  }
+  if (!cards.length) return "";
+  return `<section class="words-section" aria-label="${escapeHtml(d.wordsYouKnow)}">
+<h2>${escapeHtml(d.wordsYouKnow)}</h2>
+<p class="word-gloss-line" aria-live="polite"></p>
+<div class="word-grid">${cards.join("")}</div>
+<script>
+(function () {
+  var audio = null;
+  var line = document.querySelector(".word-gloss-line");
+  document.querySelectorAll(".wchip").forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      if (audio) audio.pause();
+      audio = new Audio(chip.dataset.audio);
+      document.querySelectorAll(".wchip.playing").forEach(function (c) { c.classList.remove("playing"); });
+      chip.classList.add("playing");
+      if (line) line.textContent = chip.dataset.word + " — " + chip.dataset.gloss;
+      var start = parseFloat(chip.dataset.start || "0");
+      var end = parseFloat(chip.dataset.end || "0");
+      if (end > start) {
+        audio.addEventListener("loadedmetadata", function () {
+          audio.currentTime = Math.max(0, start - 0.03);
+          audio.play().catch(function () {});
+          var t = setInterval(function () {
+            if (!audio || audio.currentTime >= end + 0.03) { clearInterval(t); if (audio) audio.pause(); chip.classList.remove("playing"); }
+          }, 30);
+        });
+        audio.load();
+      } else {
+        audio.play().catch(function () {});
+        audio.onended = function () { chip.classList.remove("playing"); };
+      }
+    });
+  });
+})();
+</script>
+</section>`;
+}
+
 function headHtml(path: string, streak: StreakInfo, opts: ProgressOpts, ui: UiLang): string {
   return `<header class="site-head">${brandHtml()}<span class="head-sp"></span>${streakChipHtml(streak, ui, path)}<span data-account>${accountMenuHtml({ user: opts.user, subscribed: opts.subscribed ?? false, ui, path })}</span></header>`;
 }
@@ -233,6 +297,7 @@ ${numbersHtml([
 ])}
 ${shareSectionHtml({ ui, streak, phrases, langName: info.ownName, url: `${opts.origin ?? ""}/${lang}` })}
 ${badgeSectionHtml(unitsDone, ui)}
+${wordsGalleryHtml(lang, progress, ui)}
 </main>
 ${siteFooterHtml(ui, `/${lang}`, { registered: opts.registered })}`;
   return pageShell({

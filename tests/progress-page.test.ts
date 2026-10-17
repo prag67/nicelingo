@@ -143,3 +143,27 @@ describe("share your progress", () => {
     expect(html).toContain("https://line.me/R/msg/text/?");
   });
 });
+
+describe("words you know gallery", () => {
+  it("shows finished lessons' phrases with photos, nothing unfinished", () => {
+    const html = progressPage("xx", {
+      progress: { "xx-lesson-001": ACTS },
+      registered: true,
+      user: { email: "a@b.c", isAnonymous: false },
+      streakDays: [localDayString()],
+    });
+    expect(html).toContain("Words you know");
+    expect(html).toContain("/static/lesson-001/images/");
+    // Lesson 002 is not finished, so its images stay out.
+    expect(html).not.toContain("/static/lesson-002/images/");
+  });
+
+  it("is absent before any lesson is finished", () => {
+    const html = progressPage("xx", {
+      progress: {},
+      registered: true,
+      user: { email: "a@b.c", isAnonymous: false },
+    });
+    expect(html).not.toContain("Words you know");
+  });
+});

@@ -17,6 +17,7 @@ const OWNED = [
   "src/lessons/thai.ts",
   "src/lessons/chinese.ts",
   "src/lessons/aliases.ts",
+  "src/lessons/word-timings.ts",
   "src/lessons/names.ts",
   "content/tts-overrides.mjs",
   "public/static",
