@@ -232,8 +232,11 @@ prompt chips every word except the blanked one, so help can never
 give the answer away. Mandarin words play their own isolated
 recordings (`/static/lesson-001/audio/zh/words/{word}.mp3`) because
 tones shift in context, and show characters over pinyin. The progress
-page's Words you know gallery replays the same phrases from
-finished lessons.
+page's Words you know gallery lists single vocabulary words from
+finished lessons (never sentences), each with a dedicated per-word
+photo (`images/001/words/{slug}.jpg` in R2, 62 purpose-made
+flashcard photos keyed by English gloss in `src/routes/progress.ts`)
+instead of reusing the phrase photo it first appeared in.
 
 ## Lesson media (R2)
 

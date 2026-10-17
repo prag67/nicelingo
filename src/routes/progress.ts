@@ -206,6 +206,62 @@ function shareSectionHtml(args: {
 </section>`;
 }
 
+// Dedicated per-word photos (content repo:
+// public/static/lesson-001/images/words/{slug}.jpg, served from R2 as
+// images/001/words/{slug}.jpg). Keyed by the word's English gloss,
+// normalised to its root concept, so every course language shares
+// the same purpose-made photo instead of reusing a phrase photo
+// (the "man" card no longer shows a man eating). Verb tenses share
+// one action photo per root; professions have their own portraits,
+// distinct from the matching verb action (cook vs cooking).
+const WORD_PHOTO: Record<string, string> = {
+  man: "man", woman: "woman", boy: "boy", girl: "girl",
+  dog: "dog", cat: "cat", bird: "bird", horse: "horse",
+  bunny: "bunny", rabbit: "rabbit", puppy: "puppy", kitten: "kitten",
+  chick: "chick", brother: "brother", sister: "sister",
+  mother: "mother", father: "father", grandfather: "grandfather",
+  grandmother: "grandmother", cousin: "cousin", uncle: "uncle",
+  baker: "baker", cleaner: "cleaner", cyclist: "cyclist",
+  dancer: "dancer", doctor: "doctor", driver: "driver",
+  drummer: "drummer", farmer: "farmer", guitarist: "guitarist",
+  player: "player", runner: "runner", singer: "singer",
+  swimmer: "swimmer", teacher: "teacher", waiter: "waiter",
+  eat: "eat", eating: "eat", ate: "eat",
+  drink: "drink", drinking: "drink", drank: "drink",
+  read: "read", reading: "read",
+  write: "write", writing: "write",
+  run: "run", running: "run", ran: "run",
+  walk: "walk", walking: "walk", walked: "walk",
+  sleep: "sleep", sleeping: "sleep", slept: "sleep",
+  cook: "cooking", cooking: "cooking", cooked: "cooking",
+  dance: "dance", dancing: "dance", danced: "dance",
+  sing: "sing", singing: "sing", sang: "sing",
+  play: "play", playing: "play", played: "play",
+  talk: "talk", talking: "talk", talked: "talk",
+  listen: "listen", listening: "listen", listened: "listen",
+  laugh: "laugh", laughing: "laugh", laughed: "laugh",
+  cry: "cry", crying: "cry", cried: "cry",
+  smile: "smile", smiling: "smile", smiled: "smile",
+  jump: "jump", jumping: "jump", jumped: "jump",
+  swim: "swim", swimming: "swim", swam: "swim",
+  draw: "draw", drawing: "draw", drew: "draw",
+  shop: "shop", shopping: "shop", shopped: "shop",
+  work: "work", working: "work", worked: "work",
+  clap: "clap", clapping: "clap", clapped: "clap",
+  hide: "hide", hiding: "hide", hid: "hide",
+  diving: "dive", waving: "wave",
+};
+
+export function wordPhotoUrl(gloss: string, nounSlug?: string): string | undefined {
+  if (nounSlug) return `/static/lesson-001/images/words/${nounSlug}.jpg`;
+  const g = gloss
+    .toLowerCase()
+    .replace(/^(the|a|an) /, "")
+    .replace(/^(will be|will|would|was|were) /, "");
+  const slug = WORD_PHOTO[g];
+  return slug ? `/static/lesson-001/images/words/${slug}.jpg` : undefined;
+}
+
 /** Words-you-know gallery: every phrase from finished lessons, with
  *  its photo and tappable word chips that replay the word (slice or
  *  own recording) and announce its meaning. */
@@ -230,6 +286,8 @@ function wordsGalleryHtml(lang: string, progress: Record<string, string[]>, ui: 
           const FUNCTION_GLOSS = new Set([
             "is", "are", "was", "were", "will", "will be", "wants to",
             "likes to", "is (doing)", "the", "a", "an",
+            "likes", "wants", "to", "would", "has", "is it", "that",
+            "likes listening",
           ]);
           if (/^(the|a|an) /i.test(w.gloss) && w.text.includes(" ")) {
             const nounText = w.text.split(" ").slice(1).join(" ");
@@ -239,16 +297,18 @@ function wordsGalleryHtml(lang: string, progress: Record<string, string[]>, ui: 
               .replace(/[\u0300-\u036f]/g, "")
               .replace(/[^a-z0-9]+/g, "-")
               .replace(/^-+|-+$/g, "");
+            const nounGloss = w.gloss.replace(/^(the|a|an) /i, "");
             return [{
               text: nounText,
               chars: undefined as string | undefined,
-              gloss: w.gloss.replace(/^(the|a|an) /i, ""),
+              gloss: nounGloss,
+              photo: wordPhotoUrl(nounGloss, nounGloss.toLowerCase().replace(/[^a-z0-9]+/g, "-")),
               audioUrl: `/static/lesson-001/audio/${lang}/words/${slug}.mp3?v=5`,
             }];
           }
           if (FUNCTION_GLOSS.has(w.gloss.toLowerCase())) return [];
           if (/^(the|a|an|el|la|der|die|das|le|les)$/i.test(w.text)) return [];
-          return [{ text: w.text, chars: w.chars, gloss: w.gloss, audioUrl: w.audioUrl }];
+          return [{ text: w.text, chars: w.chars, gloss: w.gloss, photo: wordPhotoUrl(w.gloss), audioUrl: w.audioUrl }];
         });
         if (!p.words?.length) {
           // No word data (public stand-in curriculum): fall back to
@@ -265,7 +325,7 @@ function wordsGalleryHtml(lang: string, progress: Record<string, string[]>, ui: 
           seen.add(key);
           const sub = w.chars ? `<span class="word-sub">${escapeHtml(w.text)}</span>` : "";
           cards.push(
-            `<button class="word-card" type="button" data-audio="${escapeHtml(w.audioUrl ?? p.audioUrl)}" aria-label="${escapeHtml(`${display} — ${w.gloss}`)}"><img src="${escapeHtml(p.imageUrl)}" alt="" loading="lazy"><span class="word-main">${escapeHtml(display)}</span>${sub}<span class="word-gloss">${escapeHtml(w.gloss)}</span></button>`,
+            `<button class="word-card" type="button" data-audio="${escapeHtml(w.audioUrl ?? p.audioUrl)}" aria-label="${escapeHtml(`${display} — ${w.gloss}`)}"><img src="${escapeHtml(w.photo ?? p.imageUrl)}" alt="" loading="lazy"><span class="word-main">${escapeHtml(display)}</span>${sub}<span class="word-gloss">${escapeHtml(w.gloss)}</span></button>`,
           );
         }
       }

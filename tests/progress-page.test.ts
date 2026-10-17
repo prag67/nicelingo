@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import app from "../src/index";
 import { lessons } from "../src/lessons/curriculum";
 import { localDayString } from "../src/lib/streaks";
-import { progressPage } from "../src/routes/progress";
+import { progressPage, wordPhotoUrl } from "../src/routes/progress";
 
 const ACTS = ["listen-match", "image-phrase", "speak-score", "read-write"];
 
@@ -187,6 +187,18 @@ describe("words you know gallery", () => {
     expect(html).toContain("/static/lesson-001/images/");
     // Lesson 002 is not finished, so its images stay out.
     expect(html).not.toContain("/static/lesson-002/images/");
+  });
+
+  it("uses dedicated per-word photos, not the phrase photo", () => {
+    // The "man" card gets its own portrait, never man-eating.jpg;
+    // verb tenses share one action photo per root concept.
+    expect(wordPhotoUrl("man", "man")).toBe("/static/lesson-001/images/words/man.jpg");
+    expect(wordPhotoUrl("eating")).toBe("/static/lesson-001/images/words/eat.jpg");
+    expect(wordPhotoUrl("ate")).toBe("/static/lesson-001/images/words/eat.jpg");
+    expect(wordPhotoUrl("cook", "cook")).toBe("/static/lesson-001/images/words/cook.jpg");
+    expect(wordPhotoUrl("cooking")).toBe("/static/lesson-001/images/words/cooking.jpg");
+    expect(wordPhotoUrl("will hide")).toBe("/static/lesson-001/images/words/hide.jpg");
+    expect(wordPhotoUrl("not-a-word")).toBeUndefined();
   });
 
   it("is absent before any lesson is finished", () => {
