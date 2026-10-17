@@ -1021,8 +1021,9 @@ const player = {
           h("p", { class: "sub" }, practice ? S.niceWork : S.canDo),
           this.shareRow(),
           h("div", { class: "spacer" }),
-          again,
-          h("a", { class: "btn", href: `/lesson/${lang}/${nextNum}` }, S.nextLesson),
+          h("div", { class: "complete-actions" },
+            again,
+            h("a", { class: "btn", href: `/lesson/${lang}/${nextNum}` }, S.nextLesson)),
           h("p", {}, h("a", { href: `/${lang}` }, `← ${S.lessonPage}`)))),
     );
   },
