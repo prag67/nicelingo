@@ -465,3 +465,4 @@ a.streak-chip { text-decoration: none; }
 .cp-card .cp-text small { color: var(--muted); font-weight: 600; }
 .review-line { margin: 0.75rem 0 0; }
 .review-btn { min-height: 44px; display: inline-flex; align-items: center; }
+.testout-line { margin: 0.5rem 0 0; }

@@ -327,6 +327,26 @@ export function coursePage(lang: string, opts: CourseOpts): string {
   const reviewBtn = (opts.weakCount ?? 0) >= 3
     ? `<p class="review-line"><a class="btn ghost review-btn" href="/${lang}/review">${escapeHtml(fmt(d.practiseMistakes, { n: opts.weakCount ?? 0 }))}</a></p>`
     : "";
-  const body = `${head}${continueCard(lang, info, locked(next.n), subscribed, returnUrl, progress, ui)}${reviewBtn}${signinNote}<nav class="tabs" aria-label="Levels">${tabs}</nav>${sections}${siteFooterHtml(ui, `/${lang}`, { registered })}<script type="application/json" id="course-data">${blob.replace(/</g, "\\u003c")}</script>${CLIENT}`;
+  const cpPassedUnits = new Set(
+    (opts.milestones ?? [])
+      .filter((m) => m.kind === "checkpoint" && m.lang === lang && m.passed)
+      .map((m) => m.unit),
+  );
+  const allCpPassed = levelUnits.length > 0 && levelUnits.every((u) => cpPassedUnits.has(u.unit));
+  const chPassed = (opts.milestones ?? []).some(
+    (m) => m.kind === "levelChallenge" && m.lang === lang && m.level === selected && m.passed,
+  );
+  const challengeCard = chPassed
+    ? `<a class="cp-card done" href="/${lang}/challenge/${selected}"><span class="ubadge">✓</span><span class="cp-text"><b>${escapeHtml(fmt(d.levelChallenge, { n: selected }))}</b><small>${escapeHtml(d.levelPassedText)}</small></span></a>`
+    : allCpPassed
+      ? `<a class="cp-card" href="/${lang}/challenge/${selected}"><span class="ubadge">${selected}</span><span class="cp-text"><b>${escapeHtml(fmt(d.levelChallenge, { n: selected }))}</b><small>${escapeHtml(d.checkpointIntro)}</small></span></a>`
+      : `<div class="cp-card locked" aria-disabled="true"><span class="ubadge">${selected}</span><span class="cp-text"><b>${escapeHtml(fmt(d.levelChallenge, { n: selected }))}</b><small>${escapeHtml(d.challengeLocked)}</small></span></div>`;
+  const levelStarted = levelUnits.some((u) =>
+    u.lessons.some((n) => (progress[progressKey(lang, n)] ?? []).length > 0),
+  );
+  const testOutLine = levelStarted
+    ? ""
+    : `<p class="testout-line"><a class="linklike" href="/${lang}/challenge/${selected}?mode=testout">${escapeHtml(d.testOutLink)}</a></p>`;
+  const body = `${head}${continueCard(lang, info, locked(next.n), subscribed, returnUrl, progress, ui)}${reviewBtn}${signinNote}<nav class="tabs" aria-label="Levels">${tabs}</nav>${testOutLine}${sections}${challengeCard}${siteFooterHtml(ui, `/${lang}`, { registered })}<script type="application/json" id="course-data">${blob.replace(/</g, "\\u003c")}</script>${CLIENT}`;
   return pageShell({ title: `${info.ownName} course · Nicelingo`, lang: ui, origin: opts.origin ?? "", canonicalPath: `/${lang}`, body });
 }

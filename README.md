@@ -158,6 +158,27 @@ to unlock it. Result screens offer Continue, Try again, and
 Practise these, which opens the review session with exactly those
 phrases.
 
+Level scene challenges and test out (`/{lang}/challenge/{level}`,
+player challenge mode) close each level: 3 scenes of 4 spoken lines
+(`GET /api/challenge/:lang/:level` builds the scenes server-side in
+`src/lib/challenge.ts`, each line from a different unit of the
+level). You hear each line, then say it; tap-to-hear words and slow
+playback work on every line. Challenge pass is an average speak
+score of 75 with no line below 40, with one retry per line (the
+better score counts). The challenge unlocks only when every unit
+checkpoint in the level is passed, and past Level 1 it needs a
+subscription (free learners can always take the Level 1 challenge).
+"Already know this? Test out" on an unstarted level runs the same
+scenes harder: average 85, no line below 50, no retries. Passing
+marks every lesson in the level done and records each unit
+checkpoint plus the level as passed with `viaTestOut: true`
+(badges show a "tested out" label); failing changes nothing. A free
+learner who passes a test out past Level 1 is sent to billing before
+anything is written. Finishing posts to `POST /api/level-complete`,
+which re-derives the best speak scores from `phrase_stats` and
+enforces the thresholds server-side, so the client cannot claim a
+pass it did not earn.
+
 Practise my mistakes (`/{lang}/review`, `GET /api/review/:lang`) is
 a session of up to 10 weak phrases, weakest first (lowest best
 speak score, then most wrong, then oldest), each replayed in the

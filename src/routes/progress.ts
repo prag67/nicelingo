@@ -306,7 +306,7 @@ ${(() => {
     ? `<section class="badge-section" aria-label="${escapeHtml(d.unitCheckpoint)}"><h2>${escapeHtml(d.unitCheckpoint)}</h2><div class="badge-grid">${passed
         .map(
           (m) =>
-            `<div class="badge-card earned"><span class="badge-icon">✓</span><b>${escapeHtml(`${d.unitWord ?? "Unit"} ${m.unit}`)}</b><span>${escapeHtml(d.checkpointPassedText)}</span></div>`,
+            `<div class="badge-card earned"><span class="badge-icon">✓</span><b>${escapeHtml(`${d.unitWord ?? "Unit"} ${m.unit}`)}</b><span>${escapeHtml(d.checkpointPassedText)}${m.viaTestOut ? ` · ${escapeHtml(d.testedOut)}` : ""}</span></div>`,
         )
         .join("")}</div></section>`
     : "";

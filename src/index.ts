@@ -21,7 +21,8 @@ import { d1ProgressStore } from "./db/progress-store";
 import { d1AttemptStore } from "./db/attempt-store";
 import { buildCheckpointSet, checkpointAccess, unitLessons } from "./lib/checkpoint";
 import { buildReviewSet, lessonOfPhrase, phraseById } from "./lib/review";
-import { unitStats } from "./lib/lesson-progress";
+import { buildChallengeScenes, evaluateChallenge, levelLessons, levelUnits } from "./lib/challenge";
+import { progressKey, unitStats } from "./lib/lesson-progress";
 import type { Milestone } from "./lib/attempts";
 import { d1PrefsStore } from "./db/prefs-store";
 import { coursePage } from "./routes/course";
@@ -1101,6 +1102,110 @@ app.get("/api/review/:lang", async (c) => {
 app.get("/:lang/review", (c) => {
   const lang = c.req.param("lang");
   if (!isPickerLang(lang)) return c.text("Not found", 404);
+  return c.html(lessonPage(lang));
+});
+
+
+// Level challenge scenes: 3 scenes of 4 spoken lines. Challenge
+// mode unlocks only when every unit checkpoint in the level is
+// passed (and, past Level 1, with a subscription); test out is open
+// to attempt, with completion gated by the level-complete endpoint.
+app.get("/api/challenge/:lang/:level", async (c) => {
+  const lang = c.req.param("lang");
+  const level = Number(c.req.param("level"));
+  const mode = c.req.query("mode") === "testout" ? "testout" : "challenge";
+  if (!isPickerLang(lang) || !Number.isInteger(level) || level < 1 || level > 5) {
+    return c.json({ error: "not found" }, 404);
+  }
+  const userId = await currentUserId(c);
+  if (!userId || !c.env?.DB) return c.json({ error: "unauthorized" }, 401);
+  const scenes = buildChallengeScenes(lang, level);
+  if (!scenes) return c.json({ error: "not found" }, 404);
+  if (mode === "challenge") {
+    const subscribed = await d1SubscriptionStore(c.env.DB).isSubscribed(userId).catch(() => false);
+    if (!paywallDisabled(c.env) && !subscribed && level > 1) {
+      return c.json({ error: "subscription_required" }, 402);
+    }
+    const milestones = await d1AttemptStore(c.env.DB).listMilestones(userId).catch(() => []);
+    const passedUnits = new Set(
+      milestones.filter((m) => m.kind === "checkpoint" && m.lang === lang && m.passed).map((m) => m.unit),
+    );
+    if (!levelUnits(level).every((u) => passedUnits.has(u))) {
+      return c.json({ error: "challenge_locked" }, 403);
+    }
+  }
+  return c.json({ lang, level, mode, scenes });
+});
+
+// Finish a level challenge or test out. Scores are re-derived from
+// the recorded speak attempts (best score per phrase), thresholds
+// enforced server-side. Test out past Level 1 needs a subscription
+// before anything is marked complete: a free pass returns
+// billingRequired and writes nothing.
+app.post("/api/level-complete", async (c) => {
+  const userId = await currentUserId(c);
+  if (!userId || !c.env?.DB) return c.json({ error: "unauthorized" }, 401);
+  const body = await c.req.json().catch(() => null);
+  const { lang, level, mode, phraseIds } = body ?? {};
+  if (
+    !isPickerLang(lang) ||
+    !Number.isInteger(level) || level < 1 || level > 5 ||
+    (mode !== "challenge" && mode !== "testout") ||
+    !Array.isArray(phraseIds) || phraseIds.length !== 12 ||
+    !phraseIds.every((x) => typeof x === "string")
+  ) {
+    return c.json({ error: "bad request" }, 400);
+  }
+  const store = d1AttemptStore(c.env.DB);
+  const stats = await store.getStats(userId, lang);
+  const byId = new Map(stats.map((s) => [s.phraseId, s]));
+  const scores = phraseIds.map((id) => byId.get(id)?.bestSpeakScore ?? 0);
+  const { passed, avg, min } = evaluateChallenge(scores, mode);
+  const phrasesLearned = stats.filter((s) => s.attempts > 0).length;
+  if (!passed) return c.json({ passed: false, avg, min, phrasesLearned });
+
+  const subscribed = await d1SubscriptionStore(c.env.DB).isSubscribed(userId).catch(() => false);
+  if (mode === "testout" && level > 1 && !subscribed && !paywallDisabled(c.env)) {
+    return c.json({ passed: true, billingRequired: true, avg, min, phrasesLearned });
+  }
+
+  const now = new Date().toISOString();
+  if (mode === "testout") {
+    // Mark every lesson in the level done, and record each unit
+    // checkpoint plus the level itself as passed via test out.
+    const progressStore = d1ProgressStore(c.env.DB);
+    for (const n of levelLessons(level)) {
+      const manifest = lessons[n]?.[lang as keyof typeof lessons[string]];
+      for (const activity of manifest?.activities ?? []) {
+        await progressStore.markComplete(userId, progressKey(lang, n), activity);
+      }
+    }
+    for (const unit of levelUnits(level)) {
+      await store.recordMilestone(userId, {
+        kind: "checkpoint", lang, level, unit, score: 10, passed: true, viaTestOut: true, completedAt: now,
+      });
+    }
+  }
+  await store.recordMilestone(userId, {
+    kind: "levelChallenge",
+    lang,
+    level,
+    unit: null,
+    score: Math.round(avg),
+    passed: true,
+    viaTestOut: mode === "testout",
+    completedAt: now,
+  });
+  return c.json({ passed: true, avg, min, phrasesLearned });
+});
+
+// Challenge page: same lesson shell; the player detects the path.
+app.get("/:lang/challenge/:level", (c) => {
+  const lang = c.req.param("lang");
+  const level = Number(c.req.param("level"));
+  if (!isPickerLang(lang) || !Number.isInteger(level) || level < 1 || level > 5) {
+    return c.text("Not found", 404);
+  }
   return c.html(lessonPage(lang));
 });
 
