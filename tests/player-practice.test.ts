@@ -262,6 +262,10 @@ describe("speak countdown", () => {
     const mid = Number.parseFloat(mic.style["--sweep"]);
     expect(mid).toBeGreaterThan(30);
     expect(mid).toBeLessThan(70);
+    // The clock hand is present and has swept halfway around.
+    const hand = mic.kids.find((k) => k.className === "clock-hand");
+    expect(hand).toBeTruthy();
+    expect(hand.style.transform).toContain("rotate(180");
     await vi.advanceTimersByTimeAsync(4000);
     expect(
       fetchCalls.some((c) => c.url === "/api/score" && c.method === "POST"),

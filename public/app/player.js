@@ -522,6 +522,37 @@ function wordChips(phrase) {
   return [row];
 }
 
+// Mic clock: while recording, the mic button becomes a clock face
+// whose hand sweeps 12-to-12 over the record window (with a conic
+// progress fill). Returns a stop function that restores the button.
+// Shared by lessons, checkpoints/reviews, and level challenges.
+function startMicClock(mic, recordMs) {
+  mic.classList.add("clock");
+  mic.style.color = "transparent";
+  const hand = h("i", { class: "clock-hand" });
+  mic.append(hand);
+  const reduceMotion =
+    typeof matchMedia === "function" &&
+    matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const started = Date.now();
+  const paint = () => {
+    const pct = Math.min(100, ((Date.now() - started) / recordMs) * 100);
+    mic.style.setProperty("--sweep", pct.toFixed(1));
+    hand.style.transform = `translateX(-50%) rotate(${(pct / 100) * 360}deg)`;
+  };
+  let sweep = null;
+  if (!reduceMotion) {
+    paint();
+    sweep = setInterval(paint, 100);
+  }
+  return () => {
+    if (sweep) clearInterval(sweep);
+    hand.remove();
+    mic.classList.remove("clock");
+    mic.style.color = "";
+  };
+}
+
 // Record one answer for phraseStats. Server-first; if the POST
 // fails (offline, no session yet), keep it on the device instead.
 function recordAttempt(phrase, activity, correct, score) {
@@ -785,41 +816,23 @@ const player = {
     // button acts as a clock face sweeping 12-to-12 while recording.
     // Tapping again just finishes early.
     const RECORD_MS = 8000;
-    mic.classList.add("clock");
-    mic.style.color = "transparent";
-    const hand = h("i", { class: "clock-hand" });
-    mic.append(hand);
-    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const started = Date.now();
-    let sweep;
+    const stopClock = startMicClock(mic, RECORD_MS);
     let deadline;
     const doStop = () => {
-      if (sweep) clearInterval(sweep);
+      stopClock();
       if (deadline) clearTimeout(deadline);
       if (rec.state !== "inactive") rec.stop();
-    };
-    const paint = () => {
-      const pct = Math.min(100, ((Date.now() - started) / RECORD_MS) * 100);
-      mic.style.setProperty("--sweep", pct.toFixed(1));
-      hand.style.transform = `translateX(-50%) rotate(${(pct / 100) * 360}deg)`;
     };
     mic.addEventListener("click", doStop, { once: true });
     rec.start();
     status.textContent = S.listening;
-    if (!reduceMotion) {
-      paint();
-      sweep = setInterval(paint, 100);
-    }
     deadline = setTimeout(doStop, RECORD_MS);
     await stopped;
-    if (sweep) clearInterval(sweep);
+    stopClock();
     if (deadline) clearTimeout(deadline);
     stream.getTracks().forEach((t) => t.stop());
     bars.remove();
-    hand.remove();
     mic.classList.remove("recording");
-    mic.classList.remove("clock");
-    mic.style.color = "";
     mic.disabled = true;
     status.textContent = S.checking;
     try {
@@ -1266,11 +1279,13 @@ function runSession({ questions, pool, title, onDone }) {
       const stopped = new Promise((resolve) => { rec.onstop = resolve; });
       const stop = () => { if (rec.state !== "inactive") rec.stop(); };
       mic.classList.add("recording");
+      const stopClock = startMicClock(mic, 8000);
       mic.addEventListener("click", stop, { once: true });
       rec.start();
       status.textContent = S.listening;
       const deadline = setTimeout(stop, 8000);
       await stopped;
+      stopClock();
       clearTimeout(deadline);
       stream.getTracks().forEach((t) => t.stop());
       mic.classList.remove("recording");
@@ -1542,11 +1557,13 @@ async function bootChallenge(lang, level, mode) {
       const stopped = new Promise((resolve) => { rec.onstop = resolve; });
       const stop = () => { if (rec.state !== "inactive") rec.stop(); };
       mic.classList.add("recording");
+      const stopClock = startMicClock(mic, 8000);
       mic.addEventListener("click", stop, { once: true });
       rec.start();
       status.textContent = S.listening;
       const deadline = setTimeout(stop, 8000);
       await stopped;
+      stopClock();
       clearTimeout(deadline);
       stream.getTracks().forEach((t) => t.stop());
       mic.classList.remove("recording");

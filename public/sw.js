@@ -1,6 +1,6 @@
 // Nicelingo offline cache. Precache the lesson shells + all lesson media;
 // serve static assets cache-first, the manifest network-first with fallback.
-const CACHE = "nicelingo-v30";
+const CACHE = "nicelingo-v32";
 
 // Fallback when /api/curriculum is unreachable during install; the live
 // endpoint is the source of truth so future levels precache automatically.
