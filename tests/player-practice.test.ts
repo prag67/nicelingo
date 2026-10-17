@@ -651,6 +651,15 @@ describe("unit checkpoint runner", () => {
   });
 });
 
+describe("checkpoint write question", () => {
+  it("autoplays the phrase on load like the lesson write question", async () => {
+    const { readFileSync } = await import("node:fs");
+    const src = readFileSync(new URL("../public/app/player.js", import.meta.url), "utf8");
+    const block = src.slice(src.indexOf("function renderWrite"), src.indexOf("function renderSpeak"));
+    expect(block).toContain("setTimeout(() => playAudio(pickAudioUrl(q.phrase), speaker), 350)");
+  });
+});
+
 describe("checkpoint result screen", () => {
   it("spaces its actions, links back to the language page, and keeps missed phrases off the passed screen", async () => {
     const { readFileSync } = await import("node:fs");

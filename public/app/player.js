@@ -1255,6 +1255,8 @@ function runSession({ questions, pool, title, onDone }) {
     });
     const speaker = h("button", { class: "speaker", "aria-label": "Play sound" }, "♪");
     speaker.addEventListener("click", () => playAudio(pickAudioUrl(q.phrase), speaker));
+    // Hear the sentence as soon as the question loads, like lessons.
+    setTimeout(() => playAudio(pickAudioUrl(q.phrase), speaker), 350);
     const shownWords = q.phrase.words?.slice(0, -1);
     const promptNodes = shownWords?.length
       ? [
